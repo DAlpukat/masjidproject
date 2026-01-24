@@ -45,4 +45,14 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function tempatLayanan()
+    {
+        return $this->hasOne(TempatLayanan::class);
+    }
+
+    public function joinedPlaces()
+    {
+        return $this->belongsToMany(TempatLayanan::class);
+    }
 }
