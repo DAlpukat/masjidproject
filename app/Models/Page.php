@@ -5,32 +5,22 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use App\Models\TempatLayanan; 
-use App\Models\User;
 
-class LaporanKas extends Model
+class Page extends Model
 {
     use HasFactory;
 
+    // Ini diperlukan agar fungsi Store() di controller bisa jalan
     protected $fillable = [
         'tempat_layanan_id',
-        'tanggal',
-        'keterangan',
-        'jumlah', // Pastikan ini ada (wajib diisi)
-        'jenis',
-        'bukti_foto',
-        'output_foto',
-        'sifat_transaksi',
-        'user_id',
+        'judul',
+        'tipe',
+        'urutan',
     ];
 
+    // Relasi Balik ke TempatLayanan
     public function tempatLayanan(): BelongsTo
     {
         return $this->belongsTo(TempatLayanan::class);
-    }
-
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class);
     }
 }

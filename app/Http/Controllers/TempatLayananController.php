@@ -22,29 +22,28 @@ class TempatLayananController extends Controller
             'is_public' => 'required|boolean', 
         ]);
 
-        // 2. Buat Slug otomatis
-        $slug = Str::slug($request->nama) . '-' . strtolower(Str::random(5));
-
-        // 3. Logika generate kode referral (Mirip gugel klasrum)
+        $slug = Str::slug($request->nama);
         $kodeReferral = null;
         if (!$request->is_public) {
-            // Generate kode random 6 huruf, semua jadi HURUF BESAR
             $kodeReferral = strtoupper(Str::random(6));
         }
 
-        // 4. bwat simpan Data
+        // Simpan Data Room
         $tempat = TempatLayanan::create([
             'nama' => $request->nama,
             'slug' => $slug,
             'deskripsi' => $request->deskripsi,
             'is_public' => $request->is_public,
             'kode_referral' => $kodeReferral,
-            'status' => 'pending', 
+            'status' => 'pending',
             'user_id' => auth()->id(),
         ]);
 
-        // 5. pesan sukses
-        $message = 'Tempat layanan berhasil dibuat.';
+        // --- TAMBAHKAN INI (Auto Join Admin ke Room) ---
+        $tempat->users()->attach(auth()->id());
+        // --------------------------------------------------
+
+        $message = 'Tempat layanan berhasil diajukan.';
         if (!$request->is_public) {
             $message .= " <strong>Kode Referral Kamu: {$kodeReferral}</strong> (Simpan kode ini!).";
         }

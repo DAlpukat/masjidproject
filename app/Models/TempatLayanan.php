@@ -14,6 +14,11 @@ class TempatLayanan extends Model
 
     protected $fillable = ['nama', 'slug', 'deskripsi', 'status', 'is_public', 'kode_referral', 'user_id'];
 
+    public function pages()
+    {
+        return $this->hasMany(Page::class);
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

@@ -32,12 +32,15 @@
                         <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                             Akses / Kode Referral
                         </th>
-                        <!-- Kolom Baru -->
                         <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                             Jumlah Anggota
                         </th>
                         <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                             Tanggal Dibuat
+                        </th>
+                        <!-- Kolom Aksi Baru -->
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Aksi
                         </th>
                     </tr>
                 </thead>
@@ -73,7 +76,6 @@
                                     </div>
                                 @endif
                             </td>
-                            <!-- Kolom Baru Isi -->
                             <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                                 <span class="bg-indigo-100 text-indigo-800 text-xs font-medium px-2.5 py-0.5 rounded">
                                     {{ $item->users->count() }} Orang
@@ -84,11 +86,17 @@
                                     {{ $item->created_at->format('d M Y') }}
                                 </p>
                             </td>
+                            <!-- Tombol Kelola Halaman Baru -->
+                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                <a href="{{ route('pages.index', $item->id) }}" class="text-blue-600 hover:text-blue-900 font-medium mr-2">
+                                    Kelola
+                                </a>
+                            </td>
                         </tr>
                     @empty
-                        <!-- colspan ubah jadi 5 karena sekarang ada 5 kolom -->
+                        <!-- colspan diubah dari 5 jadi 6 karena ada kolom Aksi -->
                         <tr>
-                            <td colspan="5" class="px-5 py-10 border-b border-gray-200 bg-white text-center text-gray-500">
+                            <td colspan="6" class="px-5 py-10 border-b border-gray-200 bg-white text-center text-gray-500">
                                 Kamu belum membuat tempat layanan apapun. Klik tombol di atas untuk membuat.
                             </td>
                         </tr>

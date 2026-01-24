@@ -1,47 +1,60 @@
-@extends('layouts.app')
-
-@section('content')
-<div class="container mx-auto py-8 px-4">
-    <div class="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-md">
-        <h1 class="text-2xl font-bold mb-6">Registrasi Tempat Layanan Baru</h1>
-
-        <form method="POST" action="{{ route('admin.temp.store') }}">
-            @csrf
-
-            <!-- Nama Tempat -->
-            <div class="mb-4">
-                <label for="nama" class="block text-sm font-medium text-gray-700">Nama Tempat (Masjid/Gereja/Sekolah)</label>
-                <input type="text" name="nama" id="nama" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2 border" required>
+<!-- Ganti seluruh bagian Sifat Dana dengan kode ini -->
+<div class="mb-4 bg-gray-50 p-4 rounded border border-gray-200">
+    <label class="block text-gray-800 text-sm font-bold mb-3">Sifat Dana</label>
+    <div class="space-y-2">
+        <!-- Opsi Umum -->
+        <label class="flex items-start cursor-pointer group">
+            <input type="radio" name="is_public" value="1" id="tipe_umum" checked onchange="toggleUserSelect()">
+            <div class="ml-2">
+                <span class="font-semibold text-gray-800 group-hover:text-blue-600">Umum / Sedekah / Dana Sosial</span>
+                <p class="text-xs text-gray-500">Contoh: Kotak Amal, Sedekah Jumat. (Akan menambah saldo total ruangan saja).</p>
             </div>
+        </label>
 
-            <!-- Deskripsi -->
-            <div class="mb-4">
-                <label for="deskripsi" class="block text-sm font-medium text-gray-700">Deskripsi</label>
-                <textarea name="deskripsi" id="deskripsi" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2 border" rows="3"></textarea>
+        <!-- Opsi Private (Tempat Kas) -->
+        <label class="flex items-start cursor-pointer group">
+            <input type="radio" name="is_public" value="0" id="tipe_private" onchange="toggleUserSelect()">
+            <div class="ml-2">
+                <span class="font-semibold text-gray-800 group-hover:text-blue-600">Private / Tempat Kas (Perorangan)</span>
+                <p class="text-xs text-gray-500">Contoh: Kas Wajib Kelas, Tabungan Pribadi. (Akan menambah saldo pribadi tiap anggota).</p>
             </div>
-
-            <!-- Status Akses (Public/Private) -->
-            <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Status Akses</label>
-                
-                <div class="flex items-center mb-2">
-                    <input type="radio" name="is_public" value="1" id="public" class="text-indigo-600 focus:ring-indigo-500" checked>
-                    <label for="public" class="ml-2">Terbuka (Siapa saja bisa akses)</label>
-                </div>
-                
-                <div class="flex items-center">
-                    <input type="radio" name="is_public" value="0" id="private" class="text-indigo-600 focus:ring-indigo-500">
-                    <label for="private" class="ml-2">Tertutup (Kode Referral otomatis dibuatkan)</label>
-                </div>
-            </div>
-
-            <!-- Tombol Submit -->
-            <div class="mt-6">
-                <button type="submit" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-700 transition">
-                    Buat Room
-                </button>
-            </div>
-        </form>
+        </label>
     </div>
 </div>
-@endsection
+
+<!-- Dropdown User (Muncul Hanya jika Private) -->
+<div id="user-select-box" class="mb-4 transition-all duration-300">
+    <label class="block text-gray-700 text-sm font-bold mb-2">Siapa pengurus tempat ini?</label>
+    <select name="user_id" id="user_dropdown" class="w-full border border-gray-300 rounded-md p-2 bg-white">
+        <option value="">-- Pilih Anggota (Opsional jika Private)</option>
+        @foreach($anggota as $user)
+            <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})</option>
+        @endforeach
+    </select>
+    <p class="text-xs text-gray-500 mt-1">Wajib diisi jika memilih tipe "Private".</p>
+</div>
+
+<!-- Script Javascript (Letak di bawah form -->
+<script>
+    function toggleUserSelect() {
+        const isPrivate = document.getElementById('tipe_private').checked;
+        const userBox = document.getElementById('user-select-box');
+        const userSelect = document.getElementById('user_dropdown');
+
+        if (isPrivate) {
+            // Tampilkan dan Wajib isi
+            userBox.classList.remove('hidden', 'opacity-50');
+            userBox.classList.add('block', 'opacity-100');
+            userSelect.setAttribute('required', 'required');
+        } else {
+            // Sembunyikan dan Tidak Wajib isi
+            userBox.classList.add('hidden', 'opacity-50');
+            userBox.classList.remove('block', 'opacity-100');
+            userSelect.removeAttribute('required');
+            userSelect.value = ""; // Reset pilihan
+        }
+    }
+
+    // Jalankan saat halaman load pertama kali
+    document.addEventListener('DOMContentLoaded', toggleUserSelect);
+</script>

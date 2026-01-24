@@ -37,4 +37,28 @@ class HomeController extends Controller
 
         return back()->with('success', 'Berhasil bergabung ke ' . $tempat->nama);
     }
+
+    public function myRooms()
+    {
+        // Ambil semua room yang user-nya join (berdasarkan tabel pivot)
+        $rooms = auth()->user()->joinedPlaces()->latest()->get();
+        return view('user.rooms', compact('rooms'));
+    }
+
+    public function viewRoom($slug)
+    {
+        // Cari room berdasarkan slug
+        $tempat = TempatLayanan::where('slug', $slug)->firstOrFail();
+
+        // Cek apakah user sudah join room ini
+        if (!$tempat->users->contains(auth()->id())) {
+            abort(403, 'Kamu belum bergabung ke room ini.');
+        }
+
+        // Ambil halaman (pages) yang dibuat admin untuk room ini
+        $pages = $tempat->pages()->orderBy('urutan')->get();
+
+        return view('user.room-view', compact('tempat', 'pages'));
+    }
+    
 }

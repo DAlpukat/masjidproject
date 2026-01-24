@@ -27,14 +27,21 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
         $request->session()->regenerate();
 
-        // Cek Role
+        // 1. Kalau Admin, ke Dashboard Admin
         if (auth()->user()->is_admin) {
-            // Kalau Admin, lempar ke dashboard admin
             return redirect()->route('admin.dashboard');
         }
 
-        // Kalau User Biasa, lempar ke halaman Home (Form Join Code)
-        return redirect()->route('home');
+        // 2. Kalau User Biasa, cek apakah sudah punya room?
+        $joinedCount = auth()->user()->joinedPlaces()->count();
+
+        if ($joinedCount > 0) {
+            // Kalau sudah ada room -> Ke Ruangan Saya
+            return redirect()->route('user.rooms');
+        } else {
+            // Kalau belum ada room -> Ke Gabung Room
+            return redirect()->route('home');
+        }
     }
 
     /**
