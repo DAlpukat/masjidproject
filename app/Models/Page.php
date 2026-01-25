@@ -19,8 +19,13 @@ class Page extends Model
     ];
 
     // Relasi Balik ke TempatLayanan
-    public function tempatLayanan(): BelongsTo
+    public function tempatLayanan()
     {
-        return $this->belongsTo(TempatLayanan::class);
+        return $this->belongsTo(TempatLayanan::class, 'tempat_layanan_id');
+    }
+
+    public function posts()
+    {
+        return $this->hasMany(Post::class)->latest();
     }
 }

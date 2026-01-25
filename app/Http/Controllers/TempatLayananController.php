@@ -47,7 +47,7 @@ class TempatLayananController extends Controller
             'deskripsi' => $request->deskripsi,
             'is_public' => $request->is_public,
             'kode_referral' => $kodeReferral,
-            'status' => 'pending',
+            'status' => 'aktif',
             'user_id' => auth()->id(),
         ]);
 

@@ -7,13 +7,39 @@ use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // Ambil semua tempat yang statusnya AKTIF dan PUBLIC
-        $publicPlaces = TempatLayanan::where('status', 'aktif')
-                                     ->where('is_public', true)
-                                     ->latest()
-                                     ->get();
+        // Ambil query dasar: Hanya Room yang TIDAK PRIVATE (Terbuka)
+        $query = TempatLayanan::where('is_public', true);
+
+        // --- 1. SEARCH (Cari nama atau deskripsi) ---
+        if ($request->filled('search')) {
+            $keyword = $request->search;
+            $query->where(function($q) use ($keyword) {
+                $q->where('nama', 'like', '%' . $keyword . '%')
+                ->orWhere('deskripsi', 'like', '%' . $keyword . '%');
+            });
+        }
+
+        // --- 2. FILTER (Status) ---
+        // Secara default kita cari 'aktif'. Tapi user bisa ubah filter.
+        $statusFilter = $request->input('status', 'aktif');
+        $query->where('status', $statusFilter);
+
+        // --- 3. SORT (Pengurutan) ---
+        $sort = $request->input('sort', 'latest');
+        if ($sort == 'latest') {
+            $query->orderBy('created_at', 'desc');
+        } elseif ($sort == 'oldest') {
+            $query->orderBy('created_at', 'asc');
+        } elseif ($sort == 'name_asc') {
+            $query->orderBy('nama', 'asc');
+        } elseif ($sort == 'name_desc') {
+            $query->orderBy('nama', 'desc');
+        }
+
+        // --- 4. PAGINATION (5 per halaman) ---
+        $publicPlaces = $query->paginate(5);
 
         return view('home', compact('publicPlaces'));
     }
@@ -77,6 +103,29 @@ class HomeController extends Controller
         auth()->user()->joinedPlaces()->detach($tempat->id);
 
         return back()->with('success', 'Berhasil keluar dari ' . $tempat->nama);
+    }
+
+    public function joinPublic(TempatLayanan $place)
+    {
+        // Cek jangan sampai pemilik room gabung ke room sendiri
+        if ($place->user_id === auth()->id()) {
+            return back()->with('info', 'Kamu adalah admin tempat ini.');
+        }
+
+        // Cek apakah room memang publik (keamanan)
+        if (!$place->is_public) {
+            return back()->with('error', 'Room ini privat. Gunakan kode referral.');
+        }
+
+        // Cek apakah user sudah join
+        if ($place->users->contains(auth()->id())) {
+            return back()->with('info', 'Kamu sudah bergabung ke room ini sebelumnya.');
+        }
+
+        // Proses Gabung
+        $place->users()->attach(auth()->id());
+
+        return back()->with('success', 'Berhasil bergabung ke ' . $place->nama);
     }
 
 }
