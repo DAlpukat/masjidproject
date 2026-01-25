@@ -11,7 +11,7 @@ class Post extends Model
 
     protected $fillable = ['title', 'image', 'content', 'page_id'];
 
-    // Relasi: Post ini milik Page (Tab Info) apa?
+
     public function page()
     {
         return $this->belongsTo(Page::class);

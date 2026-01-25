@@ -31,7 +31,7 @@ class PostController extends Controller
         $request->validate([
             'title' => 'required',
             'content' => 'required',
-            'image' => 'required|image|max:2048', // Wajib gambar
+            'image' => 'required|image|max:2048',
             'page_id' => 'required',
         ]);
 
@@ -54,10 +54,9 @@ class PostController extends Controller
     // Tampilkan detail berita untuk User
     public function show($id)
     {
-        // Cari post sekaligus ambil relasi Page dan TempatLayanan (Eager Loading)
+        // Cari post sekaligus ambil relasi Page dan TempatLayanan
         $post = Post::with('page.tempatLayanan')->findOrFail($id);
 
-        // Cek keamanan tambahan: Pastikan Post punya Page yang valid
         if (!$post->page) {
             abort(404, 'Halaman Info tidak ditemukan.');
         }
@@ -70,9 +69,7 @@ class PostController extends Controller
     {
         $post = Post::findOrFail($id);
         if ($post->page->tempatLayanan->user_id !== auth()->id()) { abort(403); }
-        
-        // Hapus file fisik jika perlu (opsional, tapi bagus)
-        // unlink(public_path('storage/' . $post->image));
+
 
         $post->delete();
         return back()->with('success', 'Berita dihapus');

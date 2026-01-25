@@ -18,7 +18,6 @@
                 <!-- Hidden ID Tempat -->
                 <input type="hidden" name="tempat_layanan_id" value="{{ $tempat->id }}">
 
-                <!-- Hidden ID Page (INI YANG PENTING & KURANG TADI) -->
                 <input type="hidden" name="page_id" value="{{ $pageId }}">
 
                 <!-- 1. Tanggal -->
@@ -121,7 +120,7 @@
             userBox.classList.add('hidden', 'opacity-50');
             userBox.classList.remove('block', 'opacity-100');
             userSelect.removeAttribute('required');
-            userSelect.value = ""; // Reset pilihan
+            userSelect.value = "";
         }
     }
 

@@ -47,7 +47,7 @@ class LaporanKasController extends Controller
 
         $laporans = $query->paginate(10)->appends(request()->query());
 
-        // --- LOGIKA PERHITUNGAN (Tanpa number_format) ---
+        // --- LOGIKA PERHITUNGAN ---
         
         // 1. Saldo Total Ruangan
         $totalMasuk = $tempat->laporanKas()->where('jenis', 'masuk')->sum('jumlah');
@@ -147,7 +147,7 @@ class LaporanKasController extends Controller
             'jumlah' => 'required|numeric|min:1',
             'jenis' => 'required|in:masuk,keluar',
             'sifat_transaksi' => 'required|in:personal,umum',
-            'user_id' => 'nullable|exists:users,id', // Wajib isi jika memilih "Personal"
+            'user_id' => 'nullable|exists:users,id',
             'bukti_foto' => 'nullable|string',
         ]);
 
@@ -170,7 +170,6 @@ class LaporanKasController extends Controller
             'bukti_foto' => $validated['bukti_foto'] ?? null,
         ]);
 
-        // --- PERBAIKAN REDIRECT ---
         // Kita ambil object TempatLayanan untuk dapat slug dan pageId
         $tempat = TempatLayanan::find($validated['tempat_layanan_id']);
         $pageId = $request->page_id;

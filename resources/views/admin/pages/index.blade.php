@@ -49,7 +49,7 @@
                                 @endif
                             </td>
                             
-                            <!-- KOLOM BARU: Pratinjau Isi -->
+                            <!-- Pratinjau Isi -->
                             <td class="p-3">
                                 @if($page->tipe == 'info')
                                     <div class="text-xs text-gray-600 max-h-20 overflow-y-auto">

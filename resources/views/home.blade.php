@@ -79,7 +79,6 @@
                         </span>
                     </div>
 
-                    <!-- LOGIKA BARU: TOMBOL GABUNG / MASUK -->
                     <div class="mt-2 pt-2 border-t border-gray-100">
                         
                         @if(auth()->check() && $place->users->contains(auth()->id()))

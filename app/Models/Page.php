@@ -10,7 +10,6 @@ class Page extends Model
 {
     use HasFactory;
 
-    // Ini diperlukan agar fungsi Store() di controller bisa jalan
     protected $fillable = [
         'tempat_layanan_id',
         'judul',
@@ -18,7 +17,6 @@ class Page extends Model
         'urutan',
     ];
 
-    // Relasi Balik ke TempatLayanan
     public function tempatLayanan()
     {
         return $this->belongsTo(TempatLayanan::class, 'tempat_layanan_id');

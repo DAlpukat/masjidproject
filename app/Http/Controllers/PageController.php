@@ -22,14 +22,14 @@ class PageController extends Controller
             'tempat_layanan_id' => 'required|exists:tempat_layanans,id',
             'judul' => 'required|string|max:255',
             'tipe' => 'required|in:kas,barang_pinjam,info',
-            'content' => 'nullable|string', // <--- Terima konten
+            'content' => 'nullable|string',
         ]);
 
         Page::create([
             'tempat_layanan_id' => $request->tempat_layanan_id,
             'judul' => $request->judul,
             'tipe' => $request->tipe,
-            'content' => $request->content, // <--- Simpan konten
+            'content' => $request->content,
             'urutan' => Page::where('tempat_layanan_id', $request->tempat_layanan_id)->count() + 1,
         ]);
 

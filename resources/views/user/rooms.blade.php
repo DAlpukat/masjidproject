@@ -35,7 +35,6 @@
                             @endif
                         </div>
                         
-                        <!-- PARAGRAF DESKRIPSI DENGAN KELAS desc-clamp -->
                         <p class="text-gray-600 text-sm mb-4 desc-clamp">
                             {{ $room->deskripsi ?: 'Tidak ada deskripsi' }}
                         </p>

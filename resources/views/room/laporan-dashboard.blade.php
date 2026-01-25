@@ -102,13 +102,11 @@
     };
 
     // --- 1. Pindahkan Data JSON ke Variabel JS ---
-    // Ini penting agar tidak error tanda kurung kurung di dalam JS
     const dbMonths = {!! json_encode($months) !!};
     const dbMasuk = {!! json_encode($masukData) !!};
     const dbKeluar = {!! json_encode($keluarData) !!};
-    const dbPie = {!! json_encode([$totalMasuk, $totalKeluar]) !!}; // Pastikan ini adalah array angka [pemasukan, pengeluaran]
+    const dbPie = {!! json_encode([$totalMasuk, $totalKeluar]) !!};
 
-    // -----------------------------------------------
 
     document.addEventListener('DOMContentLoaded', () => {
         // Panggil function initCharts dengan data tersebut
@@ -145,7 +143,7 @@
             data: {
                 labels: ['Pemasukan Total', 'Pengeluaran Total'],
                 datasets: [{
-                    data: data.pie, // Menggunakan variabel dbPie
+                    data: data.pie,
                     backgroundColor: ['#22c55e', '#ef4444']
                 }]
             },
@@ -171,21 +169,16 @@
             document.getElementById('pagination').innerHTML = data.pagination;
             
             // 2. Update Stats (Saldo Total)
-            // Di Controller, data.summary.totalPemasukan sudah terformat "Rp 1.000.000" (String), jadi langsung pakai
             document.getElementById('total-pemasukan').textContent = data.summary.totalPemasukan;
             document.getElementById('total-pengeluaran').textContent = data.summary.totalPengeluaran;
             document.getElementById('saldo-total').textContent = data.summary.saldo;
 
             // 3. Update Saldo Pribadi
-            // Data dari Controller: 'Rp 1000.000' (String).
             const saldoPribadiEl = document.getElementById('saldo-pribadi');
             const statusBox = document.getElementById('status-box');
 
             saldoPribadiEl.textContent = data.saldoPribadi;
 
-            // Karena data dari controller sudah berupa "Rp xxx", kita parse angka untuk mengecek minus atau plusnya
-            // Hapus semua karakter bukan angka.
-            // Contoh "Rp 100.000" -> "100000".
             const val = parseInt(data.saldoPribadi.replace(/\D/g, '')) || 0;
 
             if (val < 0) {
@@ -199,7 +192,6 @@
             }
 
             // 4. Update Charts
-            // Pastikan kode ini HANYA
             if(barChart) {
                 barChart.data.labels = data.chart.months;
                 barChart.data.datasets[0].data = data.chart.pemasukan;
@@ -207,7 +199,6 @@
                 barChart.update();
             }
             if(pieChart) {
-                // data.chart.pie sekarang berupa [100000, 50000]
                 pieChart.data.datasets[0].data = data.chart.pie;
                 pieChart.update();
             }

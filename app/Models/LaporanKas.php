@@ -16,7 +16,7 @@ class LaporanKas extends Model
         'tempat_layanan_id',
         'tanggal',
         'keterangan',
-        'jumlah', // Pastikan ini ada (wajib diisi)
+        'jumlah',
         'jenis',
         'bukti_foto',
         'output_foto',

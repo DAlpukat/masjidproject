@@ -11,7 +11,6 @@
             <div class="flex justify-between items-center mt-2">
                 <h1 class="text-3xl font-bold">{{ $tempat->nama }}</h1>
                 
-                <!-- HANYA UNTUK ADMIN: Tombol Cepat ke Dashboard Kelola -->
                 @if(auth()->id() == $tempat->user_id)
                     <a href="{{ route('pages.index', $tempat->id) }}" class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 text-sm font-bold shadow">
                         &uarr; Kelola Halaman (Admin)
@@ -30,7 +29,6 @@
             <div class="flex border-b border-gray-200 mb-6 overflow-x-auto whitespace-nowrap">
                 <div class="space-x-8">
                     @foreach($pages as $page)
-                        <!-- LOGIKA: TANPA PEMBEDAAN ADMIN/USER -->
                         @if($page->tipe == 'kas')
                             <!-- Tab Kas: Arah ke Dashboard Laporan -->
                             <a href="{{ route('laporan.show', [$tempat->slug, $page->id]) }}" class="block py-4 px-1 text-gray-600 border-b-2 border-transparent hover:text-blue-600 hover:border-gray-300 font-medium">

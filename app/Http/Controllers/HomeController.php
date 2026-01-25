@@ -22,7 +22,6 @@ class HomeController extends Controller
         }
 
         // --- 2. FILTER (Status) ---
-        // Secara default kita cari 'aktif'. Tapi user bisa ubah filter.
         $statusFilter = $request->input('status', 'aktif');
         $query->where('status', $statusFilter);
 

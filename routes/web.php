@@ -20,7 +20,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/home', [HomeController::class, 'index'])->name('home');
     Route::post('/join', [HomeController::class, 'join'])->name('join.store');
     
-    // --- TAMBAHAN: ROUTE GABUNG PUBLIK ---
     Route::post('/join-public/{place}', [HomeController::class, 'joinPublic'])->name('join.public');
 
     Route::get('/my-rooms', [HomeController::class, 'myRooms'])->name('user.rooms');
