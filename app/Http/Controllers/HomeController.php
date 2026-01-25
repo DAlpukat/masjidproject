@@ -61,4 +61,22 @@ class HomeController extends Controller
         return view('user.room-view', compact('tempat', 'pages'));
     }
     
+    public function leave(TempatLayanan $tempat)
+    {
+        // 1. Cek Keamanan: Pemilik/Admin tidak boleh leave.
+        if ($tempat->user_id === auth()->id()) {
+            return back()->with('error', 'Kamu adalah pengurus utama. Kamu tidak bisa keluar, silakan hapus room dari Dashboard Admin jika tidak diperlukan.');
+        }
+
+        // 2. Cek Apakah user sudah join (opsional, tapi untuk keamanan)
+        if (!$tempat->users->contains(auth()->id())) {
+            return back()->with('error', 'Kamu bukan anggota room ini.');
+        }
+
+        // 3. Proses Leave: Hapus hubungan di tabel pivot
+        auth()->user()->joinedPlaces()->detach($tempat->id);
+
+        return back()->with('success', 'Berhasil keluar dari ' . $tempat->nama);
+    }
+
 }

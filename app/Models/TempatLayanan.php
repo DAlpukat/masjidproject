@@ -33,4 +33,10 @@ class TempatLayanan extends Model
     {
         return $this->belongsToMany(User::class);
     }
+
+    public function getAnggotaCountAttribute()
+    {
+        // Kita hitung semua user yang join, lalu dikurangi 1 (karena 1-nya adalah admin/pembuat)
+        return $this->users->count() - 1;
+    }
 }

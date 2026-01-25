@@ -14,39 +14,35 @@ Route::get('/', function () {
 })->name('welcome');
 
 // --- 2. Halaman User Biasa (Join, List Room, View Room) ---
-Route::get('/home', [HomeController::class, 'index'])->name('home')->middleware('auth');
-Route::post('/join', [HomeController::class, 'join'])->name('join.store')->middleware('auth');
-
-// Route Tambahan untuk List Room dan View Room
-Route::get('/my-rooms', [HomeController::class, 'myRooms'])->name('user.rooms')->middleware('auth');
-Route::get('/room/{slug}', [HomeController::class, 'viewRoom'])->name('room.view')->middleware('auth');
+Route::middleware('auth')->group(function () {
+    Route::post('/room/{tempat}/leave', [HomeController::class, 'leave'])->name('room.leave');
+    Route::get('/home', [HomeController::class, 'index'])->name('home');
+    Route::post('/join', [HomeController::class, 'join'])->name('join.store');
+    Route::get('/my-rooms', [HomeController::class, 'myRooms'])->name('user.rooms');
+    Route::get('/room/{slug}', [HomeController::class, 'viewRoom'])->name('room.view');
+});
 
 // --- 3. Laporan Kas Routes (CRUD) ---
-Route::get('/room/{slug}/laporan/{pageId}', [LaporanKasController::class, 'show'])->name('laporan.show')->middleware('auth');
+// User biasa dan Admin bisa akses
+Route::middleware('auth')->group(function () {
+    Route::get('/room/{slug}/laporan/{pageId}', [LaporanKasController::class, 'show'])->name('laporan.show');
+    Route::get('/room/{slug}/laporan/{pageId}/create', [LaporanKasController::class, 'create'])->name('laporan.create');
+    Route::post('/laporan/store', [LaporanKasController::class, 'store'])->name('laporan.store');
+    Route::delete('/laporan/{id}', [LaporanKasController::class, 'destroy'])->name('laporan.destroy');
+});
 
-// Route Baru: Tampilkan Form Tambah Laporan
-Route::get('/room/{slug}/laporan/{pageId}/create', [LaporanKasController::class, 'create'])->name('laporan.create')->middleware('auth');
-
-// Route Baru: Simpan Laporan
-Route::post('/laporan/store', [LaporanKasController::class, 'store'])->name('laporan.store')->middleware('auth');
-
-// Route Hapus Laporan
-Route::delete('/laporan/{id}', [LaporanKasController::class, 'destroy'])->name('laporan.destroy')->middleware('auth');
-
-// --- 4. Halaman Admin ---
-Route::get('/admin/dashboard', [AdminController::class, 'index'])
-    ->name('admin.dashboard')
-    ->middleware(['auth', 'admin']);
-
-Route::get('/admin/tempat-layanan/create', [TempatLayananController::class, 'create'])
-    ->name('admin.temp.create')
-    ->middleware(['auth', 'admin']);
-
-Route::post('/admin/tempat-layanan', [TempatLayananController::class, 'store'])
-    ->name('admin.temp.store')
-    ->middleware(['auth', 'admin']);
-
+// --- 4. Halaman Admin (Hanya Admin) ---
 Route::middleware(['auth', 'admin'])->group(function () {
+    
+    // Dashboard
+    Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+
+    // Tempat Layanan (CRUD)
+    Route::get('/admin/tempat-layanan/create', [TempatLayananController::class, 'create'])->name('admin.temp.create');
+    Route::post('/admin/tempat-layanan', [TempatLayananController::class, 'store'])->name('admin.temp.store');
+    Route::delete('/admin/tempat-layanan/{tempat}', [TempatLayananController::class, 'destroy'])->name('admin.temp.destroy');
+
+    // Pages Management
     Route::get('/pages/{id}', [PageController::class, 'index'])->name('pages.index');
     Route::post('/pages', [PageController::class, 'store'])->name('pages.store');
     Route::delete('/pages/{id}', [PageController::class, 'destroy'])->name('pages.destroy');

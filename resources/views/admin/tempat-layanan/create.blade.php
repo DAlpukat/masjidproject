@@ -1,60 +1,65 @@
-<!-- Ganti seluruh bagian Sifat Dana dengan kode ini -->
-<div class="mb-4 bg-gray-50 p-4 rounded border border-gray-200">
-    <label class="block text-gray-800 text-sm font-bold mb-3">Sifat Dana</label>
-    <div class="space-y-2">
-        <!-- Opsi Umum -->
-        <label class="flex items-start cursor-pointer group">
-            <input type="radio" name="is_public" value="1" id="tipe_umum" checked onchange="toggleUserSelect()">
-            <div class="ml-2">
-                <span class="font-semibold text-gray-800 group-hover:text-blue-600">Umum / Sedekah / Dana Sosial</span>
-                <p class="text-xs text-gray-500">Contoh: Kotak Amal, Sedekah Jumat. (Akan menambah saldo total ruangan saja).</p>
-            </div>
-        </label>
+@extends('layouts.app')
 
-        <!-- Opsi Private (Tempat Kas) -->
-        <label class="flex items-start cursor-pointer group">
-            <input type="radio" name="is_public" value="0" id="tipe_private" onchange="toggleUserSelect()">
-            <div class="ml-2">
-                <span class="font-semibold text-gray-800 group-hover:text-blue-600">Private / Tempat Kas (Perorangan)</span>
-                <p class="text-xs text-gray-500">Contoh: Kas Wajib Kelas, Tabungan Pribadi. (Akan menambah saldo pribadi tiap anggota).</p>
-            </div>
-        </label>
+@section('content')
+<div class="container mx-auto py-8 px-4">
+    <div class="max-w-2xl mx-auto">
+        <!-- Header -->
+        <div class="mb-6 flex items-center justify-between">
+            <h1 class="text-2xl font-bold text-gray-800">Buat Tempat Layanan Baru</h1>
+            <a href="{{ route('admin.dashboard') }}" class="text-gray-600 hover:text-gray-900">
+                &larr; Kembali
+            </a>
+        </div>
+
+        <!-- Form Container -->
+        <div class="bg-white shadow-md rounded-lg p-6 border border-gray-200">
+            <form method="POST" action="{{ route('admin.temp.store') }}">
+                @csrf
+
+                <!-- 1. Input Nama -->
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Nama Tempat</label>
+                    <input type="text" name="nama" class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Contoh: Masjid Al-Hidayah" required>
+                </div>
+
+                <!-- 2. Input Deskripsi -->
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Deskripsi</label>
+                    <textarea name="deskripsi" class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500" rows="3" placeholder="Deskripsi singkat tentang tempat ini..."></textarea>
+                </div>
+
+                <!-- 3. Pilihan Akses (Publik/Privat) -->
+                <div class="mb-6 bg-gray-50 p-4 rounded border border-gray-200">
+                    <label class="block text-gray-800 text-sm font-bold mb-3">Siapa yang bisa gabung?</label>
+                    <div class="space-y-3">
+                        <!-- Opsi Publik -->
+                        <label class="flex items-start cursor-pointer group">
+                            <input type="radio" name="is_public" value="1" id="tipe_publik" checked class="mt-1">
+                            <div class="ml-3">
+                                <span class="font-semibold text-gray-800 group-hover:text-blue-600">Terbuka (Publik)</span>
+                                <p class="text-xs text-gray-500">Semua orang bisa melihat dan bergabung tanpa kode akses.</p>
+                            </div>
+                        </label>
+
+                        <!-- Opsi Private -->
+                        <label class="flex items-start cursor-pointer group">
+                            <input type="radio" name="is_public" value="0" id="tipe_private" class="mt-1">
+                            <div class="ml-3">
+                                <span class="font-semibold text-gray-800 group-hover:text-blue-600">Tertutup (Private)</span>
+                                <p class="text-xs text-gray-500">Kode Referral akan dibuat otomatis oleh sistem. Kamu bisa melihatnya di Dashboard nanti.</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 4. Tombol Simpan -->
+                <div class="flex justify-end">
+                    <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 font-bold transition">
+                        Buat Tempat
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
-
-<!-- Dropdown User (Muncul Hanya jika Private) -->
-<div id="user-select-box" class="mb-4 transition-all duration-300">
-    <label class="block text-gray-700 text-sm font-bold mb-2">Siapa pengurus tempat ini?</label>
-    <select name="user_id" id="user_dropdown" class="w-full border border-gray-300 rounded-md p-2 bg-white">
-        <option value="">-- Pilih Anggota (Opsional jika Private)</option>
-        @foreach($anggota as $user)
-            <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})</option>
-        @endforeach
-    </select>
-    <p class="text-xs text-gray-500 mt-1">Wajib diisi jika memilih tipe "Private".</p>
-</div>
-
-<!-- Script Javascript (Letak di bawah form -->
-<script>
-    function toggleUserSelect() {
-        const isPrivate = document.getElementById('tipe_private').checked;
-        const userBox = document.getElementById('user-select-box');
-        const userSelect = document.getElementById('user_dropdown');
-
-        if (isPrivate) {
-            // Tampilkan dan Wajib isi
-            userBox.classList.remove('hidden', 'opacity-50');
-            userBox.classList.add('block', 'opacity-100');
-            userSelect.setAttribute('required', 'required');
-        } else {
-            // Sembunyikan dan Tidak Wajib isi
-            userBox.classList.add('hidden', 'opacity-50');
-            userBox.classList.remove('block', 'opacity-100');
-            userSelect.removeAttribute('required');
-            userSelect.value = ""; // Reset pilihan
-        }
-    }
-
-    // Jalankan saat halaman load pertama kali
-    document.addEventListener('DOMContentLoaded', toggleUserSelect);
-</script>
+@endsection

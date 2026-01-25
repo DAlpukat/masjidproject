@@ -78,7 +78,12 @@
                             </td>
                             <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                                 <span class="bg-indigo-100 text-indigo-800 text-xs font-medium px-2.5 py-0.5 rounded">
-                                    {{ $item->users->count() }} Orang
+                                    <!-- LOGIKA BARU: Jika 0 tampilkan '0 Anggota', selain itu jumlah + Orang -->
+                                    @if($item->anggota_count == 0)
+                                        0 Anggota
+                                    @else
+                                        {{ $item->anggota_count }} Orang
+                                    @endif
                                 </span>
                             </td>
                             <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
@@ -86,11 +91,23 @@
                                     {{ $item->created_at->format('d M Y') }}
                                 </p>
                             </td>
-                            <!-- Tombol Kelola Halaman Baru -->
+                            <!-- Tombol Kelola Halaman -->
                             <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                <a href="{{ route('pages.index', $item->id) }}" class="text-blue-600 hover:text-blue-900 font-medium mr-2">
-                                    Kelola
-                                </a>
+                                <div class="flex items-center gap-2">
+                                    <!-- Tombol Kelola -->
+                                    <a href="{{ route('pages.index', $item->id) }}" class="text-blue-600 hover:text-blue-900 font-medium">
+                                        Kelola
+                                    </a>
+
+                                    <!-- Tombol Hapus -->
+                                    <form action="{{ route('admin.temp.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus tempat ini? Semua data laporan kas dan member akan hilang permanen!');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="text-red-600 hover:text-red-900 font-bold text-sm ml-2">
+                                            Hapus
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     @empty

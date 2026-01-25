@@ -8,7 +8,11 @@
         <div class="mb-6">
             <a href="{{ route('user.rooms') }}" class="text-blue-600 hover:underline">&larr; Kembali ke Ruangan Saya</a>
             <h1 class="text-3xl font-bold mt-2">{{ $tempat->nama }}</h1>
-            <p class="text-gray-600">{{ $tempat->deskripsi }}</p>
+            
+            <!-- Deskripsi dengan class desc-clamp untuk memotong teks panjang -->
+            <p class="text-gray-600 desc-clamp">
+                {{ $tempat->deskripsi ?: 'Tidak ada deskripsi' }}
+            </p>
         </div>
 
         <!-- Navigasi Pages (Tab) -->
