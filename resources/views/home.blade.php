@@ -56,13 +56,13 @@
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
                     <!-- Search -->
                     <div class="md:col-span-5">
-                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Cari Tempat</label>
+                        <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Cari Tempat</label>
                         <input type="text" name="search" value="{{ request('search') }}" class="glass-input px-4 py-3 w-full" placeholder="Ketik nama tempat...">
                     </div>
 
                     <!-- Filter Status -->
                     <div class="md:col-span-3">
-                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Status</label>
+                        <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Status</label>
                         <select name="status" class="glass-input px-4 py-3 w-full appearance-none cursor-pointer">
                             <option value="aktif" {{ request('status') == 'aktif' || request('status') == null ? 'selected' : '' }}>Aktif</option>
                             <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
@@ -72,7 +72,7 @@
 
                     <!-- Sort -->
                     <div class="md:col-span-3">
-                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Urutkan</label>
+                        <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Urutkan</label>
                         <select name="sort" class="glass-input px-4 py-3 w-full appearance-none cursor-pointer">
                             <option value="latest" {{ request('sort') == 'latest' || request('sort') == null ? 'selected' : '' }}>Terbaru</option>
                             <option value="oldest" {{ request('sort') == 'oldest' ? 'selected' : '' }}>Terlama</option>
@@ -105,11 +105,11 @@
                             </div>
                             <div>
                                 <h3 class="text-lg font-bold text-gray-800 leading-tight group-hover:text-pink-600 transition-colors">{{ $place->nama }}</h3>
-                                <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">#{{ $place->slug }}</div>
+                                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">#{{ $place->slug }}</div>
                             </div>
                         </div>
 
-                        <!-- Status Badge (Mirip Admin) -->
+                        <!-- Status Badge -->
                         <div class="text-right">
                             @if($place->status == 'aktif')
                                 <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-black bg-green-50 text-green-600 border border-green-100">
@@ -128,13 +128,13 @@
                     </div>
 
                     <!-- Deskripsi -->
-                    <p class="text-sm text-gray-500 leading-relaxed mb-6 min-h-[40px] desc-clamp-2">
+                    <p class="text-sm text-slate-500 leading-relaxed mb-6 min-h-[40px] desc-clamp-2">
                         {{ $place->deskripsi ?: 'Tidak ada deskripsi tersedia untuk layanan ini.' }}
                     </p>
 
                     <!-- Footer: Anggota & Tombol -->
                     <div class="pt-4 border-t border-gray-100/50 flex items-center justify-between">
-                        <!-- GUNAKAN MEMBERS_COUNT & WARNA GELAP (Slate-600) -->
+                        <!-- Anggota (Memanggil Accessor Model) -->
                         <div class="flex items-center text-xs font-bold text-slate-600">
                             <svg class="w-4 h-4 mr-1.5 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                             {{ $place->members_count }} Anggota
@@ -170,23 +170,21 @@
                     <div class="inline-flex p-6 rounded-full bg-pink-50 mb-4">
                         <svg class="w-12 h-12 text-pink-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
                     </div>
-                    <p class="text-gray-400 font-bold tracking-tight">BELUM ADA TEMPAT LAYANAN</p>
-                    <p class="text-xs text-gray-300 mt-1">Coba ubah kata kunci pencarianmu.</p>
+                    <p class="text-slate-400 font-bold tracking-tight">BELUM ADA TEMPAT LAYANAN</p>
+                    <p class="text-xs text-slate-300 mt-1">Coba ubah kata kunci pencarianmu.</p>
                 </div>
             @endforelse
         </div>
 
         <!-- PAGINATION -->
         <div class="mt-12 flex justify-center">
-            <!-- Style default pagination Laravel agar lebih cantik -->
             <div class="inline-flex rounded-xl shadow-sm overflow-hidden">
                 {{ $publicPlaces->appends(request()->query())->links('pagination::bootstrap-4') }} 
-                <!-- Catatan: Jika kamu pakai pagination bawaan Tailwind, biarkan default saja: {{ $publicPlaces->appends(request()->query())->links() }} -->
             </div>
         </div>
         
         <!-- FOOTER TEXT -->
-        <p class="mt-12 text-center text-gray-300 text-[10px] font-bold uppercase tracking-[0.2em]">
+        <p class="mt-12 text-center text-slate-300 text-[10px] font-bold uppercase tracking-[0.2em]">
             &copy; {{ date('Y') }} Sistem Management Layanan
         </p>
 

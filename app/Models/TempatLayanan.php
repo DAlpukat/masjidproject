@@ -34,9 +34,15 @@ class TempatLayanan extends Model
         return $this->belongsToMany(User::class);
     }
 
-    public function getAnggotaCountAttribute()
+    /**
+     * Accessor: Menghitung anggota tanpa admin.
+     * Nama fungsi: getMembersCountAttribute
+     * Pemanggilan di Blade: $place->members_count
+     */
+    public function getMembersCountAttribute()
     {
-        // Kita hitung semua user yang join, lalu dikurangi 1 (karena 1-nya adalah admin/pembuat)
-        return $this->users->count() - 1;
+        // Hitung user di pivot, TAPI yang ID-nya BUKAN pemilik ruangan (user_id)
+        // Ini lebih aman daripada count() - 1
+        return $this->users()->where('users.id', '!=', $this->user_id)->count();
     }
 }
