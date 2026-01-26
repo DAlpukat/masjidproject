@@ -8,9 +8,17 @@
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    word-break: break-all;
+    word-break: break-word;
     overflow-wrap: anywhere;
     white-space: normal;
+}
+
+.desc-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    word-break: break-word;
 }
 
 /* 2. BACKGROUND & GLASSMORPHISM */
@@ -69,7 +77,22 @@
     @apply w-full;
 }
 
-/* 4. IMAGE HANDLING (AUTO FIT & RESIZE) */
+/* Active Tab State */
+.nav-tab-active {
+    @apply text-pink-600;
+}
+
+.nav-tab-active::after {
+    @apply w-full bg-pink-500;
+    box-shadow: 0 4px 6px -1px rgba(236, 72, 153, 0.4);
+}
+
+/* 4. INPUTS & FORMS (Glassmorphism Style) */
+.glass-input {
+    @apply w-full bg-white/60 border border-gray-200 text-gray-700 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all outline-none shadow-sm;
+}
+
+/* 5. IMAGE HANDLING */
 .img-hover-zoom {
     @apply transition-transform duration-700 ease-out;
 }
@@ -78,7 +101,6 @@
     @apply scale-110;
 }
 
-/* Container khusus untuk Banner Detail agar Fit Width & Height */
 .banner-container {
     width: 100%;
     height: 450px;
@@ -89,11 +111,31 @@
 .banner-image {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Mencegah gambar penyot */
+    object-fit: cover;
     object-position: center;
 }
 
-/* Content Article Styling */
+/* 6. SCROLLBAR CUSTOM (Glassmorphism Style) */
+.scrollbar-glass::-webkit-scrollbar {
+    height: 6px;
+    width: 6px;
+}
+
+.scrollbar-glass::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.scrollbar-glass::-webkit-scrollbar-thumb {
+    background: rgba(236, 72, 153, 0.2);
+    border-radius: 10px;
+}
+
+.scrollbar-glass::-webkit-scrollbar-thumb:hover {
+    background: rgba(236, 72, 153, 0.4);
+}
+
+/* 7. PROSE CONTENT */
 .prose-custom {
     font-size: 1.125rem;
     line-height: 1.8;
@@ -122,7 +164,6 @@
     @apply text-pink-600 font-bold underline decoration-pink-200 decoration-2 underline-offset-4 hover:text-purple-600 transition-colors;
 }
 
-/* 5. RESPONSIVE FIX */
 @media (max-width: 768px) {
     .banner-container {
         height: 250px;

@@ -1,89 +1,169 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mx-auto py-8 px-4">
-    <div class="max-w-7xl mx-auto">
+<div class="bg-mesh-elegant min-h-screen py-8 px-4 pb-24">
+    <div class="max-w-7xl mx-auto space-y-8">
         
         <!-- Header -->
-        <div class="mb-6">
-            <a href="{{ route('room.view', $tempat->slug) }}" class="text-blue-600 hover:underline">&larr; Kembali ke Room</a>
-            <h1 class="text-3xl font-bold mt-2">{{ $tempat->nama }} - Laporan Kas</h1>
+        <div class="flex flex-col gap-4">
+            <a href="{{ route('room.view', $tempat->slug) }}" class="inline-flex items-center text-sm font-bold text-pink-500 hover:text-pink-700 transition-colors w-max group">
+                <svg class="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Kembali ke Room
+            </a>
+            
+            <div class="glass-card p-6 rounded-3xl border-white/50 shadow-sm">
+                <h1 class="text-3xl md:text-4xl font-black text-slate-800">
+                    {{ $tempat->nama }} 
+                    <!-- Gradient Text untuk tema -->
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600">Laporan Kas</span>
+                </h1>
+            </div>
         </div>
 
-        <!-- Stats Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <!-- Stats Cards Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             
             <!-- CARD 1: SALDO TOTAL RUANGAN -->
-            <div class="bg-gradient-to-br from-blue-500 to-blue-600 p-6 text-white rounded-lg shadow-lg">
-                <h3 class="text-lg font-medium opacity-90">Saldo Total Ruangan</h3>
-                <p class="text-xs opacity-75 mb-2">Kas Umum + Kas Pribadi (Total)</p>
-                <p id="saldo-total" class="text-3xl font-bold">
-                    Rp {{ number_format($saldoTotal, 0, ',', '.') }}
-                </p>
-            </div>
-
-            <!-- CARD 2: SALDO PRIBADI -->
-            <div class="bg-gradient-to-br from-emerald-500 to-emerald-600 p-6 text-white rounded-lg shadow-lg">
-                <h3 class="text-lg font-medium opacity-90">Saldo Pribadi Saya</h3>
-                <p class="text-xs opacity-75 mb-2">Total Setoran Pribadi - (Pengeluaran Bersama / Jml Anggota)</p>
+            <div class="glass-card bg-gradient-to-br from-blue-600 to-blue-700 p-6 rounded-3xl text-white shadow-blue-500/30 relative overflow-hidden group">
+                <div class="absolute -right-6 -top-6 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:scale-110 transition-transform duration-700"></div>
                 
-                <p id="saldo-pribadi" class="text-3xl font-bold">
-                    {{ number_format($saldoPribadi, 0, ',', '.') }}
-                </p>
-                
-                <div id="status-box" class="mt-2 px-2 py-1 text-xs rounded">
-                    @if($saldoPribadi < 0)
-                        <div class="bg-red-500/30">
-                            ⚠️ Anda {{ number_format(abs($saldoPribadi), 0, ',', '.') }} Minus
-                        </div>
-                    @else
-                        <div class="bg-white/20">
-                            ✅ {{ $statusSaldo }}
-                        </div>
-                    @endif
+                <div class="relative z-10">
+                    <h3 class="text-sm font-medium opacity-90 uppercase tracking-wider mb-1 text-slate-400">Saldo Ruangan</h3>
+                    <p class="text-xs opacity-60 mb-4 text-slate-400">Total Dana Tersedia</p>
+                    <p id="saldo-total" class="text-3xl font-bold tracking-tight text-slate-400">
+                        Rp {{ number_format($saldoTotal, 0, ',', '.') }}
+                    </p>
                 </div>
             </div>
 
-        <!-- Charts -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <div class="bg-white p-6 rounded-lg shadow">
-                <h3 class="text-lg font-semibold text-gray-700 mb-4">Pemasukan vs Pengeluaran</h3>
-                <canvas id="barChart"></canvas>
+            <!-- CARD 2: SALDO PRIBADI -->
+            <div class="glass-card bg-gradient-to-br from-emerald-500 to-teal-600 p-6 rounded-3xl text-white shadow-emerald-500/30 relative overflow-hidden group">
+                <div class="absolute -right-6 -top-6 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:scale-110 transition-transform duration-700"></div>
+                
+                <div class="relative z-10">
+                    <h3 class="text-sm font-medium opacity-90 uppercase tracking-wider mb-1 text-slate-400">Saldo Saya</h3>
+                    <p class="text-xs opacity-60 mb-4 text-slate-400">Estimasi Kas Pribadi</p>
+                    
+                    <p id="saldo-pribadi" class="text-3xl font-bold tracking-tight mb-2 text-slate-400">
+                        {{ number_format($saldoPribadi, 0, ',', '.') }}
+                    </p>
+                    
+                    <div id="status-box" class="inline-flex items-center px-3 py-1 text-xs font-bold rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-slate-400">
+                        @if($saldoPribadi < 0)
+                            <span class="mr-1">⚠️</span> {{ number_format(abs($saldoPribadi), 0, ',', '.') }} Minus
+                        @else
+                            <span class="mr-1">✅</span> {{ $statusSaldo }}
+                        @endif
+                    </div>
+                </div>
             </div>
-            <div class="bg-white p-6 rounded-lg shadow">
-                <h3 class="text-lg font-semibold text-gray-700 mb-4">Komposisi Keuangan</h3>
-                <canvas id="pieChart"></canvas>
+
+            <!-- CARD 3: RINGKASAN ARUS KAS -->
+            <div class="glass-card p-6 rounded-3xl bg-white/80 border-white/60 flex flex-col justify-center space-y-5">
+                <div>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Total Pemasukan</p>
+                    <div class="flex items-center">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2 shadow-sm shadow-emerald-200"></span>
+                        <!-- Text Slate-800 lebih elegan daripada pure black -->
+                        <p id="total-pemasukan" class="text-lg font-bold text-emerald-600">Rp {{ number_format($totalMasuk ?? 0, 0, ',', '.') }}</p>
+                    </div>
+                </div>
+                <div class="w-full h-px bg-slate-100"></div>
+                <div>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Total Pengeluaran</p>
+                    <div class="flex items-center">
+                        <span class="w-2 h-2 rounded-full bg-red-500 mr-2 shadow-sm shadow-red-200"></span>
+                        <p id="total-pengeluaran" class="text-lg font-bold text-red-500">Rp {{ number_format($totalKeluar ?? 0, 0, ',', '.') }}</p>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Filter & Tabel -->
-        <div class="bg-white p-6 rounded-lg shadow">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-lg font-medium">Riwayat Laporan</h3>
+        <!-- Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Chart 1 -->
+            <div class="glass-card p-6 rounded-3xl border-white/50 shadow-sm">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-bold text-slate-800 flex items-center">
+                        <!-- Garis aksen Pink Gradient -->
+                        <span class="w-1.5 h-6 bg-gradient-to-b from-pink-500 to-purple-600 rounded-full mr-3 shadow-lg shadow-pink-500/30"></span>
+                        Arus Kas Bulanan
+                    </h3>
+                </div>
+                <div class="relative h-64 w-full">
+                    <canvas id="barChart"></canvas>
+                </div>
+            </div>
+            <!-- Chart 2 -->
+            <div class="glass-card p-6 rounded-3xl border-white/50 shadow-sm">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-bold text-slate-800 flex items-center">
+                        <span class="w-1.5 h-6 bg-gradient-to-b from-purple-500 to-indigo-600 rounded-full mr-3 shadow-lg shadow-purple-500/30"></span>
+                        Komposisi Keuangan
+                    </h3>
+                </div>
+                <div class="relative h-64 w-full flex justify-center">
+                    <canvas id="pieChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter & Tabel Section -->
+        <div class="glass-card p-6 md:p-8 rounded-3xl shadow-xl border-white/50">
+            
+            <!-- Section Header -->
+            <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+                <h3 class="text-xl font-bold text-slate-800">Riwayat Transaksi</h3>
                 
-                <a href="{{ route('laporan.create', [$tempat->slug, $pageId]) }}" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 font-bold">
+                <a href="{{ route('laporan.create', [$tempat->slug, $pageId]) }}" 
+                   class="btn-gradient-pink px-6 py-2.5 rounded-xl text-sm font-bold shadow-lg hover:shadow-pink-500/40 transform hover:-translate-y-0.5 transition-all w-full md:w-auto text-center">
                     + Tambah Laporan
                 </a>
             </div>
 
             <!-- Filter Inputs -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <input type="text" id="search" placeholder="Cari keterangan..." class="px-4 py-2 border rounded-md w-full">
-                <select id="type" class="px-4 py-2 border rounded-md w-full">
-                    <option value="">Semua Tipe</option>
-                    <option value="pemasukan">Pemasukan</option>
-                    <option value="pengeluaran">Pengeluaran</option>
-                </select>
-                <select id="sort_by" class="px-4 py-2 border rounded-md w-full">
-                    <option value="tanggal">Tanggal</option>
-                    <option value="jumlah">Jumlah</option>
-                </select>
+            <div class="bg-slate-50/50 p-5 rounded-xl border border-slate-100 mb-6 backdrop-blur-sm">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <div class="relative">
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5 ml-1">Cari Keterangan</label>
+                        <div class="relative">
+                            <input type="text" id="search" placeholder="Ketik sesuatu..." class="glass-input pl-10 text-slate-700 placeholder:text-slate-400">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5 ml-1">Filter Tipe</label>
+                        <select id="type" class="glass-input appearance-none cursor-pointer text-slate-700">
+                            <option value="">Semua Tipe</option>
+                            <option value="pemasukan">Pemasukan</option>
+                            <option value="pengeluaran">Pengeluaran</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5 ml-1">Urutkan</label>
+                        <select id="sort_by" class="glass-input appearance-none cursor-pointer text-slate-700">
+                            <option value="tanggal">Terbaru</option>
+                            <option value="jumlah">Nominal Terbesar</option>
+                        </select>
+                    </div>
+                </div>
             </div>
 
-            <div id="laporanTable">
-                @include('partials.laporan-table')
+            <!-- Table Wrapper -->
+            <div class="overflow-hidden rounded-xl border border-slate-100 bg-white/50">
+                <div id="laporanTable">
+                    @include('partials.laporan-table')
+                </div>
             </div>
-            <div id="pagination" class="mt-6">{{ $laporans->links() }}</div>
+            
+            <!-- Pagination -->
+            <div id="pagination" class="mt-8 flex justify-center text-slate-600">
+                {{ $laporans->links() }}
+            </div>
         </div>
     </div>
 </div>
@@ -107,9 +187,12 @@
     const dbKeluar = {!! json_encode($keluarData) !!};
     const dbPie = {!! json_encode([$totalMasuk, $totalKeluar]) !!};
 
+    // Helper untuk format Rupiah di JS
+    const formatRupiah = (number) => {
+        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
+    };
 
     document.addEventListener('DOMContentLoaded', () => {
-        // Panggil function initCharts dengan data tersebut
         initCharts({
             months: dbMonths,
             pemasukan: dbMasuk,
@@ -122,6 +205,9 @@
     });
 
     function initCharts(data) {
+        Chart.defaults.font.family = "'Inter', sans-serif";
+        Chart.defaults.color = '#64748b'; // Slate 500
+
         // 1. Bar Chart
         const ctx1 = document.getElementById('barChart').getContext('2d');
         barChart = new Chart(ctx1, {
@@ -129,11 +215,15 @@
             data: {
                 labels: data.months,
                 datasets: [
-                    { label: 'Pemasukan', data: data.pemasukan, backgroundColor: 'rgba(34, 197, 94, 0.6)' },
-                    { label: 'Pengeluaran', data: data.pengeluaran, backgroundColor: 'rgba(239, 68, 68, 0.6)' }
+                    { label: 'Pemasukan', data: data.pemasukan, backgroundColor: '#10b981', borderRadius: 6, barPercentage: 0.6 },
+                    { label: 'Pengeluaran', data: data.pengeluaran, backgroundColor: '#ef4444', borderRadius: 6, barPercentage: 0.6 }
                 ]
             },
-            options: { responsive: true }
+            options: { 
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom' } },
+                scales: { y: { beginAtZero: true, grid: { color: '#f8fafc' } }, x: { grid: { display: false } } }
+            }
         });
 
         // 2. Pie Chart
@@ -142,12 +232,13 @@
             type: 'doughnut',
             data: {
                 labels: ['Pemasukan Total', 'Pengeluaran Total'],
-                datasets: [{
-                    data: data.pie,
-                    backgroundColor: ['#22c55e', '#ef4444']
-                }]
+                datasets: [{ data: data.pie, backgroundColor: ['#10b981', '#ef4444'], borderWidth: 0, hoverOffset: 4 }]
             },
-            options: { responsive: true }
+            options: { 
+                responsive: true, maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: { legend: { position: 'bottom' } }
+            }
         });
     }
 
@@ -169,29 +260,32 @@
             document.getElementById('pagination').innerHTML = data.pagination;
             
             // 2. Update Stats (Saldo Total)
-            document.getElementById('total-pemasukan').textContent = data.summary.totalPemasukan;
-            document.getElementById('total-pengeluaran').textContent = data.summary.totalPengeluaran;
-            document.getElementById('saldo-total').textContent = data.summary.saldo;
+            document.getElementById('saldo-total').textContent = formatRupiah(data.summary.saldo);
+            
+            // 3. Update Ringkasan (Pemasukan & Pengeluaran)
+            document.getElementById('total-pemasukan').textContent = formatRupiah(data.summary.totalPemasukan);
+            document.getElementById('total-pengeluaran').textContent = formatRupiah(data.summary.totalPengeluaran);
 
-            // 3. Update Saldo Pribadi
+            // 4. Update Saldo Pribadi
             const saldoPribadiEl = document.getElementById('saldo-pribadi');
             const statusBox = document.getElementById('status-box');
-
-            saldoPribadiEl.textContent = data.saldoPribadi;
-
+            
             const val = parseInt(data.saldoPribadi.replace(/\D/g, '')) || 0;
+            saldoPribadiEl.textContent = formatRupiah(val);
 
             if (val < 0) {
-                saldoPribadiEl.classList.add('text-red-100');
-                statusBox.innerHTML = `⚠️ ${Math.abs(val).toLocaleString('id-ID')} Minus`;
-                statusBox.className = 'mt-2 bg-red-500/30 p-2 rounded text-xs';
+                saldoPribadiEl.classList.remove('text-white');
+                saldoPribadiEl.classList.add('text-red-50'); // Sedikit lebih terang dari background merah agar tetap kontras tapi lembut
+                statusBox.innerHTML = `<span class="mr-1">⚠️</span> Minus ${formatRupiah(Math.abs(val))}`;
+                statusBox.className = 'inline-flex items-center px-3 py-1 text-xs font-bold rounded-full bg-red-500/20 backdrop-blur-md border border-red-500/30 text-red-50';
             } else {
-                saldoPribadiEl.classList.remove('text-red-100');
-                statusBox.innerHTML = `✅ ${data.statusSaldo}`;
-                statusBox.className = 'mt-2 bg-white/20 p-2 rounded text-xs';
+                saldoPribadiEl.classList.add('text-white');
+                saldoPribadiEl.classList.remove('text-red-50');
+                statusBox.innerHTML = `<span class="mr-1">✅</span> ${data.statusSaldo}`;
+                statusBox.className = 'inline-flex items-center px-3 py-1 text-xs font-bold rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white';
             }
 
-            // 4. Update Charts
+            // 5. Update Charts
             if(barChart) {
                 barChart.data.labels = data.chart.months;
                 barChart.data.datasets[0].data = data.chart.pemasukan;
@@ -202,7 +296,8 @@
                 pieChart.data.datasets[0].data = data.chart.pie;
                 pieChart.update();
             }
-        });
+        })
+        .catch(err => console.error("Error:", err));
     }
 </script>
 @endsection
