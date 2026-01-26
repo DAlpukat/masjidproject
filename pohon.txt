@@ -1,0 +1,338 @@
+Folder PATH listing for volume OS
+Volume serial number is 7C36-DFB3
+C:.
+¦   .editorconfig
+¦   .env
+¦   .env.example
+¦   .gitattributes
+¦   .gitignore
+¦   .styleci.yml
+¦   artisan
+¦   CHANGELOG.md
+¦   composer.json
+¦   composer.lock
+¦   package-lock.json
+¦   package.json
+¦   phpunit.xml
+¦   pohon.txt
+¦   postcss.config.js
+¦   README.md
+¦   tailwind.config.js
+¦   vite.config.js
+¦   
++---.github
+¦   +---workflows
+¦           issues.yml
+¦           pull-requests.yml
+¦           tests.yml
+¦           update-changelog.yml
+¦           
++---app
+¦   +---Http
+¦   ¦   +---Controllers
+¦   ¦   ¦   ¦   AdminController.php
+¦   ¦   ¦   ¦   Controller.php
+¦   ¦   ¦   ¦   HomeController.php
+¦   ¦   ¦   ¦   LaporanKasController.php
+¦   ¦   ¦   ¦   PageController.php
+¦   ¦   ¦   ¦   PostController.php
+¦   ¦   ¦   ¦   ProfileController.php
+¦   ¦   ¦   ¦   TempatLayananController.php
+¦   ¦   ¦   ¦   
+¦   ¦   ¦   +---Auth
+¦   ¦   ¦           AuthenticatedSessionController.php
+¦   ¦   ¦           ConfirmablePasswordController.php
+¦   ¦   ¦           EmailVerificationNotificationController.php
+¦   ¦   ¦           EmailVerificationPromptController.php
+¦   ¦   ¦           NewPasswordController.php
+¦   ¦   ¦           PasswordController.php
+¦   ¦   ¦           PasswordResetLinkController.php
+¦   ¦   ¦           RegisteredUserController.php
+¦   ¦   ¦           VerifyEmailController.php
+¦   ¦   ¦           
+¦   ¦   +---Middleware
+¦   ¦   ¦       IsAdmin.php
+¦   ¦   ¦       
+¦   ¦   +---Requests
+¦   ¦       ¦   ProfileUpdateRequest.php
+¦   ¦       ¦   
+¦   ¦       +---Auth
+¦   ¦               LoginRequest.php
+¦   ¦               
+¦   +---Models
+¦   ¦       LaporanKas.php
+¦   ¦       Page.php
+¦   ¦       Post.php
+¦   ¦       TempatLayanan.php
+¦   ¦       User.php
+¦   ¦       
+¦   +---Providers
+¦   ¦       AppServiceProvider.php
+¦   ¦       
+¦   +---View
+¦       +---Components
+¦               AppLayout.php
+¦               GuestLayout.php
+¦               
++---bootstrap
+¦   ¦   app.php
+¦   ¦   providers.php
+¦   ¦   
+¦   +---cache
+¦           .gitignore
+¦           packages.php
+¦           services.php
+¦           
++---config
+¦       app.php
+¦       auth.php
+¦       cache.php
+¦       database.php
+¦       filesystems.php
+¦       logging.php
+¦       mail.php
+¦       queue.php
+¦       services.php
+¦       session.php
+¦       
++---database
+¦   ¦   .gitignore
+¦   ¦   
+¦   +---factories
+¦   ¦       UserFactory.php
+¦   ¦       
+¦   +---migrations
+¦   ¦       0001_01_01_000000_create_users_table.php
+¦   ¦       0001_01_01_000001_create_cache_table.php
+¦   ¦       0001_01_01_000002_create_jobs_table.php
+¦   ¦       2026_01_24_041805_add_is_admin_to_users_table.php
+¦   ¦       2026_01_24_044241_create_tempat_layanans_table.php
+¦   ¦       2026_01_24_044242_create_laporan_kas_table.php
+¦   ¦       2026_01_24_051601_create_tempat_layanan_user_table.php
+¦   ¦       2026_01_24_065033_create_pages_table.php
+¦   ¦       2026_01_24_073859_add_type_details_to_laporan_kas_table.php
+¦   ¦       2026_01_25_090636_add_content_to_pages_table.php
+¦   ¦       2026_01_25_093626_create_posts_table.php
+¦   ¦       
+¦   +---seeders
+¦           DatabaseSeeder.php
+¦           
++---public
+¦   ¦   .htaccess
+¦   ¦   favicon.ico
+¦   ¦   index.php
+¦   ¦   robots.txt
+¦   ¦   
+¦   +---build
+¦   ¦   ¦   manifest.json
+¦   ¦   ¦   
+¦   ¦   +---assets
+¦   ¦           app-BXS-Op9n.js
+¦   ¦           app-DNDLQyfs.css
+¦   ¦           
+¦   +---storage
+¦       ¦   .gitignore
+¦       ¦   
+¦       +---uploads
+¦           +---posts
+¦                   FgPrO2Tvqfi3FO3HUbAndZwzwcijX8BM6H5eMbqE.png
+¦                   ygEiZ1MkYxwzW2B7eaFZJTJD6o92PEpjy6NvINWg.jpg
+¦                   
++---resources
+¦   +---css
+¦   ¦       app.css
+¦   ¦       
+¦   +---js
+¦   ¦       app.js
+¦   ¦       bootstrap.js
+¦   ¦       
+¦   +---views
+¦       ¦   dashboard.blade.php
+¦       ¦   home.blade.php
+¦       ¦   welcome.blade.php
+¦       ¦   
+¦       +---admin
+¦       ¦   ¦   dashboard.blade.php
+¦       ¦   ¦   
+¦       ¦   +---pages
+¦       ¦   ¦       edit.blade.php
+¦       ¦   ¦       index.blade.php
+¦       ¦   ¦       
+¦       ¦   +---posts
+¦       ¦   ¦       create.blade.php
+¦       ¦   ¦       index.blade.php
+¦       ¦   ¦       
+¦       ¦   +---tempat-layanan
+¦       ¦           create.blade.php
+¦       ¦           
+¦       +---auth
+¦       ¦       confirm-password.blade.php
+¦       ¦       forgot-password.blade.php
+¦       ¦       login.blade.php
+¦       ¦       register.blade.php
+¦       ¦       reset-password.blade.php
+¦       ¦       verify-email.blade.php
+¦       ¦       
+¦       +---components
+¦       ¦       application-logo.blade.php
+¦       ¦       auth-session-status.blade.php
+¦       ¦       danger-button.blade.php
+¦       ¦       dropdown-link.blade.php
+¦       ¦       dropdown.blade.php
+¦       ¦       input-error.blade.php
+¦       ¦       input-label.blade.php
+¦       ¦       modal.blade.php
+¦       ¦       nav-link.blade.php
+¦       ¦       primary-button.blade.php
+¦       ¦       responsive-nav-link.blade.php
+¦       ¦       secondary-button.blade.php
+¦       ¦       text-input.blade.php
+¦       ¦       
+¦       +---layouts
+¦       ¦       app.blade.php
+¦       ¦       guest.blade.php
+¦       ¦       navigation.blade.php
+¦       ¦       
+¦       +---partials
+¦       ¦       laporan-table.blade.php
+¦       ¦       
+¦       +---profile
+¦       ¦   ¦   edit.blade.php
+¦       ¦   ¦   
+¦       ¦   +---partials
+¦       ¦           delete-user-form.blade.php
+¦       ¦           update-password-form.blade.php
+¦       ¦           update-profile-information-form.blade.php
+¦       ¦           
+¦       +---room
+¦       ¦       laporan-create.blade.php
+¦       ¦       laporan-dashboard.blade.php
+¦       ¦       
+¦       +---user
+¦               post-show.blade.php
+¦               room-view.blade.php
+¦               rooms.blade.php
+¦               
++---routes
+¦       auth.php
+¦       console.php
+¦       web.php
+¦       
++---storage
+    +---app
+    ¦   ¦   .gitignore
+    ¦   ¦   
+    ¦   +---private
+    ¦   ¦       .gitignore
+    ¦   ¦       
+    ¦   +---public
+    ¦       ¦   .gitignore
+    ¦       ¦   
+    ¦       +---uploads
+    ¦           +---posts
+    ¦                   FgPrO2Tvqfi3FO3HUbAndZwzwcijX8BM6H5eMbqE.png
+    ¦                   ygEiZ1MkYxwzW2B7eaFZJTJD6o92PEpjy6NvINWg.jpg
+    ¦                   
+    +---framework
+    ¦   ¦   .gitignore
+    ¦   ¦   
+    ¦   +---cache
+    ¦   ¦   ¦   .gitignore
+    ¦   ¦   ¦   
+    ¦   ¦   +---data
+    ¦   ¦           .gitignore
+    ¦   ¦           
+    ¦   +---sessions
+    ¦   ¦       .gitignore
+    ¦   ¦       
+    ¦   +---testing
+    ¦   ¦       .gitignore
+    ¦   ¦       
+    ¦   +---views
+    ¦           .gitignore
+    ¦           03e4b146829d7626a101087bd18aeaa0.php
+    ¦           0922268e72b7d2a2ef69216de57aa38d.php
+    ¦           0f78d892731f0b87d46d908193e8792e.php
+    ¦           18d758d84e0c0b7557d8bd71781712f4.php
+    ¦           1ab4203470faeb82105fe6e3c0d9ccfb.php
+    ¦           1b34d6aa450664008ab4b3275df7d58f.php
+    ¦           2034804303ff0535443626de3071226c.php
+    ¦           217e485ac52a3178c2d84fc9880f429f.php
+    ¦           2403d2bad1849d8288a78ad5fb32978b.php
+    ¦           268907a92c4062b36f315a818154ee06.php
+    ¦           26e7d060be907baf26a6b8fb63d9185b.php
+    ¦           29ea0421af0945a53973c9342a2ed67c.php
+    ¦           2d757528ac0a454293e414b6d2dd8f28.php
+    ¦           34905b49be6d552794d2f6d97fb89be8.php
+    ¦           38a29a1b06e1d1005de0eb34e8f728df.php
+    ¦           3c26c29ab1ac1d9d6abad850bf7f1b1e.php
+    ¦           40529aec143baa91c7246f4585816c69.php
+    ¦           42cd319687c2481158312a32d075d721.php
+    ¦           44a9dcd8bb71ac31eb622fb0f35b5111.php
+    ¦           469b8eee9e4ec93ed1f148ba4c2fa689.php
+    ¦           4a3c4f55ab2a54086fa3b8b42884c9d1.php
+    ¦           4d292bf1564cf88fd61e87298e8f3134.php
+    ¦           50f6124e9af3fcd84bea544a15a5e3be.php
+    ¦           52d592924ed81dd3aaa25485b07174d4.php
+    ¦           5bcbc65fcfb2b7be22b18aca1e11e8bf.php
+    ¦           6514b2f7b6afe562b0c5e05a92aeae56.php
+    ¦           651d232a1b0f8385c9c943f347ec81e8.php
+    ¦           6547167e596f19ce242183116924d48a.php
+    ¦           672e24ffe9b73e7aee5cbc1d581c20cb.php
+    ¦           697a1970ebaae66aab09bb8fdb4d8238.php
+    ¦           6a9720af9985210dd1ac76a69c5bbd7c.php
+    ¦           6b13b68f98f4ed5cf7a8d95666a07c8d.php
+    ¦           6d8898de9ef17d4bc5cfa4a15a16beae.php
+    ¦           6f316575fed4b651647d205f773c10c0.php
+    ¦           6f31901854dc73a1a42104e2b1b138eb.php
+    ¦           7277d31de472ab35cd7a5a705127be43.php
+    ¦           8301ca89bced59c232766a637343d3a2.php
+    ¦           86eed87646db561ec979a48722074bc4.php
+    ¦           8837465cb5b77d6eff890ce7ebc8b47b.php
+    ¦           8aa102fc5684570a2279f315e23d8ac2.php
+    ¦           8addbf737da1cc9d5eca5290ce8763f4.php
+    ¦           8b156f24072d86044ca46d0d56e60bf5.php
+    ¦           91120d58304d4d8ca00aceb2ea5a9fc7.php
+    ¦           922446732cac0ebe78d4d365a7eb60d5.php
+    ¦           92eecc9a50354355c083ca3ffa508fc6.php
+    ¦           999abc98dda2089787eb4acd48ffe5bd.php
+    ¦           9b7e75307748522afdc3d6470d8d7cb2.php
+    ¦           9be5e29fea828a243b9cef3022799f6d.php
+    ¦           9ce1618b8278fd03f7abcc0f89027b89.php
+    ¦           9d7aa2af6f9bb8452afdb7ea7d2a6f01.php
+    ¦           a476b1fc61905bfa2c0398cbdf09f5ff.php
+    ¦           a4c3a4ca497ccb27d3a849062f01e8c4.php
+    ¦           a57ad29e859d10c91ebcfa3e2d3e82e9.php
+    ¦           a61f5e782dda0d345a9555c354d0e28f.php
+    ¦           ab76d6ccb1a8a05e7a5e78ddc6fac906.php
+    ¦           abefd3ca466ec38b9ab115a9705c6c60.php
+    ¦           abfde33a5022f18f98126de61049b439.php
+    ¦           acfd8682dab356dd9605d22832dd31ee.php
+    ¦           aef362c611ad925f1c7b8fac17224f75.php
+    ¦           aeffefdbacde47fd6b8b42a7dbd253af.php
+    ¦           b272dd2fa773bd5a8e832b4b492f8a17.php
+    ¦           b3d00258b2a48b84fa05180123c22923.php
+    ¦           b6b6bf9ec762e78ff81ee4e0cb28802f.php
+    ¦           b889540f65dc61d90bd66e859afdcf5d.php
+    ¦           bd4a656d94523b6e38a3ad529a155696.php
+    ¦           c45b3a1f19b93d3557d073284e205fbe.php
+    ¦           c89cfd1571b3063b00e8be5698a0be31.php
+    ¦           cf2c2f2646100ad46bc5d19a4d381882.php
+    ¦           d130feb31178d18cd4580fcc198d981e.php
+    ¦           d1e036396d421959874882832fc1c07a.php
+    ¦           d60e2079bd6689abcc25d2a85dc84870.php
+    ¦           d6cfc378f9df31a334484b1de6883ab4.php
+    ¦           d9d9a678fd33ad6fda7a5fc3fed33cba.php
+    ¦           dae9f0f2b469b384a2e046d092801244.php
+    ¦           e0e11036fb06aa8e6b69f1ef6a0b8506.php
+    ¦           e80b254eaaab20802c63a5127722dff9.php
+    ¦           f02bcae0858660efa24a8e4a953f29af.php
+    ¦           f81ca7c0cce77f56d50b4d9e7a69d29e.php
+    ¦           fb67ea82d334e53ca427d6bbcf36846b.php
+    ¦           fc559b2e76373489e3f7dbedf99012b2.php
+    ¦           
+    +---logs
+            .gitignore
+            browser.log
+            laravel.log
+            
