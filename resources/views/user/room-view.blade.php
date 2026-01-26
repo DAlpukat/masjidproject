@@ -36,7 +36,11 @@
             <div class="glass-card rounded-2xl px-6 mb-10 overflow-x-auto shadow-sm border-white/50 scrollbar-hide">
                 <div class="flex space-x-8 min-w-max">
                     @foreach($pages as $page)
-                        @php $link = ($page->tipe == 'kas') ? route('laporan.show', [$tempat->slug, $page->id]) : "#{$page->tipe}-{$page->id}"; @endphp
+                        @php 
+                            // Tentukan link
+                            $link = ($page->tipe == 'kas') ? route('laporan.show', [$tempat->slug, $page->id]) : "#{$page->tipe}-{$page->id}"; 
+                        @endphp
+                        
                         <a href="{{ $link }}" class="nav-tab-item">
                             @if($page->tipe == 'kas') 
                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -62,11 +66,19 @@
                         <div class="absolute -top-10 -right-10 opacity-[0.03] group-hover/kas:scale-110 transition-transform duration-700">
                             <svg class="w-64 h-64 text-purple-600" fill="currentColor" viewBox="0 0 20 20"><path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path><path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path></svg>
                         </div>
-                        <p class="text-gray-600 text-lg mb-8 relative z-10 font-medium">Laporan keuangan transparan tersedia untuk semua anggota.</p>
-                        <a href="{{ route('laporan.show', [$tempat->slug, $page->id]) }}" class="btn-gradient-pink px-10 py-4 rounded-2xl font-bold text-lg">
-                            Buka Dashboard Kas
-                            <svg class="w-6 h-6 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
-                        </a>
+                        <p class="text-gray-600 text-lg mb-8 relative z-10 font-medium">Laporan keuangan transparan tersedia.</p>
+                        
+                        @if(auth()->id() == $tempat->user_id)
+                            <a href="{{ route('laporan.show', [$tempat->slug, $page->id]) }}" class="btn-gradient-pink px-10 py-4 rounded-2xl font-bold text-lg">
+                                Buka Dashboard Kas (Admin)
+                                <svg class="w-6 h-6 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+                            </a>
+                        @else
+                            <a href="{{ route('laporan.show', [$tempat->slug, $page->id]) }}" class="inline-flex items-center px-8 py-3 bg-gray-100 text-gray-700 border border-gray-200 rounded-2xl font-bold hover:bg-gray-200 transition-colors">
+                                Lihat Laporan Kas
+                                <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 3 12 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S3.732 16.057 2.458 12z"></path></svg>
+                            </a>
+                        @endif
                     </div>
 
                 @elseif($page->tipe == 'info')

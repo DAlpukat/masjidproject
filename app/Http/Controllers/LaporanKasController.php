@@ -11,28 +11,30 @@ class LaporanKasController extends Controller
 {
     public function create($slug, $pageId)
     {
-        // Cari Room berdasarkan Slug
         $tempat = TempatLayanan::where('slug', $slug)->firstOrFail();
         
-        // Cek apakah user join room ini
-        if (!$tempat->users->contains(auth()->id())) {
-            abort(403);
+        // Hanya Admin (Pemilik) yang bisa masuk halaman tambah
+        if ($tempat->user_id !== auth()->id()) {
+            abort(403, 'Hanya Admin yang bisa menambah laporan.');
         }
 
-        // Ambil semua user di room ini untuk dropdown
         $anggota = $tempat->users;
-
         return view('room.laporan-create', compact('tempat', 'pageId', 'anggota'));
     }
 
     public function show($slug, $pageId)
     {
         $tempat = TempatLayanan::where('slug', $slug)->firstOrFail();
+        
+        // Cek apakah user yang login adalah anggota ruangan ATAU admin
         if (!$tempat->users->contains(auth()->id())) {
-            abort(403);
+            abort(403, 'Kamu belum bergabung di ruangan ini.');
         }
 
-        // Filter & Pagination
+        // Tentukan apakah user yang sedang login adalah Admin Ruangan ini
+        $isAdmin = ($tempat->user_id === auth()->id());
+
+        // Ambil data laporan
         $query = $tempat->laporanKas();
         if ($search = request()->input('search')) {
             $query->where('keterangan', 'like', "%{$search}%");
@@ -47,30 +49,28 @@ class LaporanKasController extends Controller
 
         $laporans = $query->paginate(10)->appends(request()->query());
 
-        // --- LOGIKA PERHITUNGAN ---
-        
-        // 1. Saldo Total Ruangan
+        // Hitung total saldo ruangan
         $totalMasuk = $tempat->laporanKas()->where('jenis', 'masuk')->sum('jumlah');
         $totalKeluar = $tempat->laporanKas()->where('jenis', 'keluar')->sum('jumlah');
         $saldoTotal = $totalMasuk - $totalKeluar;
 
-        // 2. Saldo Pribadi User
-        // A. Kas Masuk Pribadi (Hanya milik user yang login)
+        // Hitung saldo pribadi
         $personalMasuk = $tempat->laporanKas()
             ->where('jenis', 'masuk')
             ->where('sifat_transaksi', 'personal')
             ->where('user_id', auth()->id())
             ->sum('jumlah');
 
-        // B. Potongan Pengeluaran (Dibagi rata ke semua anggota)
+        // Hitung pembagian pengeluaran bersama
         $totalPengeluaranBersama = $tempat->laporanKas()->where('jenis', 'keluar')->sum('jumlah');
-        $jumlahAnggota = $tempat->users->count() > 0 ? $tempat->users->count() : 1;
+        // Gunakan count user yang join (bukan termasuk admin jika join)
+        $jumlahAnggota = $tempat->users->count() > 0 ? $tempat->users->count() : 1; 
         $pembagianPerOrang = $totalPengeluaranBersama / $jumlahAnggota;
         
         $saldoPribadi = $personalMasuk - $pembagianPerOrang;
         $statusSaldo = $saldoPribadi >= 0 ? 'Surplus / Lunas' : 'Kurang Bayar';
 
-        // --- DATA CHART ---
+        // Data Chart
         $months = [];
         $masukData = [];
         $keluarData = [];
@@ -98,10 +98,10 @@ class LaporanKasController extends Controller
             $saldoData[] = $currentSaldo;
         }
 
-        // --- JSON Response untuk AJAX ---
+        // Respon JSON
         if (request()->ajax() || request()->wantsJson()) {
             return response()->json([
-                'table' => view('partials.laporan-table', compact('laporans'))->render(),
+                'table' => view('partials.laporan-table', compact('laporans', 'isAdmin'))->render(),
                 'pagination' => $laporans->links()->render(),
                 'summary' => [
                     'totalPemasukan' => 'Rp ' . number_format($totalMasuk, 0, ',', '.'),
@@ -110,6 +110,7 @@ class LaporanKasController extends Controller
                 ],
                 'saldoPribadi' => 'Rp ' . number_format($saldoPribadi, 0, ',', '.'),
                 'statusSaldo' => $statusSaldo,
+                'isAdmin' => $isAdmin, // Kirim status admin untuk JS jika diperlukan
                 'chart' => [
                     'months' => $months,
                     'pemasukan' => $masukData,
@@ -132,14 +133,13 @@ class LaporanKasController extends Controller
             'months',
             'masukData',
             'keluarData',
-            'saldoData'
+            'saldoData',
+            'isAdmin' // PENTING: Kirim variabel ini ke view
         ));
     }
 
-
     public function store(Request $request)
     {
-        // Validasi Input
         $validated = $request->validate([
             'tempat_layanan_id' => 'required|exists:tempat_layanans,id',
             'tanggal' => 'required|date',
@@ -151,14 +151,18 @@ class LaporanKasController extends Controller
             'bukti_foto' => 'nullable|string',
         ]);
 
-        // Logika Khusus: Validasi User Personal
+        // Hanya Admin yang bisa store
+        $tempat = TempatLayanan::find($validated['tempat_layanan_id']);
+        if ($tempat->user_id !== auth()->id()) {
+            abort(403, 'Anda tidak berhak menambah laporan di room ini.');
+        }
+
         if ($validated['jenis'] == 'masuk' && $validated['sifat_transaksi'] == 'personal') {
             if (empty($validated['user_id'])) {
                 return back()->with('error', 'Wajib pilih user untuk Kas Perorangan!');
             }
         }
 
-        // Simpan Laporan
         LaporanKas::create([
             'tempat_layanan_id' => $validated['tempat_layanan_id'],
             'tanggal' => $validated['tanggal'],
@@ -170,23 +174,20 @@ class LaporanKasController extends Controller
             'bukti_foto' => $validated['bukti_foto'] ?? null,
         ]);
 
-        // Kita ambil object TempatLayanan untuk dapat slug dan pageId
-        $tempat = TempatLayanan::find($validated['tempat_layanan_id']);
         $pageId = $request->page_id;
 
         return redirect()->route('laporan.show', [$tempat->slug, $pageId])
             ->with('success', 'Laporan berhasil ditambahkan!');
     }
 
-
     public function destroy($id) 
     {
-        // Logika hapus laporan kas
         $laporan = LaporanKas::findOrFail($id);
         $tempat = $laporan->tempatLayanan;
         
-        if (!$tempat->users->contains(auth()->id())) {
-            abort(403);
+        // Hanya Admin yang bisa hapus
+        if ($tempat->user_id !== auth()->id()) {
+            abort(403, 'Akses ditolak.');
         }
 
         $laporan->delete();

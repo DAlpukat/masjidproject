@@ -1,98 +1,64 @@
-<table class="min-w-full divide-y divide-gray-200">
-    <thead class="bg-gray-50">
+<table class="w-full text-left border-collapse">
+    <thead class="bg-slate-50/50 border-b border-slate-100">
         <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Tanggal
-            </th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Keterangan
-            </th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Sifat
-            </th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Jenis
-            </th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Jumlah
-            </th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Bukti
-            </th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Aksi
-            </th>
+            <th class="p-4 text-xs font-bold uppercase tracking-wider text-slate-500">Tanggal</th>
+            <th class="p-4 text-xs font-bold uppercase tracking-wider text-slate-500">Keterangan</th>
+            <th class="p-4 text-xs font-bold uppercase tracking-wider text-slate-500">User</th>
+            <th class="p-4 text-xs font-bold uppercase tracking-wider text-slate-500 text-center">Jenis</th>
+            <th class="p-4 text-xs font-bold uppercase tracking-wider text-slate-500 text-right">Jumlah</th>
+            <th class="p-4 text-xs font-bold uppercase tracking-wider text-slate-500 text-right w-24">Aksi</th>
         </tr>
     </thead>
-    <tbody class="bg-white divide-y divide-gray-200">
-        @forelse($laporans as $item)
-            <tr>
-                <!-- Tanggal (Pakai Accessor) -->
-                <td class="px-6 py-4 whitespace-nowrap">
-                    {{ $item->tanggal_format }}
+    <tbody class="divide-y divide-slate-50">
+        @forelse($laporans as $laporan)
+            <tr class="hover:bg-slate-50/50 transition-colors">
+                <td class="p-4 text-sm text-slate-600 whitespace-nowrap">
+                    {{ $laporan->tanggal->format('d M Y') }}
                 </td>
-                
-                <!-- Keterangan -->
-                <td class="px-6 py-4">
-                    {{ $item->keterangan }}
+                <td class="p-4">
+                    <div class="text-sm font-semibold text-slate-800">{{ $laporan->keterangan }}</div>
+                    <div class="text-xs text-slate-400 capitalize mt-1">{{ $laporan->sifat_transaksi }}</div>
                 </td>
-
-                <!-- Sifat Transaksi (Personal vs Umum) -->
-                <td class="px-6 py-4">
-                    @if($item->sifat_transaksi == 'personal')
-                        <span class="text-blue-600 text-xs">({{ $item->user->name }})</span>
+                <td class="p-4 text-sm text-slate-600">
+                    @if($laporan->sifat_transaksi == 'personal')
+                        {{ $laporan->user->name ?? '-' }}
                     @else
-                        <span class="text-gray-400 text-xs">Umum</span>
+                        <span class="px-2 py-1 bg-slate-100 rounded text-xs text-slate-500">Umum</span>
                     @endif
                 </td>
-
-                <!-- Jenis (Masuk / Keluar) -->
-                <td class="px-6 py-4">
-                    @if($item->jenis == 'masuk')
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                <td class="p-4 text-center">
+                    @if($laporan->jenis == 'masuk')
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
                             Masuk
                         </span>
                     @else
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
                             Keluar
                         </span>
                     @endif
                 </td>
-
-                <!-- Jumlah (Pakai Accessor) -->
-                <td class="px-6 py-4 font-bold">
-                    {{ $item->jumlah_rupiah }}
+                <td class="p-4 text-right text-sm font-bold font-mono text-slate-700">
+                    Rp {{ number_format($laporan->jumlah, 0, ',', '.') }}
                 </td>
-
-                <!-- Bukti -->
-                <td class="px-6 py-4">
-                    @if($item->bukti_foto)
-                        <a href="#" class="text-blue-500 hover:underline">Lihat</a>
-                    @else
-                        <span class="text-gray-400">-</span>
-                    @endif
-                </td>
-
-                <!-- Aksi (Edit/Hapus) -->
-                <td class="px-6 py-4 text-sm font-medium">
-                    @if(auth()->id() == $item->tempatLayanan->user_id)
-                        <a href="#" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</a>
-
-                        <!-- Form Hapus -->
-                        <form action="{{ route('laporan.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Hapus?')">
+                <td class="p-4 text-right">
+                    <!-- Cek Admin: Hanya Admin yang bisa hapus -->
+                    @if($isAdmin)
+                        <form action="{{ route('laporan.destroy', $laporan->id) }}" method="POST" onsubmit="return confirm('Yakin hapus laporan ini?')">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="text-red-600 hover:text-red-900">Hapus</button>
+                            <button type="submit" class="text-red-400 hover:text-red-600 transition-colors p-2 hover:bg-red-50 rounded-lg" title="Hapus Laporan">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            </button>
                         </form>
                     @else
-                        <span class="text-gray-400 italic text-xs">Read Only</span>
+                        <span class="text-slate-300 text-xs">-</span>
                     @endif
                 </td>
             </tr>
         @empty
             <tr>
-                <td colspan="8" class="px-6 py-4 text-center text-gray-500">
-                    Belum ada laporan.
+                <td colspan="6" class="p-8 text-center text-slate-400">
+                    Belum ada data transaksi.
                 </td>
             </tr>
         @endforelse
