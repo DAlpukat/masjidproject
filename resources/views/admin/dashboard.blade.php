@@ -60,7 +60,7 @@
                                 <td class="px-8 py-6">
                                     @if($item->status == 'aktif')
                                         <span class="inline-flex items-center px-4 py-1.5 rounded-xl text-xs font-black bg-green-50 text-green-600 border border-green-100">
-                                            <span class="w-2 h-2 mr-2 bg-green-500 rounded-full shadow-[0_0_8px_rgba(34,197,94,0.6)] animate-pulse"></span> AKTIF
+                                            <span class="w-2 h-2 mr-2 bg-green-500 rounded-full shadow-[0 0 8px_rgba(34,197,94,0.6)] animate-pulse"></span> AKTIF
                                         </span>
                                     @else
                                         <span class="inline-flex items-center px-4 py-1.5 rounded-xl text-xs font-black bg-orange-50 text-orange-600 border border-orange-100">
@@ -91,10 +91,17 @@
                                 </td>
                                 <td class="px-8 py-6 text-center">
                                     <div class="flex items-center justify-center space-x-3">
+                                        <!-- Tombol Edit (BARU) -->
+                                        <a href="{{ route('admin.temp.edit', $item->id) }}" class="p-2 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-600 hover:text-white transition-all shadow-sm" title="Edit Pengaturan">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                        </a>
+
+                                        <!-- Tombol Pages -->
                                         <a href="{{ route('pages.index', $item->id) }}" class="p-2 bg-purple-50 text-purple-600 rounded-xl hover:bg-purple-600 hover:text-white transition-all shadow-sm">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                                         </a>
                                         
+                                        <!-- Tombol Hapus -->
                                         <form action="{{ route('admin.temp.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Hapus permanen?');">
                                             @csrf @method('DELETE')
                                             <button type="submit" class="p-2 bg-pink-50 text-pink-500 rounded-xl hover:bg-red-500 hover:text-white transition-all shadow-sm">

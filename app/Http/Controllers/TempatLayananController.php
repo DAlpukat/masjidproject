@@ -9,6 +9,42 @@ use Illuminate\Support\Str; // Jangan lupa import ini
 
 class TempatLayananController extends Controller
 {
+
+    public function edit($id)
+    {
+        $tempat = TempatLayanan::findOrFail($id);
+        return view('admin.tempat-layanan.edit', compact('tempat'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $tempat = TempatLayanan::findOrFail($id);
+
+        // Gunakan $request->boolean() agar aman dari checkbox/radio
+        $data = $request->validate([
+            'nama' => 'required|string|max:255',
+            'deskripsi' => 'nullable|string',
+            'is_public' => 'boolean',
+            
+            'use_individual_ledger' => 'boolean',
+            'use_mandatory_cash' => 'boolean',
+            'shared_expense_enabled' => 'boolean',
+            'free_expense_enabled' => 'boolean',
+        ]);
+
+        // Pastikan nilai boolean terbaca dengan benar
+        $data['use_individual_ledger'] = $request->boolean('use_individual_ledger');
+        $data['use_mandatory_cash'] = $request->boolean('use_mandatory_cash');
+        $data['shared_expense_enabled'] = $request->boolean('shared_expense_enabled');
+        $data['free_expense_enabled'] = $request->boolean('free_expense_enabled');
+        $data['is_public'] = $request->boolean('is_public');
+
+        $tempat->update($data);
+
+        return redirect()->route('admin.dashboard')->with('success', 'Pengaturan Tempat Layanan berhasil diperbarui.');
+    }
+
+
     public function create()
     {
         // Ambil semua user (jika masih diperlukan untuk halaman lain, 

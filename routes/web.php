@@ -8,6 +8,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\LaporanKasController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\KasController;
 
 // --- 1. Landing Page (Publik / Tanpa Login) ---
 Route::get('/', function () {
@@ -26,14 +27,16 @@ Route::middleware('auth')->group(function () {
     Route::get('/room/{slug}', [HomeController::class, 'viewRoom'])->name('room.view');
 });
 
-// --- 3. Laporan Kas Routes (CRUD) ---
-// User biasa dan Admin bisa akses
+// --- 3. Sistem Kas Baru (Menggantikan LaporanKasController lama) ---
 Route::middleware('auth')->group(function () {
-    Route::get('/room/{slug}/laporan/{pageId}', [LaporanKasController::class, 'show'])->name('laporan.show');
-    Route::get('/room/{slug}/laporan/{pageId}/create', [LaporanKasController::class, 'create'])->name('laporan.create');
-    Route::post('/laporan/store', [LaporanKasController::class, 'store'])->name('laporan.store');
-    Route::delete('/laporan/{id}', [LaporanKasController::class, 'destroy'])->name('laporan.destroy');
+    // Dashboard Kas Utama
+    Route::get('/room/{tempatId}/kas', [KasController::class, 'dashboard'])->name('kas.dashboard');
+    // Proses Simpan Transaksi (Masuk/Keluar/Shared/Free)
+    Route::post('/room/{tempatId}/kas', [KasController::class, 'store'])->name('kas.store');
 
+    Route::post('/room/{tempatId}/kategori', [KasController::class, 'storeKategori'])->name('kas.kategori.store');
+    Route::delete('/kas/destroy/{id}', [KasController::class, 'destroy'])->name('kas.destroy');
+    
     // Route Detail Post (User dan Admin bisa akses)
     Route::get('/post/{id}', [PostController::class, 'show'])->name('post.show');
 });
@@ -50,6 +53,11 @@ Route::middleware(['auth', 'admin'])->group(function () {
     // Tempat Layanan (CRUD)
     Route::get('/admin/tempat-layanan/create', [TempatLayananController::class, 'create'])->name('admin.temp.create');
     Route::post('/admin/tempat-layanan', [TempatLayananController::class, 'store'])->name('admin.temp.store');
+    
+    // TAMBAHKAN ROUTE EDIT & UPDATE DISINI
+    Route::get('/admin/tempat-layanan/{id}/edit', [TempatLayananController::class, 'edit'])->name('admin.temp.edit');
+    Route::put('/admin/tempat-layanan/{id}', [TempatLayananController::class, 'update'])->name('admin.temp.update');
+    
     Route::delete('/admin/tempat-layanan/{tempat}', [TempatLayananController::class, 'destroy'])->name('admin.temp.destroy');
 
     // Pages Management

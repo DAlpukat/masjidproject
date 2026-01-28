@@ -12,7 +12,31 @@ class TempatLayanan extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['nama', 'slug', 'deskripsi', 'status', 'is_public', 'kode_referral', 'user_id'];
+    // PASTIKAN 4 KOLOM BARU INI ADA DI BAWAH INI:
+    protected $fillable = [
+        'nama',
+        'slug',
+        'deskripsi',
+        'status',
+        'is_public',
+        'kode_referral',
+        'user_id',
+        
+        // KOLOM UNTUK LOGIKA KAS BARU:
+        'use_individual_ledger',
+        'use_mandatory_cash',
+        'shared_expense_enabled',
+        'free_expense_enabled',
+    ];
+
+    // Casts sudah benar
+    protected $casts = [
+        'is_public' => 'boolean',
+        'use_individual_ledger' => 'boolean',
+        'use_mandatory_cash' => 'boolean',
+        'shared_expense_enabled' => 'boolean',
+        'free_expense_enabled' => 'boolean',
+    ];
 
     public function pages()
     {
@@ -34,15 +58,18 @@ class TempatLayanan extends Model
         return $this->belongsToMany(User::class);
     }
 
-    /**
-     * Accessor: Menghitung anggota tanpa admin.
-     * Nama fungsi: getMembersCountAttribute
-     * Pemanggilan di Blade: $place->members_count
-     */
+    public function kategoriKas()
+    {
+        return $this->hasMany(KategoriKas::class);
+    }
+
+    public function anggota()
+    {
+        return $this->belongsToMany(User::class, 'tempat_layanan_user');
+    }
+
     public function getMembersCountAttribute()
     {
-        // Hitung user di pivot, TAPI yang ID-nya BUKAN pemilik ruangan (user_id)
-        // Ini lebih aman daripada count() - 1
         return $this->users()->where('users.id', '!=', $this->user_id)->count();
     }
 }
