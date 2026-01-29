@@ -53,7 +53,7 @@
                             <td class="p-3">
                                 @if($page->tipe == 'info')
                                     <div class="text-xs text-gray-600 max-h-20 overflow-y-auto">
-                                        {{ Str::limit(strip_tags($page->content), 150, '...') ?: '<span class="italic">Kosong</span>' }}
+                                        {{ Str::limit(strip_tags($page->content), 150, '...') ?: strip_tags('<span class="italic">Kosong</span>') }}
                                     </div>
                                 @elseif($page->tipe == 'kas')
                                     <span class="text-xs text-blue-600">Laporan Keuangan</span>
