@@ -79,7 +79,7 @@ class KasTransactionService
         // Proses Setor Perorangan
         $kategori = KategoriKas::find($data['kategori_kas_id']);
         
-        if ($kategori->tempat_layanan_id !== $this->tempat->id) {
+        if (!$kategori || $kategori->tempat_layanan_id !== $this->tempat->id) {
             throw new \Exception("Kategori tidak valid.");
         }
 
@@ -99,9 +99,9 @@ class KasTransactionService
 
         if ($type === 'shared') {
             // Logika: Pengeluaran Kas Bersama
-            // Mengurangi saldo kas wajib SEMUA anggota aktif
-            
-            // 1. Cari Kategori Wajib Utama (Bisa ditambah flag is_default di DB, disini kita cari pertama)
+            // Mengurangi saldo kas wajib SEMUA anggota aktif (KECUALI ADMIN)
+
+            // 1. Cari Kategori Wajib Utama (Default: Kategori wajib pertama yang ditemukan)
             $kategori = KategoriKas::where('tempat_layanan_id', $this->tempat->id)
                                   ->where('tipe', 'wajib')
                                   ->first();
@@ -110,16 +110,21 @@ class KasTransactionService
                 throw new \Exception("Tidak ada kategori kas wajib ditemukan untuk didistribusikan.");
             }
 
-            // 2. Ambil semua anggota
-            $anggotas = $this->tempat->anggota;
+            // 2. Ambil semua anggota DAN FILTER HILANGKAN ADMIN
+            // Fix: Menggunakan relasi 'users' (standard) dan memfilter agar admin tidak kena potongan
+            $anggotas = $this->tempat->users->where('id', '!=', $this->tempat->user_id);
+
+            // 3. Validasi jika kosong (Cegah Error Divide By Zero)
             if ($anggotas->isEmpty()) {
-                throw new \Exception("Tidak ada anggota untuk didistribusikan biaya.");
+                // Jika tidak ada anggota lain selain admin, biarkan pengeluaran ini berjalan sebagai "Free Expense"
+                // (Admin bayar sendiri dengan uang fisik, ledger user tidak berubah)
+                return;
             }
 
-            // 3. Hitung pembagian
+            // 4. Hitung pembagian (HANYA dibagi jumlah anggota saja)
             $jumlahPerOrang = $laporan->jumlah / $anggotas->count();
 
-            // 4. Distribusikan ke Log
+            // 5. Distribusikan ke Log User
             foreach ($anggotas as $user) {
                 // Cek Saldo Saat Ini
                 $saldoSekarang = $this->getUserBalance($user->id, $kategori->id);
@@ -127,12 +132,8 @@ class KasTransactionService
 
                 // Validasi: Apakah boleh minus?
                 if (!$kategori->allow_negative && $saldoBaru < 0) {
-                    // Opsi: Throw error, atau biarkan jadi minus tapi warning. 
-                    // Sesuai request "kas wajib mengizinkan saldo bernilai negatif", kita anggap kategori wajib boleh minus secara default atau via config.
-                    // Tapi jika 'sedekah' dipaksa shared, harusnya error.
-                    if (!$kategori->isWajib()) {
-                        throw new \Exception("Saldo user {$user->name} tidak cukup dan kategori ini tidak boleh minus.");
-                    }
+                    // Jika kategori tidak boleh minus dan user tidak punya uang, lempar error
+                    throw new \Exception("Saldo user {$user->name} tidak cukup untuk kategori {$kategori->nama} (Saldo: Rp " . number_format($saldoSekarang) . ").");
                 }
 
                 UserKasLog::create([
@@ -153,7 +154,7 @@ class KasTransactionService
     {
         return UserKasLog::where('user_id', $userId)
                          ->where('kategori_kas_id', $kategoriId)
-                         ->selectRaw('SUM(IF(jenis="masuk", jumlah, -jumlah)) as saldo')
+                         ->selectRaw("SUM(IF(jenis='masuk', jumlah, -jumlah)) as saldo")
                          ->value('saldo') ?? 0;
     }
 }

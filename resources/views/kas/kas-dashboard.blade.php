@@ -252,8 +252,6 @@
                     <div class="glass-card p-6 mb-8">
                         <h3 class="font-bold text-gray-700 mb-4 border-b pb-2">Grafik Arus Kas (6 Bulan Terakhir)</h3>
                         
-                        <!-- FIX CHART USER: Batasi max-width agar tidak terlalu lebar di layar User -->
-                        <!-- Gunakan mx-auto untuk centering -->
                         <div class="relative h-72 w-full max-w-full lg:max-w-4xl mx-auto">
                             <canvas id="kasChart"></canvas>
                         </div>
@@ -333,90 +331,136 @@
 </div>
 
 <script>
-    let kasChart; // Global variable untuk update chart
+    let kasChart;
 
     function toggleForm() {
-        const jenis = document.querySelector('input[name="jenis"]:checked').value;
+        // 1. Ambil elemen dengan pengecekan keamanan
         const sectionMasuk = document.getElementById('section-pemasukan');
         const sectionKeluar = document.getElementById('section-pengeluaran');
+        const jenisInput = document.querySelector('input[name="jenis"]:checked');
+
+        // Jika elemen tidak ditemukan, jangan lanjut (mencegah error di mode Kas Umum)
+        if (!sectionMasuk || !sectionKeluar || !jenisInput) return;
+
+        const jenis = jenisInput.value;
 
         if (jenis === 'masuk') {
             sectionMasuk.classList.remove('hidden');
             sectionKeluar.classList.add('hidden');
             
             // Reset Pengeluaran
-            document.querySelectorAll('#section-pengeluaran input[type="radio"]').forEach(el => el.checked = false);
+            const expenseRadios = document.querySelectorAll('#section-pengeluaran input[type="radio"]');
+            expenseRadios.forEach(el => el.checked = false);
 
         } else {
             sectionMasuk.classList.add('hidden');
             sectionKeluar.classList.remove('hidden');
             
-            // Reset Pemasukan
-            document.querySelector('input[name="is_personal"][value="0"]').checked = true;
-            togglePersonalInput();
+            // Reset Pemasukan (Hanya jika inputnya ada)
+            const freeRadio = document.querySelector('input[name="is_personal"][value="0"]');
+            if (freeRadio) {
+                freeRadio.checked = true;
+                togglePersonalInput(); // Call function
+            }
         }
     }
 
     function togglePersonalInput() {
-        const isPersonal = document.querySelector('input[name="is_personal"]:checked').value;
-        const inputs = document.getElementById('personal-inputs');
+        // SAFETY CHECK: Hanya jalankan jika input is_personal ADA
+        // Ini error tadi karena input ini hilang di mode Kas Umum
+        const isPersonalInput = document.querySelector('input[name="is_personal"]:checked');
+        const personalInputsDiv = document.getElementById('personal-inputs');
+
+        if (!isPersonalInput || !personalInputsDiv) return;
+
+        const isPersonal = isPersonalInput.value;
         
         if (isPersonal === "1") {
-            inputs.classList.remove('hidden');
+            personalInputsDiv.classList.remove('hidden');
         } else {
-            inputs.classList.add('hidden');
+            personalInputsDiv.classList.add('hidden');
         }
     }
 
     function initChart() {
         const canvas = document.getElementById('kasChart');
-        if(!canvas) return; // Guard clause
+        if(!canvas) return;
+
+        if (typeof Chart === 'undefined') {
+            console.error("Chart.js library belum termuat.");
+            return;
+        }
 
         const ctx = canvas.getContext('2d');
         
-        const labels = @json($chartData->pluck('bulan'));
-        const dataMasuk = @json($chartData->pluck('pemasukan'));
-        const dataKeluar = @json($chartData->pluck('pengeluaran'));
+        try {
+            // Ambil data dari PHP
+            const rawData = @json($chartData); 
+            
+            let labels = rawData.map(item => item.bulan);
+            let dataMasuk = rawData.map(item => parseFloat(item.pemasukan));
+            let dataKeluar = rawData.map(item => parseFloat(item.pengeluaran));
 
-        // Jika data kosong, jangan render chart
-        if (!labels || labels.length === 0) return;
+            // Balik urutan data (DESC dari PHP -> ASC untuk Chart)
+            labels.reverse();
+            dataMasuk.reverse();
+            dataKeluar.reverse();
 
-        kasChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [
-                    {
-                        label: 'Pemasukan',
-                        data: dataMasuk,
-                        backgroundColor: 'rgba(34, 197, 94, 0.7)', // Green
-                        borderColor: 'rgba(34, 197, 94, 1)',
-                        borderWidth: 1,
-                        borderRadius: 4,
-                    },
-                    {
-                        label: 'Pengeluaran',
-                        data: dataKeluar,
-                        backgroundColor: 'rgba(239, 68, 68, 0.7)', // Red
-                        borderColor: 'rgba(239, 68, 68, 1)',
-                        borderWidth: 1,
-                        borderRadius: 4,
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { position: 'bottom' } },
-                scales: {
-                    y: { 
-                        beginAtZero: true, 
-                        grid: { borderDash: [2, 4], color: '#f3f4f6' } 
-                    },
-                    x: { grid: { display: false } }
-                }
+            if (!labels || labels.length === 0) return;
+
+            // Buat Gradient
+            const gradientMasuk = ctx.createLinearGradient(0, 0, 0, 400);
+            gradientMasuk.addColorStop(0, 'rgba(34, 197, 94, 0.7)'); 
+            gradientMasuk.addColorStop(1, 'rgba(34, 197, 94, 0.0)');
+
+            const gradientKeluar = ctx.createLinearGradient(0, 0, 0, 400);
+            gradientKeluar.addColorStop(0, 'rgba(239, 68, 68, 0.7)'); 
+            gradientKeluar.addColorStop(1, 'rgba(239, 68, 68, 0.0)');
+
+            // Hapus chart lama jika ada
+            if (window.kasChartInstance) {
+                window.kasChartInstance.destroy();
             }
-        });
+
+            window.kasChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Pemasukan',
+                            data: dataMasuk,
+                            backgroundColor: 'rgba(34, 197, 94, 0.7)', 
+                            borderColor: 'rgba(34, 197, 94, 1)',
+                            borderWidth: 1,
+                            borderRadius: 4,
+                        },
+                        {
+                            label: 'Pengeluaran',
+                            data: dataKeluar,
+                            backgroundColor: 'rgba(239, 68, 68, 0.7)', 
+                            borderColor: 'rgba(239, 68, 68, 1)',
+                            borderWidth: 1,
+                            borderRadius: 4,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } },
+                    scales: {
+                        y: { 
+                            beginAtZero: true, 
+                            grid: { borderDash: [2, 4], color: '#f3f4f6' } 
+                        },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        } catch (e) {
+            console.error("Gagal merender grafik:", e);
+        }
     }
 
     async function hapusTransaksi(id, btnElement) {
@@ -427,7 +471,6 @@
         btnElement.innerHTML = `<svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
 
         try {
-            // URL dinamis
             const url = "{{ url('/kas/destroy') }}" + '/' + id;
 
             const response = await fetch(url, {
@@ -441,7 +484,6 @@
             const result = await response.json();
 
             if (response.ok && result.success) {
-                // Reload halaman untuk update data sempurna
                 window.location.reload(); 
             } else {
                 throw new Error(result.message || 'Gagal menghapus');
@@ -455,10 +497,9 @@
 
     // Initialize
     window.addEventListener('DOMContentLoaded', () => {
-        if(document.querySelector('input[name="jenis"]')) {
-            toggleForm();
-            togglePersonalInput();
-        }
+        // Panggil fungsi dengan aman
+        toggleForm();
+        togglePersonalInput();
         initChart();
     });
 </script>

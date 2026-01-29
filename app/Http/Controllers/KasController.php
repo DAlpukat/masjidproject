@@ -71,12 +71,12 @@ class KasController extends Controller
     {
         $tempat = TempatLayanan::findOrFail($tempatId);
 
-        // 1. Hitung Saldo Total (Fisik)
+        // 1. Hitung Saldo Total
         $totalBalance = LaporanKas::where('tempat_layanan_id', $tempatId)
             ->selectRaw("SUM(IF(jenis='masuk', jumlah, -jumlah)) as saldo")
             ->value('saldo') ?? 0;
 
-        // 2. Hitung Saldo Pribadi (Jika Ledger Aktif)
+        // 2. Hitung Saldo Pribadi
         $personalBalance = 0;
         if ($tempat->use_individual_ledger) {
             $personalBalance = UserKasLog::whereHas('kategori', function($q) use ($tempatId) {
@@ -87,21 +87,21 @@ class KasController extends Controller
                 ->value('saldo') ?? 0;
         }
 
-        // 3. Data untuk Grafik (6 Bulan Terakhir)
+        // 3. Data untuk Grafik (AMBIL 6 BULAN TERBARU - DESC)
         $chartData = LaporanKas::where('tempat_layanan_id', $tempatId)
             ->selectRaw("DATE_FORMAT(tanggal, '%Y-%m') as bulan, SUM(CASE WHEN jenis='masuk' THEN jumlah ELSE 0 END) as pemasukan, SUM(CASE WHEN jenis='keluar' THEN jumlah ELSE 0 END) as pengeluaran")
             ->groupBy('bulan')
-            ->orderBy('bulan', 'ASC')
+            // FIX: Ambil yang terbaru dulu (DESC)
+            ->orderBy('bulan', 'DESC') 
             ->limit(6)
             ->get();
 
         $laporans = LaporanKas::where('tempat_layanan_id', $tempatId)
-                              ->latest('tanggal')
-                              ->paginate(20);
+                                ->latest('tanggal')
+                                ->paginate(20);
 
         $kategoriKas = $tempat->kategoriKas;
 
-        // Kirim variable baru ke view
         return view('kas.kas-dashboard', compact('tempat', 'laporans', 'kategoriKas', 'totalBalance', 'personalBalance', 'chartData'));
     }
 
