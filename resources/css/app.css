@@ -9,258 +9,108 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
     word-break: break-word;
-    overflow-wrap: anywhere;
-    white-space: normal;
 }
 
-.desc-clamp-2 {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    word-break: break-word;
+/* 2. BACKGROUND & MONOCHROME THEME */
+
+/* Background GIF dengan Overlay Gelap */
+.bg-monochrome-gif {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background-color: #0f0f0f;
+    background-image: url('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZHJyODZra3JudDBmZ3Nqc2hkMnV0bmgxMGhsb2U1aXQ4NXB2aHhveiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/zwX4VWYjwqMVAPa5DS/giphy.gif');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
-/* 2. BACKGROUND & GLASSMORPHISM */
-
-/* Background Mesh untuk halaman Home (Inline style sebelumnya) */
-.bg-mesh-elegant {
-    background-color: #ffffff;
-    background-image:
-        radial-gradient(
-            at 0% 0%,
-            rgba(255, 182, 193, 0.4) 0px,
-            transparent 50%
-        ),
-        radial-gradient(
-            at 100% 100%,
-            rgba(230, 190, 255, 0.3) 0px,
-            transparent 50%
-        );
-    min-height: 100vh;
+/* Overlay agar teks terbaca jelas di atas GIF */
+.bg-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.75); /* Hitam pekat transparan */
+    background: radial-gradient(circle at center, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.9) 100%);
+    z-index: -1;
 }
 
-/* Background Theme Global (Dipakai di Body/Layout Utama) */
-.bg-app-theme {
-    background-color: #ffffff;
-    background-image:
-        radial-gradient(
-            at 0% 0%,
-            rgba(255, 192, 203, 0.4) 0px,
-            transparent 50%
-        ),
-        radial-gradient(
-            at 100% 100%,
-            rgba(221, 160, 221, 0.3) 0px,
-            transparent 50%
-        );
-    background-attachment: fixed; /* Agar background tetap saat di-scroll */
-    min-height: 100vh;
-}
-
-/* Glass Card Style */
+/* 3. GLASSMORPHISM (MONOCHROME VERSION) */
 .glass-card {
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: rgba(255, 255, 255, 0.05); /* Putih sangat tipis */
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .glass-card:hover {
+    background: rgba(255, 255, 255, 0.08);
     transform: translateY(-5px);
-    box-shadow: 0 20px 25px -5px rgba(244, 114, 182, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
 }
 
-/* 3. NAVIGATION STYLES (UPDATE) */
-
-/* Efek Kaca untuk Navbar Container */
+/* Navbar Glass */
 .nav-glass {
-    background: rgba(255, 255, 255, 0.85);
+    background: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
 }
 
-/* Style untuk Link yang Aktif (Pink Underline Gradient) */
-.nav-link-active {
-    color: #db2777; /* pink-600 */
-    font-weight: 700;
-    position: relative;
+/* 4. BUTTONS (ELEGANT MONOCHROME) */
+.btn-monochrome {
+    @apply px-6 py-3 rounded-full font-semibold transition-all duration-300 flex items-center justify-center border border-white/20;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+    color: #ffffff;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
 }
 
-.nav-link-active::after {
-    content: "";
-    position: absolute;
-    bottom: -18px; /* Sesuaikan jarak garis bawah dari teks */
-    left: 0;
-    width: 100%;
-    height: 3px;
-    background: linear-gradient(to right, #ec4899, #9333ea); /* Pink ke Ungu */
-    border-radius: 10px 10px 0 0;
-    box-shadow: 0 -4px 6px -1px rgba(236, 72, 153, 0.2);
+.btn-monochrome:hover {
+    @apply bg-white text-black border-white scale-105 shadow-[0_0_20px_rgba(255,255,255,0.3)];
+    text-shadow: none;
 }
 
-/* Tab Style (Untuk keperluan internal lain jika ada) */
-.nav-tab-item {
-    @apply relative py-4 px-2 text-gray-500 font-bold transition-all duration-300 min-w-max flex items-center;
+.btn-secondary {
+    @apply text-gray-300 hover:text-white font-medium transition-colors relative;
 }
 
-.nav-tab-item:hover {
-    @apply text-pink-600;
+.btn-secondary::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-0 h-0.5 bg-white transition-all duration-300;
 }
 
-.nav-tab-item::after {
-    content: "";
-    @apply absolute bottom-0 left-0 w-0 h-1 bg-gradient-to-r from-pink-500 to-purple-600 transition-all duration-300 rounded-t-full;
-}
-
-.nav-tab-item:hover::after {
+.btn-secondary:hover::after {
     @apply w-full;
 }
 
-.nav-tab-active {
-    @apply text-pink-600;
+/* 5. ANIMASI SCROLL (REVEAL ON SCROLL) */
+.reveal {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: all 1s ease-out;
 }
 
-.nav-tab-active::after {
-    @apply w-full bg-pink-500;
-    box-shadow: 0 4px 6px -1px rgba(236, 72, 153, 0.4);
+.reveal.active {
+    opacity: 1;
+    transform: translateY(0);
 }
 
-/* 4. BUTTONS & INPUTS */
-.btn-gradient-pink {
-    @apply bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-lg transition-all duration-300 flex items-center justify-center;
-}
+/* Delay classes untuk staggered animation */
+.delay-100 { transition-delay: 0.1s; }
+.delay-200 { transition-delay: 0.2s; }
+.delay-300 { transition-delay: 0.3s; }
 
-.btn-gradient-pink:hover {
-    @apply from-pink-600 to-purple-700 scale-105 shadow-pink-200/50;
-}
-
-.glass-input {
-    @apply w-full bg-white/60 border border-gray-200 text-gray-700 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all outline-none shadow-sm;
-}
-
-/* 5. IMAGE HANDLING */
-.img-hover-zoom {
-    @apply transition-transform duration-700 ease-out;
-}
-
-.group:hover .img-hover-zoom {
-    @apply scale-110;
-}
-
-.banner-container {
-    width: 100%;
-    height: 450px;
-    overflow: hidden;
-    border-radius: 2rem;
-}
-
-.banner-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-}
-
-/* 6. SCROLLBAR CUSTOM (Glassmorphism Style) */
-.scrollbar-glass::-webkit-scrollbar {
-    height: 6px;
-    width: 6px;
-}
-
-.scrollbar-glass::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-}
-
-.scrollbar-glass::-webkit-scrollbar-thumb {
-    background: rgba(236, 72, 153, 0.2);
-    border-radius: 10px;
-}
-
-.scrollbar-glass::-webkit-scrollbar-thumb:hover {
-    background: rgba(236, 72, 153, 0.4);
-}
-
-/* 7. PROSE CONTENT */
-.prose-custom {
-    font-size: 1.125rem;
-    line-height: 1.8;
-    @apply text-gray-700;
-}
-
-.prose-custom img {
-    width: 100% !important;
-    max-width: 100% !important;
-    height: auto !important;
-    object-fit: cover;
-    border-radius: 1.5rem;
-    margin: 2.5rem 0;
-    display: block;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-}
-
-.prose-custom p {
-    @apply mb-6;
-}
-.prose-custom h2,
-.prose-custom h3 {
-    @apply font-black text-gray-800 mt-10 mb-4;
-}
-.prose-custom a {
-    @apply text-pink-600 font-bold underline decoration-pink-200 decoration-2 underline-offset-4 hover:text-purple-600 transition-colors;
-}
-.toggle-password {
-    position: absolute;
-    top: 50%;
-    right: 14px;
-    transform: translateY(-50%);
-    color: white;
-    cursor: pointer;
-    font-size: 18px;
-    opacity: 0.8;
-}
-
-.toggle-password:hover {
-    color: #d1d5db; /* abu-abu lembut */
-}
-.back-button {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    color: #9ca3af; /* abu-abu lembut */
-    font-size: 14px;
-    text-decoration: none;
-    transition: all 0.2s ease;
-    font-size: 15px;
-}
-
-.back-button:hover {
-    color: #ffffff;
-    transform: translateX(-4px);
-}
-
-
-.glass-card .text-gray-300 {
-    color: #94a3b8 !important;
-}
-
-.glass-card .text-gray-400 {
-    color: #64748b !important;
-}
-
-.glass-card .text-gray-500 {
-    color: #475569 !important;
-}
-
-.glass-card svg.text-gray-400 {
-    color: #64748b !important;
-}
-
-@media (max-width: 768px) {
-    .banner-container {
-        height: 250px;
-    }
+/* 6. TYPOGRAPHY */
+.text-gradient-mono {
+    background: linear-gradient(to right, #ffffff, #9ca3af);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
