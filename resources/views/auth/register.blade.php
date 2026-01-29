@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <x-guest-layout>
     <form method="POST" action="{{ route('register') }}">
         @csrf
@@ -47,6 +48,13 @@
             <x-primary-button class="ms-4">
                 {{ __('Register') }}
             </x-primary-button>
+        </div>
+        <div class="flex justify-end mt-6">
+            <a href="{{ url('/') }}"
+            class="back-button">
+                <i class="fa-solid fa-arrow-left mr-2"></i>
+                Kembali
+            </a>
         </div>
     </form>
 </x-guest-layout>

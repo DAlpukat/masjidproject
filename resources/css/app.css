@@ -212,6 +212,36 @@
 .prose-custom a {
     @apply text-pink-600 font-bold underline decoration-pink-200 decoration-2 underline-offset-4 hover:text-purple-600 transition-colors;
 }
+.toggle-password {
+    position: absolute;
+    top: 50%;
+    right: 14px;
+    transform: translateY(-50%);
+    color: white;
+    cursor: pointer;
+    font-size: 18px;
+    opacity: 0.8;
+}
+
+.toggle-password:hover {
+    color: #d1d5db; /* abu-abu lembut */
+}
+.back-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #9ca3af; /* abu-abu lembut */
+    font-size: 14px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    font-size: 15px;
+}
+
+.back-button:hover {
+    color: #ffffff;
+    transform: translateX(-4px);
+}
+
 
 .glass-card .text-gray-300 {
     color: #94a3b8 !important;
