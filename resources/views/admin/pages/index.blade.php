@@ -74,7 +74,7 @@
 
                                     <!-- JIKA KAS: TOMBOL LIHAT LAPORAN -->
                                     @if($page->tipe == 'kas')
-                                        <a href="{{ route('kas.dashboard', $page->tempat_layanan_id) }}" class="...">
+                                        <a href="{{ route('kas.dashboard', $page->tempat_layanan_id) }}" class="text-blue-600 hover:underline text-sm mr-2 font-bold">
                                             Buka Kas
                                         </a>
                                     @endif
