@@ -2,56 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User; 
+use App\Models\User;
 use App\Models\TempatLayanan;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str; // Jangan lupa import ini
+use Illuminate\Support\Str;
 
 class TempatLayananController extends Controller
 {
-
-    public function edit($id)
-    {
-        $tempat = TempatLayanan::findOrFail($id);
-        return view('admin.tempat-layanan.edit', compact('tempat'));
-    }
-
-    public function update(Request $request, $id)
-    {
-        $tempat = TempatLayanan::findOrFail($id);
-
-        // Gunakan $request->boolean() agar aman dari checkbox/radio
-        $data = $request->validate([
-            'nama' => 'required|string|max:255',
-            'deskripsi' => 'nullable|string',
-            'is_public' => 'boolean',
-            
-            'use_individual_ledger' => 'boolean',
-            'use_mandatory_cash' => 'boolean',
-            'shared_expense_enabled' => 'boolean',
-            'free_expense_enabled' => 'boolean',
-        ]);
-
-        // Pastikan nilai boolean terbaca dengan benar
-        $data['use_individual_ledger'] = $request->boolean('use_individual_ledger');
-        $data['use_mandatory_cash'] = $request->boolean('use_mandatory_cash');
-        $data['shared_expense_enabled'] = $request->boolean('shared_expense_enabled');
-        $data['free_expense_enabled'] = $request->boolean('free_expense_enabled');
-        $data['is_public'] = $request->boolean('is_public');
-
-        $tempat->update($data);
-
-        return redirect()->route('admin.dashboard')->with('success', 'Pengaturan Tempat Layanan berhasil diperbarui.');
-    }
-
-
     public function create()
     {
-        // Ambil semua user (jika masih diperlukan untuk halaman lain, 
-        // tapi untuk create tempat ini sebenarnya sudah cukup auth()->id() saja)
-        $anggota = User::all();
-
-        return view('admin.tempat-layanan.create', compact('anggota'));
+        // Siapa yang boleh akses halaman create? Sudah diatur di Route middleware 'admin'
+        return view('admin.tempat-layanan.create');
     }
 
     public function store(Request $request)
@@ -70,20 +31,19 @@ class TempatLayananController extends Controller
         $kodeReferral = null;
         if ($request->is_public == 0) { // Jika dipilih Private
             do {
-                // Buat kode random 6 huruf kapital
                 $kodeReferral = strtoupper(Str::random(6));
             } while (TempatLayanan::where('kode_referral', $kodeReferral)->exists());
-            // Ulangi terus sampai kodenya unik/belum ada di database
         }
 
         // 4. Simpan Data
+        // PERUBAHAN PENTING: Status default sekarang adalah 'pending'
         $tempat = TempatLayanan::create([
             'nama' => $request->nama,
             'slug' => $slug,
             'deskripsi' => $request->deskripsi,
             'is_public' => $request->is_public,
             'kode_referral' => $kodeReferral,
-            'status' => 'aktif',
+            'status' => 'pending', // <--- HARUS PENDING AGAR PERLU APPROVAL
             'user_id' => auth()->id(),
         ]);
 
@@ -91,29 +51,68 @@ class TempatLayananController extends Controller
         $tempat->users()->attach(auth()->id());
 
         // 6. Redirect
-        $message = 'Tempat layanan berhasil diajukan.';
-        if (!$request->is_public) {
-            // Tampilkan kode di alert dashboard
-            $message .= " <strong>Kode Referral Kamu: {$kodeReferral}</strong> (Simpan kode ini!).";
-        }
-
+        // Pesan disesuaikan memberitahu bahwa kelas butuh persetujuan
+        $message = 'Tempat layanan berhasil diajukan. Menunggu persetujuan Superadmin.';
+        
         return redirect()->route('admin.dashboard')->with('success', $message);
     }
 
+    public function edit($id)
+    {
+        $tempat = TempatLayanan::findOrFail($id);
+
+        // KEAMANAN: Pastikan yang edit adalah pemilik kelas
+        if ($tempat->user_id !== auth()->id()) {
+            abort(403, 'Anda tidak memiliki akses untuk mengedit tempat ini.');
+        }
+
+        return view('admin.tempat-layanan.edit', compact('tempat'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $tempat = TempatLayanan::findOrFail($id);
+
+        // KEAMANAN: Pastikan yang update adalah pemilik kelas
+        if ($tempat->user_id !== auth()->id()) {
+            abort(403, 'Anda tidak memiliki akses untuk mengubah tempat ini.');
+        }
+
+        // Validasi Data
+        $data = $request->validate([
+            'nama' => 'required|string|max:255',
+            'deskripsi' => 'nullable|string',
+            'is_public' => 'boolean',
+            
+            'use_individual_ledger' => 'boolean',
+            'use_mandatory_cash' => 'boolean',
+            'shared_expense_enabled' => 'boolean',
+            'free_expense_enabled' => 'boolean',
+        ]);
+
+        // Pastikan nilai boolean terbaca dengan benar
+        $data['is_public'] = $request->boolean('is_public');
+        $data['use_individual_ledger'] = $request->boolean('use_individual_ledger');
+        $data['use_mandatory_cash'] = $request->boolean('use_mandatory_cash');
+        $data['shared_expense_enabled'] = $request->boolean('shared_expense_enabled');
+        $data['free_expense_enabled'] = $request->boolean('free_expense_enabled');
+
+        $tempat->update($data);
+
+        return redirect()->route('admin.dashboard')->with('success', 'Pengaturan Tempat Layanan berhasil diperbarui.');
+    }
 
     public function destroy(TempatLayanan $tempat)
     {
-        // 1. Cek Keamanan: Pastikan yang menghapus adalah pemilik room
+        // KEAMANAN: Pastikan yang menghapus adalah pemilik room
+        // Catatan: Superadmin memiliki route hapus sendiri di SuperAdminController
         if ($tempat->user_id !== auth()->id()) {
-            abort(403, 'Kamu tidak punya izin menghapus tempat ini.');
+            abort(403, 'Anda tidak memiliki izin menghapus tempat ini.');
         }
 
-        // 2. Hapus Data
-        // Karena di migration kita sudah pakai onDelete('cascade') pada tabel 
-        // pivot dan laporan_kas, maka relasinya akan otomatis terhapus.
+        // Hapus Data (Relasi cascade akan berjalan otomatis dari migration)
         $tempat->delete();
 
-        // 3. Redirect
         return redirect()->route('admin.dashboard')->with('success', 'Tempat layanan berhasil dihapus.');
     }
 }
