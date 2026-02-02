@@ -22,7 +22,7 @@
     height: 100%;
     z-index: -1;
     background-color: #0f0f0f;
-    background-image: url('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZHJyODZra3JudDBmZ3Nqc2hkMnV0bmgxMGhsb2U1aXQ4NXB2aHhveiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/zwX4VWYjwqMVAPa5DS/giphy.gif');
+    background-image: url("https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZHJyODZra3JudDBmZ3Nqc2hkMnV0bmgxMGhsb2U1aXQ4NXB2aHhveiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/zwX4VWYjwqMVAPa5DS/giphy.gif");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -36,7 +36,11 @@
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.75); /* Hitam pekat transparan */
-    background: radial-gradient(circle at center, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.9) 100%);
+    background: radial-gradient(
+        circle at center,
+        rgba(0, 0, 0, 0.6) 0%,
+        rgba(0, 0, 0, 0.9) 100%
+    );
     z-index: -1;
 }
 
@@ -68,9 +72,13 @@
 /* 4. BUTTONS (ELEGANT MONOCHROME) */
 .btn-monochrome {
     @apply px-6 py-3 rounded-full font-semibold transition-all duration-300 flex items-center justify-center border border-white/20;
-    background: linear-gradient(to bottom, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+    background: linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.1),
+        rgba(255, 255, 255, 0.05)
+    );
     color: #ffffff;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .btn-monochrome:hover {
@@ -83,7 +91,7 @@
 }
 
 .btn-secondary::after {
-    content: '';
+    content: "";
     @apply absolute bottom-0 left-0 w-0 h-0.5 bg-white transition-all duration-300;
 }
 
@@ -104,9 +112,15 @@
 }
 
 /* Delay classes untuk staggered animation */
-.delay-100 { transition-delay: 0.1s; }
-.delay-200 { transition-delay: 0.2s; }
-.delay-300 { transition-delay: 0.3s; }
+.delay-100 {
+    transition-delay: 0.1s;
+}
+.delay-200 {
+    transition-delay: 0.2s;
+}
+.delay-300 {
+    transition-delay: 0.3s;
+}
 
 /* 6. TYPOGRAPHY */
 .text-gradient-mono {
