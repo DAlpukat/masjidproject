@@ -50,26 +50,37 @@ Route::middleware(['auth', 'admin'])->group(function () {
     // Dashboard
     Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
 
-    // Tempat Layanan (CRUD)
+    // Tempat Layanan (Sesuai dengan pemanggilan di Blade Anda)
     Route::get('/admin/tempat-layanan/create', [TempatLayananController::class, 'create'])->name('admin.temp.create');
     Route::post('/admin/tempat-layanan', [TempatLayananController::class, 'store'])->name('admin.temp.store');
     
-    // TAMBAHKAN ROUTE EDIT & UPDATE DISINI
+    // Perbaikan ID: Menggunakan {id} agar sesuai dengan controller $id
     Route::get('/admin/tempat-layanan/{id}/edit', [TempatLayananController::class, 'edit'])->name('admin.temp.edit');
     Route::put('/admin/tempat-layanan/{id}', [TempatLayananController::class, 'update'])->name('admin.temp.update');
     
+    // Gunakan parameter {tempat} agar sesuai dengan logic destroy Anda
     Route::delete('/admin/tempat-layanan/{tempat}', [TempatLayananController::class, 'destroy'])->name('admin.temp.destroy');
+    
+    // Tombol Anggota: Nama route diperbaiki menjadi admin.group.members agar sinkron dengan Blade
+    Route::get('/admin/tempat-layanan/{id}/members', [TempatLayananController::class, 'members'])->name('admin.group.members');
 
     // Pages Management
     Route::get('/pages/{id}', [PageController::class, 'index'])->name('pages.index');
     Route::post('/pages', [PageController::class, 'store'])->name('pages.store');
     Route::delete('/pages/{id}', [PageController::class, 'destroy'])->name('pages.destroy');
     
-    // Posts Management (Berita di Halaman Info)
+    // Posts Management
     Route::get('/pages/{pageId}/posts', [PostController::class, 'index'])->name('posts.index');
     Route::get('/pages/{pageId}/posts/create', [PostController::class, 'create'])->name('posts.create');
     Route::post('/posts/store', [PostController::class, 'store'])->name('posts.store');
     Route::delete('/posts/{id}', [PostController::class, 'destroy'])->name('posts.destroy');
+
+    /**
+     * CATATAN:
+     * Baris Route::resource('temp', ...) DIHAPUS karena Anda sudah mendefinisikan 
+     * semua routenya secara manual (index, create, store, edit, update, destroy) di atas.
+     * Mempertahankan keduanya hanya akan membuat route bentrok.
+     */
 });
 
 // --- 5. Route Standard Lainnya ---

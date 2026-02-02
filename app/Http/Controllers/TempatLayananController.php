@@ -116,4 +116,13 @@ class TempatLayananController extends Controller
         // 3. Redirect
         return redirect()->route('admin.dashboard')->with('success', 'Tempat layanan berhasil dihapus.');
     }
+    public function members($id)
+    {
+        // Mengambil data tempat layanan beserta user yang terkait
+        // Asumsi: Anda memiliki relasi 'users' di model TempatLayanan
+        $item = TempatLayanan::with('users')->findOrFail($id);
+        
+        return view('admin.tempat-layanan.members', compact('item'));
+    }
+
 }
