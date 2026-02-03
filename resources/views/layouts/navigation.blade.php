@@ -1,9 +1,13 @@
 <?php
- $logoRoute = 'home';
+// LOGIKA REDIRECT LOGO
+ $logoRoute = 'home'; // Default
 
 if (auth()->check()) {
-    if (auth()->user()->is_admin) {
-        // Jika Admin, Logo menuju Dashboard Admin
+    if (auth()->user()->is_superadmin) {
+        // Jika Superadmin, Logo menuju Dashboard Superadmin
+        $logoRoute = 'superadmin.dashboard';
+    } elseif (auth()->user()->is_admin) {
+        // Jika Admin biasa, Logo menuju Dashboard Admin
         $logoRoute = 'admin.dashboard';
     } else {
         // Jika User Biasa, Logo menuju Ruangan Saya
@@ -21,7 +25,6 @@ if (auth()->check()) {
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route($logoRoute) }}" class="flex items-center gap-2 group">
-                        <!-- Ganti logo dengan text gradient agar modern, atau pakai komponen asli -->
                         <span class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600">
                             MyLayanan
                         </span>
@@ -31,24 +34,32 @@ if (auth()->check()) {
                 <!-- Navigation Links (Desktop) -->
                 <div class="hidden space-x-1 sm:-my-px sm:ml-8 sm:flex items-center">
                     
-                    <!-- Menu Admin Dashboard -->
-                    @if(auth()->check() && auth()->user()->is_admin)
+                    {{-- MENU SUPERADMIN (BEDAKAN WARNA/STYLE) --}}
+                    @if(auth()->check() && auth()->user()->is_superadmin)
+                        <a href="{{ route('superadmin.dashboard') }}" 
+                           class="bg-purple-50 text-purple-700 border border-purple-200 {{ request()->routeIs('superadmin.*') ? 'ring-2 ring-purple-500' : '' }} px-3 py-2 rounded-md text-sm font-bold transition-all duration-200 shadow-sm hover:shadow-md">
+                            ⚡ Panel Superadmin
+                        </a>
+                    @endif
+
+                    {{-- MENU ADMIN BIASA --}}
+                    @if(auth()->check() && auth()->user()->is_admin && !auth()->user()->is_superadmin)
                         <a href="{{ route('admin.dashboard') }}" 
-                           class="{{ request()->routeIs('admin.dashboard') ? 'nav-link-active' : 'text-gray-500 hover:text-pink-600' }} px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
+                           class="{{ request()->routeIs('admin.dashboard') ? 'nav-link-active text-pink-600' : 'text-gray-500 hover:text-pink-600' }} px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
                             Admin Dashboard
                         </a>
                     @endif
 
-                    <!-- Menu Ruangan Saya -->
+                    <!-- Menu Ruangan Saya (Untuk Admin & User) -->
                     <a href="{{ route('user.rooms') }}" 
-                       class="{{ request()->routeIs('user.rooms') ? 'nav-link-active' : 'text-gray-500 hover:text-pink-600' }} px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
+                       class="{{ request()->routeIs('user.rooms') ? 'nav-link-active text-pink-600' : 'text-gray-500 hover:text-pink-600' }} px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
                         Ruangan Saya
                     </a>
 
-                    <!-- Menu Gabung Room (User Biasa) -->
+                    {{-- MENU USER BIASA --}}
                     @if(auth()->check() && !auth()->user()->is_admin)
                         <a href="{{ route('home') }}" 
-                           class="{{ request()->routeIs('home') ? 'nav-link-active' : 'text-gray-500 hover:text-pink-600' }} px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
+                           class="{{ request()->routeIs('home') ? 'nav-link-active text-pink-600' : 'text-gray-500 hover:text-pink-600' }} px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
                             Cari Room
                         </a>
                     @endif
@@ -60,7 +71,12 @@ if (auth()->check()) {
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button class="inline-flex items-center px-3 py-2 border border-gray-200 text-sm leading-4 font-medium rounded-xl text-gray-700 bg-white/50 hover:bg-white hover:text-pink-600 focus:outline-none focus:ring-2 focus:ring-pink-500 transition-all duration-200">
-                           <span class="mr-2">{{ auth()->user()->name ?? auth()->user()->email ?? 'User' }}</span>
+                           <span class="mr-2">{{ auth()->user()->name ?? 'User' }}</span>
+                           @if(auth()->user()->is_superadmin)
+                               <span class="text-[10px] bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded font-bold mr-1">SA</span>
+                           @elseif(auth()->user()->is_admin)
+                               <span class="text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-bold mr-1">ADM</span>
+                           @endif
                            <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                             </svg>
@@ -68,9 +84,16 @@ if (auth()->check()) {
                     </x-slot>
 
                     <x-slot name="content">
-                        <!-- Dropdown Content Container -->
                         <div class="block w-full px-4 py-2 text-sm text-gray-700 bg-white border border-gray-100 rounded-xl shadow-xl">
-                            <x-dropdown-link :href="route('profile.edit')" class="block w-full text-left px-4 py-2 hover:bg-pink-50 hover:text-pink-600 rounded-lg transition-colors">
+                            <!-- Link Superadmin khusus muncul di dropdown juga -->
+                            @if(auth()->user()->is_superadmin)
+                                <x-dropdown-link :href="route('superadmin.dashboard')" class="text-purple-600 font-bold">
+                                    ⚡ Panel Superadmin
+                                </x-dropdown-link>
+                                <div class="border-t border-gray-100 my-1"></div>
+                            @endif
+
+                            <x-dropdown-link :href="route('profile.edit')">
                                 Profile Settings
                             </x-dropdown-link>
 
@@ -103,7 +126,13 @@ if (auth()->check()) {
     <div :class="{'block': open, 'hidden': ! open }" class="hidden sm:hidden border-t border-gray-100 bg-white/90 backdrop-blur-md">
         <div class="pt-2 pb-3 space-y-1 px-2">
             
-            @if(auth()->check() && auth()->user()->is_admin)
+            @if(auth()->check() && auth()->user()->is_superadmin)
+                <a href="{{ route('superadmin.dashboard') }}" class="bg-purple-50 text-purple-700 block pl-3 pr-4 py-2 rounded-lg text-base font-bold border-l-4 border-purple-500">
+                    ⚡ Panel Superadmin
+                </a>
+            @endif
+
+            @if(auth()->check() && auth()->user()->is_admin && !auth()->user()->is_superadmin)
                 <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'bg-pink-50 text-pink-700' : 'text-gray-600 hover:bg-gray-50' }} block pl-3 pr-4 py-2 rounded-lg text-base font-medium">
                     Admin Dashboard
                 </a>

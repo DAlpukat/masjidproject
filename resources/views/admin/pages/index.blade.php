@@ -10,7 +10,7 @@
 
         <!-- Form Tambah Halaman -->
         <div class="bg-white p-4 rounded shadow mb-6">
-            <form method="POST" action="{{ route('pages.store') }}">
+            <form method="POST" action="{{ route('admin.pages.store') }}">
                 @csrf
                 <input type="hidden" name="tempat_layanan_id" value="{{ $tempat->id }}">
                 

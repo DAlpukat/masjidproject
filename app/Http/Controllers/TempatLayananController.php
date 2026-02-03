@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use App\Models\TempatLayanan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -11,59 +10,58 @@ class TempatLayananController extends Controller
 {
     public function create()
     {
-        // Siapa yang boleh akses halaman create? Sudah diatur di Route middleware 'admin'
         return view('admin.tempat-layanan.create');
     }
 
     public function store(Request $request)
     {
-        // 1. Validasi
-        $request->validate([
+        // 1. Validasi Input
+        $validated = $request->validate([
             'nama' => 'required|string|max:255',
             'deskripsi' => 'nullable|string|max:255',
-            'is_public' => 'required', // Menerima 1 atau 0
+            'is_public' => 'required|boolean', // Pastikan kirim 1 atau 0
         ]);
 
-        // 2. Generate Slug
+        // 2. Generate Slug dari Nama
         $slug = Str::slug($request->nama);
 
-        // 3. Generate Kode Referral (Otomatis jika private)
+        // 3. Logika Kode Referral & Status
         $kodeReferral = null;
-        if ($request->is_public == 0) { // Jika dipilih Private
+        $status = 'pending'; // Default harus PENDING
+
+        // Jika Private (is_public = 0), generate kode unik
+        if (!$request->is_public) {
             do {
-                $kodeReferral = strtoupper(Str::random(6));
+                $kodeReferral = strtoupper(Str::random(6)); // Contoh: X7Y9Z2
             } while (TempatLayanan::where('kode_referral', $kodeReferral)->exists());
         }
 
-        // 4. Simpan Data
-        // PERUBAHAN PENTING: Status default sekarang adalah 'pending'
+        // 4. Simpan ke Database
         $tempat = TempatLayanan::create([
             'nama' => $request->nama,
             'slug' => $slug,
             'deskripsi' => $request->deskripsi,
             'is_public' => $request->is_public,
             'kode_referral' => $kodeReferral,
-            'status' => 'pending', // <--- HARUS PENDING AGAR PERLU APPROVAL
+            'status' => $status, // 'pending'
             'user_id' => auth()->id(),
         ]);
 
-        // 5. Auto Join Admin sebagai anggota
+        // 5. Auto-join Admin sebagai anggota pertama
         $tempat->users()->attach(auth()->id());
 
-        // 6. Redirect
-        // Pesan disesuaikan memberitahu bahwa kelas butuh persetujuan
-        $message = 'Tempat layanan berhasil diajukan. Menunggu persetujuan Superadmin.';
-        
-        return redirect()->route('admin.dashboard')->with('success', $message);
+        return redirect()
+            ->route('admin.dashboard')
+            ->with('success', 'Kelas berhasil diajukan. Menunggu persetujuan Superadmin.');
     }
 
     public function edit($id)
     {
         $tempat = TempatLayanan::findOrFail($id);
 
-        // KEAMANAN: Pastikan yang edit adalah pemilik kelas
+        // Cek Keamanan: Hanya pemilik yang boleh edit
         if ($tempat->user_id !== auth()->id()) {
-            abort(403, 'Anda tidak memiliki akses untuk mengedit tempat ini.');
+            abort(403, 'Anda tidak memiliki akses.');
         }
 
         return view('admin.tempat-layanan.edit', compact('tempat'));
@@ -73,24 +71,24 @@ class TempatLayananController extends Controller
     {
         $tempat = TempatLayanan::findOrFail($id);
 
-        // KEAMANAN: Pastikan yang update adalah pemilik kelas
         if ($tempat->user_id !== auth()->id()) {
-            abort(403, 'Anda tidak memiliki akses untuk mengubah tempat ini.');
+            abort(403, 'Anda tidak memiliki akses.');
         }
 
-        // Validasi Data
+        // Validasi & Casting Boolean
         $data = $request->validate([
             'nama' => 'required|string|max:255',
             'deskripsi' => 'nullable|string',
             'is_public' => 'boolean',
             
+            // Validasi config kas
             'use_individual_ledger' => 'boolean',
             'use_mandatory_cash' => 'boolean',
             'shared_expense_enabled' => 'boolean',
             'free_expense_enabled' => 'boolean',
         ]);
 
-        // Pastikan nilai boolean terbaca dengan benar
+        // Pastikan checkbox terbaca dengan benar (1 atau 0)
         $data['is_public'] = $request->boolean('is_public');
         $data['use_individual_ledger'] = $request->boolean('use_individual_ledger');
         $data['use_mandatory_cash'] = $request->boolean('use_mandatory_cash');
@@ -99,20 +97,21 @@ class TempatLayananController extends Controller
 
         $tempat->update($data);
 
-        return redirect()->route('admin.dashboard')->with('success', 'Pengaturan Tempat Layanan berhasil diperbarui.');
+        return redirect()
+            ->route('admin.dashboard')
+            ->with('success', 'Pengaturan kelas berhasil diperbarui.');
     }
 
     public function destroy(TempatLayanan $tempat)
     {
-        // KEAMANAN: Pastikan yang menghapus adalah pemilik room
-        // Catatan: Superadmin memiliki route hapus sendiri di SuperAdminController
         if ($tempat->user_id !== auth()->id()) {
-            abort(403, 'Anda tidak memiliki izin menghapus tempat ini.');
+            abort(403, 'Anda tidak bisa menghapus milik orang lain.');
         }
 
-        // Hapus Data (Relasi cascade akan berjalan otomatis dari migration)
         $tempat->delete();
 
-        return redirect()->route('admin.dashboard')->with('success', 'Tempat layanan berhasil dihapus.');
+        return redirect()
+            ->route('admin.dashboard')
+            ->with('success', 'Kelas berhasil dihapus.');
     }
 }

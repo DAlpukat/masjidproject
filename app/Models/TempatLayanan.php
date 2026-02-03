@@ -12,24 +12,32 @@ class TempatLayanan extends Model
 {
     use HasFactory;
 
-    // PASTIKAN 4 KOLOM BARU INI ADA DI BAWAH INI:
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = [
         'nama',
         'slug',
         'deskripsi',
-        'status',
-        'is_public',
-        'kode_referral',
+        'status', // 'pending', 'approved', 'rejected'
+        'is_public', // true (publik), false (privat)
+        'kode_referral', // Kode akses jika privat
         'user_id',
         
-        // KOLOM UNTUK LOGIKA KAS BARU:
+        // Konfigurasi Logika Kas
         'use_individual_ledger',
         'use_mandatory_cash',
         'shared_expense_enabled',
         'free_expense_enabled',
     ];
 
-    // Casts sudah benar
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
     protected $casts = [
         'is_public' => 'boolean',
         'use_individual_ledger' => 'boolean',
@@ -38,7 +46,9 @@ class TempatLayanan extends Model
         'free_expense_enabled' => 'boolean',
     ];
 
-    public function pages()
+    // RELATIONS
+
+    public function pages(): HasMany
     {
         return $this->hasMany(Page::class);
     }
@@ -58,17 +68,19 @@ class TempatLayanan extends Model
         return $this->belongsToMany(User::class);
     }
 
-    public function kategoriKas()
+    public function kategoriKas(): HasMany
     {
         return $this->hasMany(KategoriKas::class);
     }
 
-    public function anggota()
+    public function anggota(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'tempat_layanan_user');
     }
 
-    public function getMembersCountAttribute()
+    // ACCESSORS (Helpers)
+
+    public function getMembersCountAttribute(): int
     {
         return $this->users()->where('users.id', '!=', $this->user_id)->count();
     }
