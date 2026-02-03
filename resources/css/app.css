@@ -2,7 +2,177 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 1. TYPOGRAPHY & TEXT FIX */
+/* =========================================
+   1. BASE SETUP & CUSTOM SCROLLBAR
+   ========================================= */
+
+/* Text Selection agar terlihat bagus di dark mode */
+::selection {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+}
+
+/* Custom Scrollbar Chrome/Safari/Edge */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #0f0f0f;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+/* =========================================
+   2. LAYOUT & BACKGROUNDS
+   ========================================= */
+
+/* Background GIF (Z-Index -2 agar di paling bawah) */
+.bg-monochrome-gif {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+    background-color: #0f0f0f;
+    background-image: url("https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZHJyODZra3JudDBmZ3Nqc2hkMnV0bmgxMGhsb2U1aXQ4NXB2aHhveiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/zwX4VWYjwqMVAPa5DS/giphy.gif");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* Overlay Gelap (Z-Index -1 agar di atas GIF tapi di bawah konten) */
+.bg-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.75); /* Hitam pekat transparan */
+    background: radial-gradient(
+        circle at center,
+        rgba(0, 0, 0, 0.6) 0%,
+        rgba(0, 0, 0, 0.9) 100%
+    );
+    z-index: -1;
+    pointer-events: none; /* Agar klik tembus ke konten */
+}
+
+/* Wrapper umum untuk konten agar Z-Index bekerja */
+.content-wrapper {
+    position: relative;
+    z-index: 10;
+}
+
+/* =========================================
+   3. GLASSMORPHISM COMPONENTS
+   ========================================= */
+
+/* Kartu Kaca Utama */
+.glass-card {
+    background: rgba(255, 255, 255, 0.03); /* Lebih transparan */
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+    background: rgba(255, 255, 255, 0.07);
+    transform: translateY(-5px);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+}
+
+/* Navbar Glass */
+.nav-glass {
+    background: rgba(0, 0, 0, 0.4); /* Lebih gelap untuk kontras navbar */
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Input Form Glass (Untuk Login/Register) */
+.glass-input {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #fff;
+    transition: all 0.3s ease;
+}
+
+.glass-input:focus {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+}
+
+.glass-input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* =========================================
+   4. BUTTONS & INTERACTIVE
+   ========================================= */
+
+/* Tombol Monochrome Elegant (User defined) */
+.btn-monochrome {
+    @apply px-6 py-3 rounded-full font-semibold transition-all duration-300 flex items-center justify-center border border-white/20;
+    background: linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.1),
+        rgba(255, 255, 255, 0.05)
+    );
+    color: #ffffff;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.btn-monochrome:hover {
+    @apply bg-white text-black border-white scale-105 shadow-[0_0_20px_rgba(255,255,255,0.3)];
+    text-shadow: none;
+}
+
+/* Tombol Gradient Pink (Untuk Blade Views sebelumnya) */
+.btn-gradient-pink {
+    background: linear-gradient(135deg, #db2777 0%, #9333ea 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(219, 39, 119, 0.3);
+    transition: all 0.3s ease;
+}
+
+.btn-gradient-pink:hover {
+    box-shadow: 0 6px 20px rgba(219, 39, 119, 0.5);
+    transform: translateY(-1px);
+    filter: brightness(1.1);
+}
+
+/* Tombol Secondary Link */
+.btn-secondary {
+    @apply text-gray-300 hover:text-white font-medium transition-colors relative cursor-pointer;
+}
+
+.btn-secondary::after {
+    content: "";
+    @apply absolute bottom-0 left-0 w-0 h-0.5 bg-white transition-all duration-300;
+}
+
+.btn-secondary:hover::after {
+    @apply w-full;
+}
+
+/* =========================================
+   5. TYPOGRAPHY & TEXT UTILS
+   ========================================= */
+
 .desc-clamp {
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -26,76 +196,28 @@
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+/* Text Gradient Monochrome (Putih ke Abu) */
+.text-gradient-mono {
+    background: linear-gradient(to right, #ffffff, #9ca3af);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
-/* Overlay agar teks terbaca jelas di atas GIF */
-.bg-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.75); /* Hitam pekat transparan */
-    background: radial-gradient(circle at center, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.9) 100%);
-    z-index: -1;
-}
-
-/* 3. GLASSMORPHISM (MONOCHROME VERSION) */
-.glass-card {
-    background: rgba(255, 255, 255, 0.05); /* Putih sangat tipis */
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
-    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.glass-card:hover {
-    background: rgba(255, 255, 255, 0.08);
-    transform: translateY(-5px);
-    border-color: rgba(255, 255, 255, 0.3);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-}
-
-/* Navbar Glass */
-.nav-glass {
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    transition: all 0.3s ease;
-}
-
-/* 4. BUTTONS (ELEGANT MONOCHROME) */
-.btn-monochrome {
-    @apply px-6 py-3 rounded-full font-semibold transition-all duration-300 flex items-center justify-center border border-white/20;
-    background: linear-gradient(to bottom, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+/* Active Link State (Untuk Navbar Blade) */
+.nav-link-active {
     color: #ffffff;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    background-color: rgba(255, 255, 255, 0.1);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.5);
 }
 
-.btn-monochrome:hover {
-    @apply bg-white text-black border-white scale-105 shadow-[0_0_20px_rgba(255,255,255,0.3)];
-    text-shadow: none;
-}
+/* =========================================
+   6. ANIMATIONS
+   ========================================= */
 
-.btn-secondary {
-    @apply text-gray-300 hover:text-white font-medium transition-colors relative;
-}
-
-.btn-secondary::after {
-    content: '';
-    @apply absolute bottom-0 left-0 w-0 h-0.5 bg-white transition-all duration-300;
-}
-
-.btn-secondary:hover::after {
-    @apply w-full;
-}
-
-/* 5. ANIMASI SCROLL (REVEAL ON SCROLL) */
 .reveal {
     opacity: 0;
-    transform: translateY(50px);
-    transition: all 1s ease-out;
+    transform: translateY(30px);
+    transition: all 1s cubic-bezier(0.5, 0, 0, 1);
 }
 
 .reveal.active {
@@ -103,14 +225,30 @@
     transform: translateY(0);
 }
 
-/* Delay classes untuk staggered animation */
-.delay-100 { transition-delay: 0.1s; }
-.delay-200 { transition-delay: 0.2s; }
-.delay-300 { transition-delay: 0.3s; }
+/* Delays */
+.delay-100 {
+    transition-delay: 100ms;
+}
+.delay-200 {
+    transition-delay: 200ms;
+}
+.delay-300 {
+    transition-delay: 300ms;
+}
+.delay-400 {
+    transition-delay: 400ms;
+}
 
-/* 6. TYPOGRAPHY */
-.text-gradient-mono {
-    background: linear-gradient(to right, #ffffff, #9ca3af);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+/* Pulse Animation helper */
+@keyframes soft-pulse {
+    0%,
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+.animate-soft-pulse {
+    animation: soft-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }

@@ -10,7 +10,7 @@
 
         <!-- Form Tambah Halaman -->
         <div class="bg-white p-4 rounded shadow mb-6">
-            <form method="POST" action="{{ route('pages.store') }}">
+            <form method="POST" action="{{ route('admin.pages.store') }}">
                 @csrf
                 <input type="hidden" name="tempat_layanan_id" value="{{ $tempat->id }}">
                 
@@ -53,7 +53,7 @@
                             <td class="p-3">
                                 @if($page->tipe == 'info')
                                     <div class="text-xs text-gray-600 max-h-20 overflow-y-auto">
-                                        {{ Str::limit(strip_tags($page->content), 150, '...') ?: '<span class="italic">Kosong</span>' }}
+                                        {{ Str::limit(strip_tags($page->content), 150, '...') ?: strip_tags('<span class="italic">Kosong</span>') }}
                                     </div>
                                 @elseif($page->tipe == 'kas')
                                     <span class="text-xs text-blue-600">Laporan Keuangan</span>
@@ -74,7 +74,7 @@
 
                                     <!-- JIKA KAS: TOMBOL LIHAT LAPORAN -->
                                     @if($page->tipe == 'kas')
-                                        <a href="{{ route('kas.dashboard', $page->tempat_layanan_id) }}" class="...">
+                                        <a href="{{ route('kas.dashboard', $page->tempat_layanan_id) }}" class="text-blue-600 hover:underline text-sm mr-2 font-bold">
                                             Buka Kas
                                         </a>
                                     @endif
