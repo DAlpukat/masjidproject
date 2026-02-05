@@ -53,9 +53,9 @@ class TempatLayanan extends Model
         return $this->hasMany(LaporanKas::class);
     }
 
-    public function users(): BelongsToMany
+    public function users()
     {
-        return $this->belongsToMany(User::class);
+        return $this->belongsToMany(User::class, 'tempat_layanan_user', 'tempat_layanan_id', 'user_id');
     }
 
     public function kategoriKas()

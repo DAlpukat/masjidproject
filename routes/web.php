@@ -63,7 +63,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     
     // Tombol Anggota: Nama route diperbaiki menjadi admin.group.members agar sinkron dengan Blade
     Route::get('/admin/tempat-layanan/{id}/members', [TempatLayananController::class, 'members'])->name('admin.group.members');
-
+    Route::delete('/admin/tempat/{id}/members/{userId}', [TempatLayananController::class, 'kick'])->name('admin.members.kick');
     // Pages Management
     Route::get('/pages/{id}', [PageController::class, 'index'])->name('pages.index');
     Route::post('/pages', [PageController::class, 'store'])->name('pages.store');
