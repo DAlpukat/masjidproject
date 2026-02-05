@@ -133,13 +133,13 @@
     <footer class="relative z-10 border-t border-white/10 bg-black/80 backdrop-blur-lg mt-auto">
         <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="text-gray-400 text-sm">
-                &copy; {{ date('Y') }} AllStarADMN. All rights reserved.
+                &copy; {{ date('Y') }} AllStarCmp. All rights reserved.
             </div>
             
             <div class="flex items-center gap-2 text-sm text-gray-500">
                 <span>Developed by</span>
                 <span class="text-white font-semibold px-2 py-1 bg-white/10 rounded-md border border-white/10 hover:bg-white hover:text-black transition-colors cursor-default">
-                    AllStarADMN
+                    AllStarCmp
                 </span>
             </div>
         </div>
