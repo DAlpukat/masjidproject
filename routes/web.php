@@ -99,7 +99,7 @@ Route::middleware(['auth', 'is.superadmin'])
     ->group(function () {
         Route::get('/dashboard', [SuperAdminController::class, 'index'])->name('dashboard');
         
-        // Approve Kelas (Pending -> Aktif)
+        // Approve Kelas (Pending -> Aktif sir)
         Route::post('/tempat/{id}/approve', [SuperAdminController::class, 'approveTempat'])->name('approve');
         
         // Hapus Kelas Global
