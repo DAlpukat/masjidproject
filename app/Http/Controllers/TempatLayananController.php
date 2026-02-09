@@ -117,7 +117,9 @@ class TempatLayananController extends Controller
     public function members($id)
     {
         $tempat = TempatLayanan::findOrFail($id);
-        $members = $tempat->users; 
+        $members = $tempat->users->filter(function($user) {
+            return !$user->is_admin && !$user->is_superadmin;
+        });
 
         // Ubah dari 'admin.members' menjadi 'admin.tempat-layanan.members'
         return view('admin.tempat-layanan.members', compact('tempat', 'members'));
