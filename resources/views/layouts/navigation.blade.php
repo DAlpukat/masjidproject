@@ -15,55 +15,46 @@ if (auth()->check()) {
 
 <!-- NAVIGATION: Dark Glass Theme -->
 <nav x-data="{ open: false }" class="fixed w-full z-50 nav-glass top-0">
-    <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-20"> <!-- Tinggi diperbesar sedikit agar proporsional -->
-            <!-- Left Side: Logo & Links -->
+        <div class="flex justify-between h-20"> 
             <div class="flex">
-                <!-- Logo -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route($logoRoute) }}" class="flex items-center gap-2 group">
-                        <span class="text-2xl font-black text-white tracking-wider border-b-2 border-transparent hover:border-white transition-all duration-300">
+                        <span class="text-2xl font-black text-white tracking-wider border-b-2 border-transparent hover:border-white">
                             TRANS<span class="text-gray-400">PARANSI</span>
                         </span>
                     </a>
                 </div>
 
-                <!-- Navigation Links (Desktop) -->
                 <div class="hidden space-x-1 sm:-my-px sm:ml-8 sm:flex items-center">
-                    
-                    {{-- MENU SUPERADMIN --}}
-                    @if(auth()->check() && auth()->user()->is_superadmin)
-                        <a href="{{ route('superadmin.dashboard') }}" 
-                           class="bg-white/10 text-white border border-white/20 hover:bg-white/20 {{ request()->routeIs('superadmin.*') ? 'bg-white/20 ring-1 ring-white' : '' }} px-4 py-2 rounded-full text-sm font-bold transition-all duration-300">
-                            ⚡ Superadmin Panel
-                        </a>
-                    @endif
-
-                    {{-- MENU ADMIN BIASA --}}
-                    @if(auth()->check() && auth()->user()->is_admin && !auth()->user()->is_superadmin)
-                        <a href="{{ route('admin.dashboard') }}" 
-                           class="{{ request()->routeIs('admin.dashboard') ? 'text-white bg-white/10' : 'text-gray-400 hover:text-white hover:bg-white/5' }} px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300">
-                            Admin Dashboard
-                        </a>
-                    @endif
-
-                    <!-- Menu Ruangan Saya -->
-                    <a href="{{ route('user.rooms') }}" 
-                       class="{{ request()->routeIs('user.rooms') ? 'text-white bg-white/10' : 'text-gray-400 hover:text-white hover:bg-white/5' }} px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300">
-                        Ruangan Saya
+                
+                @if(auth()->check() && auth()->user()->is_superadmin)
+                    <a href="{{ route('superadmin.dashboard') }}" 
+                    class="bg-white/10 text-white border border-white/20 hover:bg-white/20 {{ request()->routeIs('superadmin.*') ? 'bg-white/20 ring-1 ring-white' : '' }} px-4 py-2 rounded-full text-sm font-bold">
+                        ⚡ Superadmin Panel
                     </a>
+                @endif
 
-                    {{-- MENU USER BIASA --}}
-                    @if(auth()->check() && !auth()->user()->is_admin)
-                        <a href="{{ route('home') }}" 
-                           class="{{ request()->routeIs('home') ? 'text-white bg-white/10' : 'text-gray-400 hover:text-white hover:bg-white/5' }} px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300">
-                            Cari Room
-                        </a>
-                    @endif
-                </div>
+                @if(auth()->check() && auth()->user()->is_admin && !auth()->user()->is_superadmin)
+                    <a href="{{ route('admin.dashboard') }}" 
+                    class="{{ request()->routeIs('admin.dashboard') ? 'text-white bg-white/20' : 'text-gray-400 hover:text-white hover:bg-white/10' }} px-3 py-2 rounded-md text-sm font-medium">
+                        Admin Dashboard
+                    </a>
+                @endif
+
+                <a href="{{ route('user.rooms') }}" 
+                    class="{{ request()->routeIs('user.rooms') ? 'text-white bg-white/20' : 'text-gray-300 hover:text-white hover:bg-white/10' }} px-4 py-2 rounded-lg text-sm font-bold">
+                    Ruangan Saya
+                </a>
+
+                @if(auth()->check() && !auth()->user()->is_admin)
+                <a href="{{ route('home') }}" 
+                class="{{ request()->routeIs('home') ? 'text-white bg-white/20' : 'text-gray-300 hover:text-white hover:bg-white/10' }} px-4 py-2 rounded-lg text-sm font-bold">
+                    Cari Room
+                </a>
+                @endif
             </div>
-
+            </div>
            <div class="hidden sm:flex sm:items-center sm:ml-6">
                 <div class="relative" x-data="{ open: false }">
                     
