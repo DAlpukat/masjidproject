@@ -98,11 +98,31 @@
     box-shadow: 0 15px 45px rgba(0, 0, 0, 0.5);
 }
 
-/* Navbar Glass */
+
+/* Navbar Glass - Diperbarui untuk menghilangkan glitch hitam */
+/* =========================================
+   4. GLASSMORPHISM COMPONENTS (REVISED)
+   ========================================= */
+
+/* Navbar Glass - Versi Dark Crystal */
 .nav-glass {
-    background: rgba(0, 0, 0, 0.5); /* Lebih gelap agar konten navbar terbaca */
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    /* Gunakan warna yang sedikit lebih pekat agar render lebih stabil */
+    background: rgba(10, 10, 10, 0.85) !important; 
+    
+    /* Blur yang lebih ringan agar tidak membebani kartu grafis */
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+
+    /* --- SOLUSI AMPUH --- */
+    /* Hapus transisi sama sekali agar tidak ada delay render shadow */
+    transition: none !important; 
+    
+    /* Paksa browser membuat layer baru (Hardware Acceleration) */
+    will-change: transform;
+    transform: translateZ(0);
+    
+    /* Hilangkan bayangan box saat loading */
+    box-shadow: none !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
