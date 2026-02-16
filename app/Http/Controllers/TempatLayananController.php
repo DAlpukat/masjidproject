@@ -117,9 +117,19 @@ class TempatLayananController extends Controller
     public function members($id)
     {
         $tempat = TempatLayanan::findOrFail($id);
-        $members = $tempat->users; 
+        
+        $members = $tempat->users()
+            ->where('users.id', '!=', $tempat->user_id) // Exclude admin room
+            ->where(function($query) {
+                $query->where('users.is_admin', false)
+                    ->orWhereNull('users.is_admin');
+            })
+            ->where(function($query) {
+                $query->where('users.is_superadmin', false)
+                    ->orWhereNull('users.is_superadmin');
+            })
+            ->get();
 
-        // Ubah dari 'admin.members' menjadi 'admin.tempat-layanan.members'
         return view('admin.tempat-layanan.members', compact('tempat', 'members'));
     }
     public function kick($id, $userId)

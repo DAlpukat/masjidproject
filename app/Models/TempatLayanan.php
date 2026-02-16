@@ -82,6 +82,16 @@ class TempatLayanan extends Model
 
     public function getMembersCountAttribute(): int
     {
-        return $this->users()->where('users.id', '!=', $this->user_id)->count();
+        return $this->users()
+            ->where('users.id', '!=', $this->user_id) // Exclude pemilik/admin room
+            ->where(function($query) {
+                $query->where('users.is_admin', false)
+                    ->orWhereNull('users.is_admin');
+            })
+            ->where(function($query) {
+                $query->where('users.is_superadmin', false)
+                    ->orWhereNull('users.is_superadmin');
+            })
+            ->count();
     }
 }

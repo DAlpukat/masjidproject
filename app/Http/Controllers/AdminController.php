@@ -9,7 +9,6 @@ class AdminController extends Controller
 {
     public function index()
     {
-        // ambil tempat beserta user yang join (eager loading)
         $tempatLayanans = TempatLayanan::with('users')
                                         ->where('user_id', auth()->id())
                                         ->latest()
