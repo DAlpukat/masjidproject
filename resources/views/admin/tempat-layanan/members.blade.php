@@ -136,10 +136,6 @@
                 </div>
             @endif
         </div>
-        
-        <p class="mt-8 text-center text-gray-500 text-xs font-medium uppercase tracking-widest">
-            Catatan: Admin room dan Superadmin tidak ditampilkan di daftar ini
-        </p>
     </div>
 </div>
 
