@@ -80,7 +80,7 @@
                                     @endif
 
                                     <!-- TOMBOL HAPUS (UMUM) -->
-                                    <form method="POST" action="{{ route('pages.destroy', $page->id) }}" onsubmit="return confirm('Yakin hapus halaman ini?')" class="inline">
+                                    <form method="POST" action="{{ route('admin.pages.destroy', $page->id) }}" onsubmit="return confirm('Yakin hapus halaman ini?')" class="inline">
                                         @csrf
                                         @method('DELETE')
                                         <button class="text-red-500 hover:underline text-xs">Hapus Halaman</button>
