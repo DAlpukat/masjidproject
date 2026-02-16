@@ -20,9 +20,9 @@
                     </h1>
                     <p class="text-gray-400 font-medium mt-1">{{ $tempat->nama }}</p>
                 </div>
-                <a href="{{ route('admin.dashboard') }}" class="group inline-flex items-center text-sm font-bold text-pink-400 hover:text-pink-300 transition-colors">
+                <a href="{{ route('room.view', $tempat->slug) }}" class="group inline-flex items-center text-sm font-bold text-pink-400 hover:text-pink-300 transition-colors">
                     <svg class="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                    Kembali ke Dashboard
+                    Kembali ke Ruangan
                 </a>
             </div>
         </div>
@@ -147,7 +147,7 @@
                                 @endif
                             </div>
 
-                            <form method="POST" action="{{ route('pages.destroy', $page->id) }}" onsubmit="return confirm('Yakin hapus halaman ini?')">
+                            <form method="POST" action="{{ route('admin.pages.destroy', $page->id) }}" onsubmit="return confirm('Yakin hapus halaman ini?')">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="p-2 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all" title="Hapus Halaman">
