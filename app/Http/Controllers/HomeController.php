@@ -65,22 +65,27 @@ class HomeController extends Controller
 
     public function myRooms()
     {
-        // Ambil semua room yang user-nya join (berdasarkan tabel pivot)
-        $rooms = auth()->user()->joinedPlaces()->latest()->get();
+        $rooms = auth()->user()->joinedPlaces()
+            ->withCount(['users as anggota_count' => function($query) {
+                $query->whereColumn('users.id', '!=', 'tempat_layanans.user_id') // Kecualikan Admin
+                    ->where('users.email', '!=', 'superadmin@gmail.com'); // GANTI dengan email Super Admin Anda
+            }]) 
+            ->latest()
+            ->get();
+
         return view('user.rooms', compact('rooms'));
     }
 
     public function viewRoom($slug)
     {
-        // Cari room berdasarkan slug
-        $tempat = TempatLayanan::where('slug', $slug)->firstOrFail();
+        // PERBAIKAN: Tambahkan withCount agar di halaman detail juga muncul jumlahnya jika butuh
+        $tempat = TempatLayanan::where('slug', $slug)
+            ->withCount('users')
+            ->firstOrFail();
 
-        // Cek apakah user sudah join room ini
         if (!$tempat->users->contains(auth()->id())) {
             abort(403, 'Kamu belum bergabung ke room ini.');
         }
-
-        // Ambil halaman (pages) yang dibuat admin untuk room ini
         $pages = $tempat->pages()->orderBy('urutan')->get();
 
         return view('user.room-view', compact('tempat', 'pages'));

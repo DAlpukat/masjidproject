@@ -63,7 +63,8 @@ class TempatLayanan extends Model
         return $this->hasMany(LaporanKas::class);
     }
 
-    public function users()
+    // RELATIONS
+    public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'tempat_layanan_user', 'tempat_layanan_id', 'user_id');
     }
@@ -80,8 +81,12 @@ class TempatLayanan extends Model
 
     // ACCESSORS (Helpers)
 
-    public function getMembersCountAttribute(): int
+    public function getAnggotaCountAttribute(): int
     {
-        return $this->users()->where('users.id', '!=', $this->user_id)->count();
+        // Mengambil semua user di pivot yang bukan pemilik dan bukan super admin (berdasarkan email)
+        return $this->users()
+            ->where('users.id', '!=', $this->user_id)
+            ->where('users.email', '!=', 'superadmin@gmail.com') // GANTI dengan email Super Admin Anda
+            ->count();
     }
 }
