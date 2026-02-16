@@ -57,8 +57,10 @@
                 <!-- Pilihan Akses -->
                 <div class="mb-8">
                     <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">
-                        <svg class="w-4 h-4 inline-block mr-2 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 4v4m0 0h4m-4 0H8"></path></svg>
-                        Siapa yang bisa bergabung?
+                        <svg class="w-4 h-4 inline-block mr-2 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+                        </svg>
+                        Tipe Layanan
                     </label>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -70,7 +72,7 @@
                                     <div class="p-2 bg-blue-500/10 rounded-xl">
                                         <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 20 20"><path fill="currentColor" d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.523 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"></path></svg>
                                     </div>
-                                    <span class="bg-blue-500/10 text-blue-400 text-[10px] font-bold px-2 py-1 rounded uppercase">Recommended</span>
+                                    <span class="bg-blue-500/10 text-blue-400 text-[10px] font-bold px-2 py-1 rounded uppercase">PUBLIK</span>
                                 </div>
                                 <h4 class="font-bold text-lg text-white mb-2">Terbuka (Publik)</h4>
                                 <p class="text-sm text-gray-500 leading-relaxed">
