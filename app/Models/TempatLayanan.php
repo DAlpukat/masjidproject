@@ -79,12 +79,10 @@ class TempatLayanan extends Model
         return $this->belongsToMany(User::class, 'tempat_layanan_user');
     }
 
-    // ACCESSORS (Helpers)
-
     public function getAnggotaCountAttribute(): int
     {
         return $this->users()
-            ->where('users.id', '!=', $this->user_id) // Exclude pemilik/admin room
+            ->where('users.id', '!=', $this->user_id)
             ->where(function($query) {
                 $query->where('users.is_admin', false)
                     ->orWhereNull('users.is_admin');
