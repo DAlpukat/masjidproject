@@ -20,7 +20,7 @@
                     </h1>
                     <p class="text-gray-400 font-medium mt-1">{{ $tempat->nama }}</p>
                 </div>
-                <a href="{{ route('room.view', $tempat->slug) }}" class="group inline-flex items-center text-sm font-bold text-pink-400 hover:text-pink-300 transition-colors">
+                <a href="{{ route('admin.dashboard') }}" class="group inline-flex items-center text-sm font-bold text-pink-400 hover:text-pink-300 transition-colors">
                     <svg class="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                     Kembali ke Ruangan
                 </a>
