@@ -1,7 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-<!-- TAMBAHKAN BACKGROUND DI SINI AGAR TEMA MASUK -->
 <div class="bg-monochrome-gif"></div>
 <div class="bg-overlay"></div>
 
@@ -75,37 +74,44 @@
                                 </div>
                             </div>
 
-                            <!-- Publik/Private Toggle -->
+                            <!-- Publik/Private Toggle (Logika Inverse) -->
                             <div class="bg-white/5 p-5 rounded-2xl border border-white/5">
                                 <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Akses</p>
                                 <label class="flex items-center cursor-pointer group">
                                     <div class="relative">
-                                        <input type="checkbox" name="is_public" id="is_public" {{ $tempat->is_public ? 'checked' : '' }} 
-                                            class="sr-only peer" value="1">
+                                        <!-- LOGIC:
+                                             1. Hidden default value = 1 (Publik).
+                                             2. Checkbox value = 0 (Privat).
+                                             3. Jika Checked (Kanan) -> Value 0 (Privat).
+                                             4. Jika Unchecked (Kiri) -> Value 1 (Publik).
+                                        -->
+                                        <input type="hidden" name="is_public" value="1">
+                                        <input type="checkbox" name="is_public" id="is_public" value="0" 
+                                            {{ $tempat->is_public == 0 ? 'checked' : '' }} 
+                                            class="sr-only peer">
+                                        
                                         <div class="w-14 h-7 bg-gray-700 rounded-full peer peer-checked:bg-gradient-to-r peer-checked:from-pink-500 peer-checked:to-purple-500 transition-all"></div>
                                         <div class="absolute left-1 top-1 w-5 h-5 bg-white rounded-full shadow-md peer-checked:translate-x-7 transition-transform"></div>
                                     </div>
-                                    <span class="ml-4 text-sm font-bold text-white group-hover:text-pink-400 transition-colors">
-                                        {{ $tempat->is_public ? 'Publik' : 'Privat' }}
+                                    <span id="access-label" class="ml-4 text-sm font-bold text-white group-hover:text-pink-400 transition-colors">
+                                        {{ $tempat->is_public == 0 ? 'Privat' : 'Publik' }}
                                     </span>
                                 </label>
                             </div>
                         </div>
 
                         <!-- Kode Referral (jika privat) -->
-                        @if(!$tempat->is_public && $tempat->kode_referral)
-                            <div class="bg-purple-500/10 p-5 rounded-2xl border border-purple-500/20">
-                                <p class="text-xs font-bold text-purple-400 uppercase tracking-wider mb-2">Kode Referral</p>
-                                <div class="flex items-center gap-3">
-                                    <span class="font-mono text-2xl font-bold text-white tracking-widest">{{ $tempat->kode_referral }}</span>
-                                    <button type="button" onclick="navigator.clipboard.writeText('{{ $tempat->kode_referral }}')" 
-                                        class="p-2 bg-white/10 hover:bg-white/20 rounded-xl transition-all group/btn">
-                                        <svg class="w-5 h-5 text-purple-400 group-hover/btn:text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
-                                    </button>
-                                </div>
-                                <p class="text-xs text-gray-500 mt-2">Bagikan kode ini untuk mengundang anggota baru</p>
+                        <div id="referral-section" class="{{ $tempat->is_public == 0 ? '' : 'hidden' }} bg-purple-500/10 p-5 rounded-2xl border border-purple-500/20">
+                            <p class="text-xs font-bold text-purple-400 uppercase tracking-wider mb-2">Kode Referral</p>
+                            <div class="flex items-center gap-3">
+                                <span class="font-mono text-2xl font-bold text-white tracking-widest">{{ $tempat->kode_referral }}</span>
+                                <button type="button" onclick="navigator.clipboard.writeText('{{ $tempat->kode_referral }}')" 
+                                    class="p-2 bg-white/10 hover:bg-white/20 rounded-xl transition-all group/btn">
+                                    <svg class="w-5 h-5 text-purple-400 group-hover/btn:text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+                                </button>
                             </div>
-                        @endif
+                            <p class="text-xs text-gray-500 mt-2">Bagikan kode ini untuk mengundang anggota baru</p>
+                        </div>
                     </div>
                 </div>
 
@@ -215,10 +221,27 @@
         }
     }
     
-    // Update toggle text
-    document.getElementById('is_public')?.addEventListener('change', function() {
-        const label = this.parentElement.parentElement.querySelector('span:last-child');
-        label.textContent = this.checked ? 'Publik' : 'Privat';
-    });
+    // Script untuk toggle Akses (Publik/Privat) & Update Label/Referral Section
+    const accessToggle = document.getElementById('is_public');
+    const accessLabel = document.getElementById('access-label');
+    const referralSection = document.getElementById('referral-section');
+
+    function updateAccessUI() {
+        if (accessToggle.checked) {
+            // Kanan (Checked) -> Private (Value 0)
+            accessLabel.textContent = 'Privat';
+            referralSection.classList.remove('hidden');
+        } else {
+            // Kiri (Unchecked) -> Public (Value 1)
+            accessLabel.textContent = 'Publik';
+            referralSection.classList.add('hidden');
+        }
+    }
+
+    // Init on load
+    updateAccessUI();
+    
+    // Listen to change
+    accessToggle?.addEventListener('change', updateAccessUI);
 </script>
 @endsection

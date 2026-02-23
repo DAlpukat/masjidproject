@@ -133,7 +133,7 @@
                         <div class="px-6 py-4 bg-white/5 border-t border-white/5 flex items-center justify-between">
                             <div class="flex items-center gap-2">
                                 @if($page->tipe == 'info')
-                                    <a href="{{ route('posts.index', $page->id) }}" 
+                                    <a href="{{ route('admin.posts.index', $page->id) }}" 
                                         class="px-3 py-1.5 bg-blue-500/10 text-blue-400 rounded-lg text-xs font-bold hover:bg-blue-500 hover:text-white transition-all border border-blue-500/20 hover:border-blue-500">
                                         Kelola Berita
                                     </a>
