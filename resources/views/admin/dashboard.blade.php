@@ -71,10 +71,20 @@
                                     <span class="px-2 py-0.5 bg-blue-500/10 border border-blue-500/20 rounded text-xs">Publik</span>
                                 </div>
                             @else
-                                <button onclick="navigator.clipboard.writeText('{{ $item->kode_referral }}');" class="flex items-center group/btn space-x-2 bg-white/5 px-4 py-2 rounded-xl border border-white/10 hover:border-pink-500/30 transition-all">
-                                    <span class="font-mono font-bold text-pink-400">{{ $item->kode_referral }}</span>
-                                    <svg class="w-4 h-4 text-gray-500 group-hover/btn:text-pink-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
-                                </button>
+                            <button onclick="copyToClipboard(this, '{{ $item->kode_referral }}')" 
+                                class="flex items-center group/btn space-x-2 bg-white/5 px-4 py-2 rounded-xl border border-white/10 hover:border-pink-500/30 transition-all active:scale-95">
+                                
+                                <span class="font-mono font-bold text-pink-400">{{ $item->kode_referral }}</span>
+                                
+                                <div class="icon-container">
+                                    <svg class="copy-icon w-4 h-4 text-gray-500 group-hover/btn:text-pink-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path>
+                                    </svg>
+                                    <svg class="check-icon hidden w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                </div>
+                            </button>
                             @endif
                         </div>
 
@@ -130,4 +140,24 @@
         </div>
     </div>
 </div>
+
+<script>
+function copyToClipboard(btn, text) {
+    navigator.clipboard.writeText(text);
+    
+    // Ambil elemen ikon
+    const copyIcon = btn.querySelector('.copy-icon');
+    const checkIcon = btn.querySelector('.check-icon');
+    
+    // Tukar ikon
+    copyIcon.classList.add('hidden');
+    checkIcon.classList.remove('hidden');
+    
+    // Balikkan ikon ke semula setelah 2 detik
+    setTimeout(() => {
+        copyIcon.classList.remove('hidden');
+        checkIcon.classList.add('hidden');
+    }, 2000);
+}
+</script>
 @endsection
