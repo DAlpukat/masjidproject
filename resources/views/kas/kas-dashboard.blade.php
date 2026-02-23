@@ -13,7 +13,6 @@
         <!-- Header -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
             <div>
-                {{-- Gunakan ID untuk route admin karena route admin menerima ID --}}
                 <a href="{{ route('admin.pages.index', $tempat->id) }}" class="text-pink-400 hover:text-pink-300 hover:underline font-bold">&larr; Kembali ke Daftar Halaman</a>
                 <h1 class="text-3xl font-black text-white mt-2 drop-shadow-lg">Kas & Keuangan: {{ $tempat->nama }}</h1>
             </div>
@@ -36,7 +35,6 @@
                     <div class="glass-card p-6 sticky top-6">
                         <h2 class="text-lg font-bold mb-4 text-white border-b border-white/10 pb-2">Catat Transaksi</h2>
                         
-                        {{-- PERBAIKAN: Gunakan $tempat->slug --}}
                         <form action="{{ route('kas.store', $tempat->slug) }}" method="POST" enctype="multipart/form-data">
                             @csrf
 
@@ -123,30 +121,40 @@
                                     @endif
                                 </div>
 
-                                <!-- LOGIKA PENGELUARAN -->
+                                <!-- LOGIKA PENGELUARAN (FINAL) -->
                                 <div id="section-pengeluaran" class="hidden space-y-4 pt-2 border-t border-white/10">
-                                    <label class="block text-xs font-bold text-gray-300 uppercase mb-1">Mode Pengeluaran</label>
-                                    <div class="space-y-2">
-                                        @if($tempat->shared_expense_enabled)
-                                            <label class="flex items-start p-3 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5 transition">
-                                                <input type="radio" name="tipe_pengeluaran" value="shared" class="mt-1 mr-3 text-pink-500 bg-gray-700 border-gray-600" checked>
-                                                <div>
-                                                    <span class="block font-bold text-white text-sm">Dibagi Rata (Shared)</span>
-                                                    <p class="text-xs text-gray-400">Biaya dibagi ke semua anggota.</p>
-                                                </div>
-                                            </label>
-                                        @endif
-                                        
-                                        @if($tempat->free_expense_enabled)
+                                    
+                                    @if(!$tempat->use_individual_ledger)
+                                        {{-- KAS UMUM: Langsung ambil dari total, tanpa pilihan --}}
+                                        <div class="p-3 bg-red-500/10 text-red-200 text-xs rounded border border-red-500/20">
+                                            Mode <strong>Kas Umum</strong>. Pengeluaran diambil dari saldo fisik total.
+                                        </div>
+                                        <input type="hidden" name="tipe_pengeluaran" value="free">
+                                    @else
+                                        {{-- KAS PERORANGAN: Muncul pilihan mode pengeluaran --}}
+                                        <label class="block text-xs font-bold text-gray-300 uppercase mb-1">Mode Pengeluaran</label>
+                                        <div class="space-y-2">
+                                            {{-- Opsi 1: Dibagi Rata (Hanya muncul jika fitur shared aktif) --}}
+                                            @if($tempat->shared_expense_enabled)
+                                                <label class="flex items-start p-3 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5 transition">
+                                                    <input type="radio" name="tipe_pengeluaran" value="shared" class="mt-1 mr-3 text-pink-500 bg-gray-700 border-gray-600" checked>
+                                                    <div>
+                                                        <span class="block font-bold text-white text-sm">Dibagi Rata (Shared)</span>
+                                                        <p class="text-xs text-gray-400">Biaya dibagi ke semua anggota.</p>
+                                                    </div>
+                                                </label>
+                                            @endif
+
+                                            {{-- Opsi 2: Ambil Saldo Total (Selalu muncul untuk Perorangan) --}}
                                             <label class="flex items-start p-3 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5 transition">
                                                 <input type="radio" name="tipe_pengeluaran" value="free" class="mt-1 mr-3 text-pink-500 bg-gray-700 border-gray-600" {{ !$tempat->shared_expense_enabled ? 'checked' : '' }}>
                                                 <div>
                                                     <span class="block font-bold text-white text-sm">Ambil Saldo Total (Free)</span>
-                                                    <p class="text-xs text-gray-400">Hanya kurangi uang fisik.</p>
+                                                    <p class="text-xs text-gray-400">Hanya kurangi uang fisik (tidak membebani anggota).</p>
                                                 </div>
                                             </label>
-                                        @endif
-                                    </div>
+                                        </div>
+                                    @endif
                                 </div>
 
                                 <div>
@@ -182,7 +190,6 @@
                                     @endforelse
                                 </div>
 
-                                {{-- PERBAIKAN: Gunakan $tempat->slug --}}
                                 <form action="{{ route('kas.kategori.store', $tempat->slug) }}" method="POST" class="space-y-2">
                                     @csrf
                                     <input type="text" name="nama" placeholder="Nama Kategori baru..." class="glass-input text-sm w-full" required>
@@ -371,7 +378,6 @@
 
 <!-- CSS Dark Mode Override -->
 <style>
-    /* Styling Choices.js agar Dark Mode */
     .choices__inner {
         background-color: rgba(255, 255, 255, 0.05) !important;
         border: 1px solid rgba(255, 255, 255, 0.15) !important;
@@ -404,7 +410,6 @@
     .choices::after { border-color: #ffffff transparent transparent !important; }
     .choices.is-open::after { border-color: transparent transparent #ffffff !important; }
     
-    /* Pagination Dark Mode */
     .pagination span, .pagination a {
         background-color: rgba(255, 255, 255, 0.05) !important;
         color: #d1d5db !important;
@@ -422,7 +427,6 @@
 </style>
 
 <script>
-    // --- LOGIC HELPERS ---
     function toggleForm() {
         const sectionMasuk = document.getElementById('section-pemasukan');
         const sectionKeluar = document.getElementById('section-pengeluaran');
@@ -450,7 +454,6 @@
         }
     }
 
-    // --- CHART LOGIC ---
     function initChart() {
         const canvas = document.getElementById('kasChart');
         if(!canvas) return;
@@ -509,7 +512,6 @@
         } catch (e) { console.error(e); }
     }
 
-    // --- DELETE LOGIC ---
     async function hapusTransaksi(id, btnElement) {
         if(!confirm('Yakin ingin menghapus transaksi ini?')) return;
         const originalContent = btnElement.innerHTML;
@@ -533,7 +535,6 @@
         }
     }
 
-    // --- MODAL LOGIC ---
     function openPhotoModal(url) {
         document.getElementById('modalImageContent').src = url;
         document.getElementById('photoModal').classList.remove('hidden');
@@ -544,7 +545,6 @@
         document.getElementById('modalImageContent').src = '';
     }
 
-    // --- INIT CHOICES.JS ---
     function initChoices() {
         const choiceElements = document.querySelectorAll('.choices-dark');
         choiceElements.forEach(el => {
@@ -566,7 +566,6 @@
         });
     }
 
-    // --- MAIN INIT ---
     window.addEventListener('DOMContentLoaded', () => {
         toggleForm();
         togglePersonalInput();
