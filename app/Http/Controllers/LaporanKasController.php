@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\TempatLayanan;
 use App\Models\LaporanKas;
+use App\Models\KategoriKas; // Tambahkan ini
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -13,29 +14,29 @@ class LaporanKasController extends Controller
     {
         $tempat = TempatLayanan::where('slug', $slug)->firstOrFail();
         
-        // Hanya Admin (Pemilik) yang bisa masuk halaman tambah
         if ($tempat->user_id !== auth()->id()) {
             abort(403, 'Hanya Admin yang bisa menambah laporan.');
         }
 
         $anggota = $tempat->users;
-        return view('room.laporan-create', compact('tempat', 'pageId', 'anggota'));
+        $kategoriKas = $tempat->kategoriKas; // Tambahkan data kategori untuk dropdown
+
+        return view('room.laporan-create', compact('tempat', 'pageId', 'anggota', 'kategoriKas'));
     }
 
     public function show($slug, $pageId)
     {
         $tempat = TempatLayanan::where('slug', $slug)->firstOrFail();
         
-        // Cek apakah user yang login adalah anggota ruangan ATAU admin
         if (!$tempat->users->contains(auth()->id())) {
             abort(403, 'Kamu belum bergabung di ruangan ini.');
         }
 
-        // Tentukan apakah user yang sedang login adalah Admin Ruangan ini
         $isAdmin = ($tempat->user_id === auth()->id());
 
-        // Ambil data laporan
-        $query = $tempat->laporanKas();
+        // FIX: Tambahkan Eager Loading
+        $query = $tempat->laporanKas()->with(['user', 'kategori']);
+        
         if ($search = request()->input('search')) {
             $query->where('keterangan', 'like', "%{$search}%");
         }
@@ -61,9 +62,7 @@ class LaporanKasController extends Controller
             ->where('user_id', auth()->id())
             ->sum('jumlah');
 
-        // Hitung pembagian pengeluaran bersama
         $totalPengeluaranBersama = $tempat->laporanKas()->where('jenis', 'keluar')->sum('jumlah');
-        // Gunakan count user yang join (bukan termasuk admin jika join)
         $jumlahAnggota = $tempat->users->count() > 0 ? $tempat->users->count() : 1; 
         $pembagianPerOrang = $totalPengeluaranBersama / $jumlahAnggota;
         
@@ -98,7 +97,6 @@ class LaporanKasController extends Controller
             $saldoData[] = $currentSaldo;
         }
 
-        // Respon JSON
         if (request()->ajax() || request()->wantsJson()) {
             return response()->json([
                 'table' => view('partials.laporan-table', compact('laporans', 'isAdmin'))->render(),
@@ -110,7 +108,7 @@ class LaporanKasController extends Controller
                 ],
                 'saldoPribadi' => 'Rp ' . number_format($saldoPribadi, 0, ',', '.'),
                 'statusSaldo' => $statusSaldo,
-                'isAdmin' => $isAdmin, // Kirim status admin untuk JS jika diperlukan
+                'isAdmin' => $isAdmin,
                 'chart' => [
                     'months' => $months,
                     'pemasukan' => $masukData,
@@ -122,19 +120,9 @@ class LaporanKasController extends Controller
         }
 
         return view('room.laporan-dashboard', compact(
-            'tempat',
-            'pageId',
-            'laporans',
-            'totalMasuk',
-            'totalKeluar',
-            'saldoTotal',
-            'saldoPribadi', 
-            'statusSaldo',
-            'months',
-            'masukData',
-            'keluarData',
-            'saldoData',
-            'isAdmin' // PENTING: Kirim variabel ini ke view
+            'tempat', 'pageId', 'laporans', 'totalMasuk', 'totalKeluar', 
+            'saldoTotal', 'saldoPribadi', 'statusSaldo', 'months', 
+            'masukData', 'keluarData', 'saldoData', 'isAdmin'
         ));
     }
 
@@ -148,19 +136,18 @@ class LaporanKasController extends Controller
             'jenis' => 'required|in:masuk,keluar',
             'sifat_transaksi' => 'required|in:personal,umum',
             'user_id' => 'nullable|exists:users,id',
+            'kategori_kas_id' => 'nullable|exists:kategori_kas,id', // Tambah validasi kategori
             'bukti_foto' => 'nullable|string',
         ]);
 
-        // Hanya Admin yang bisa store
         $tempat = TempatLayanan::find($validated['tempat_layanan_id']);
         if ($tempat->user_id !== auth()->id()) {
             abort(403, 'Anda tidak berhak menambah laporan di room ini.');
         }
 
-        if ($validated['jenis'] == 'masuk' && $validated['sifat_transaksi'] == 'personal') {
-            if (empty($validated['user_id'])) {
-                return back()->with('error', 'Wajib pilih user untuk Kas Perorangan!');
-            }
+        // Logika Khusus: Jika Personal, user_id wajib
+        if ($validated['sifat_transaksi'] == 'personal' && empty($validated['user_id'])) {
+            return back()->with('error', 'Wajib pilih user untuk Kas Perorangan!')->withInput();
         }
 
         LaporanKas::create([
@@ -171,6 +158,7 @@ class LaporanKasController extends Controller
             'jenis' => $validated['jenis'],
             'sifat_transaksi' => $validated['sifat_transaksi'],
             'user_id' => $validated['user_id'] ?? null,
+            'kategori_kas_id' => $validated['kategori_kas_id'] ?? null, // Simpan kategori
             'bukti_foto' => $validated['bukti_foto'] ?? null,
         ]);
 
@@ -185,7 +173,6 @@ class LaporanKasController extends Controller
         $laporan = LaporanKas::findOrFail($id);
         $tempat = $laporan->tempatLayanan;
         
-        // Hanya Admin yang bisa hapus
         if ($tempat->user_id !== auth()->id()) {
             abort(403, 'Akses ditolak.');
         }

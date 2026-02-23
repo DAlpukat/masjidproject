@@ -54,7 +54,6 @@ class KasController extends Controller
             ->limit(6)
             ->get();
 
-        // Return semua data yang diperlukan untuk update UI tanpa reload
         return response()->json([
             'success' => true,
             'message' => 'Transaksi dihapus',
@@ -65,7 +64,6 @@ class KasController extends Controller
             'chartKeluar' => $newChartData->pluck('pengeluaran'),
         ]);
     }
-
 
     public function dashboard($tempatId)
     {
@@ -87,18 +85,19 @@ class KasController extends Controller
                 ->value('saldo') ?? 0;
         }
 
-        // 3. Data untuk Grafik (AMBIL 6 BULAN TERBARU - DESC)
+        // 3. Data untuk Grafik (AMBIL 6 BULAN TERBARU)
         $chartData = LaporanKas::where('tempat_layanan_id', $tempatId)
             ->selectRaw("DATE_FORMAT(tanggal, '%Y-%m') as bulan, SUM(CASE WHEN jenis='masuk' THEN jumlah ELSE 0 END) as pemasukan, SUM(CASE WHEN jenis='keluar' THEN jumlah ELSE 0 END) as pengeluaran")
             ->groupBy('bulan')
-            // FIX: Ambil yang terbaru dulu (DESC)
             ->orderBy('bulan', 'DESC') 
             ->limit(6)
             ->get();
 
-        $laporans = LaporanKas::where('tempat_layanan_id', $tempatId)
-                                ->latest('tanggal')
-                                ->paginate(20);
+        // FIX: Tambahkan Eager Loading 'user' dan 'kategori' untuk data tabel
+        $laporans = LaporanKas::with(['user', 'kategori'])
+            ->where('tempat_layanan_id', $tempatId)
+            ->latest('tanggal')
+            ->paginate(20);
 
         $kategoriKas = $tempat->kategoriKas;
 
@@ -107,15 +106,13 @@ class KasController extends Controller
 
     public function store(Request $request, $tempatId)
     {
-        // 1. Cari Tempat
         $tempat = TempatLayanan::findOrFail($tempatId);
 
-        // 2. VALIDASI HAK AKSES
         if (auth()->id() != $tempat->user_id) {
             abort(403, 'Anda tidak memiliki izin untuk mencatat transaksi.');
         }
 
-        // 3. Validasi Input
+        // FIX: Validasi ketat untuk kategori dan user jika personal
         $request->validate([
             'tanggal'           => 'required|date',
             'keterangan'        => 'required|string',
@@ -124,21 +121,21 @@ class KasController extends Controller
             'bukti_foto'        => 'nullable|image|max:2048',
             
             'is_personal'       => 'nullable|boolean', 
-            'user_id'           => 'nullable|required_if:is_personal,1',
-            'kategori_kas_id'   => 'nullable|required_if:is_personal,1',
+            // Wajib jika is_personal = 1
+            'user_id'           => 'required_if:is_personal,1|nullable|exists:users,id',
+            'kategori_kas_id'   => 'required_if:is_personal,1|nullable|exists:kategori_kas,id',
+            
             'tipe_pengeluaran'  => 'nullable|required_if:jenis,keluar|in:shared,free',
         ]);
 
-        // 4. Proses Transaksi
         $service = new KasTransactionService($tempat);
 
         try {
             $data = $request->all();
             
-            // Handle Boolean Conversion
             $data['is_personal'] = $request->boolean('is_personal');
             
-            // --- LOGIKA PEMBERSIHAN ---
+            // --- LOGIKA PEMBERSIHAN DATA ---
             
             // 1. Jika Uang Bebas (Masuk Umum)
             if ($data['jenis'] === 'masuk' && !$data['is_personal']) {
@@ -147,7 +144,6 @@ class KasController extends Controller
             }
 
             // 2. Jika PEMASUKAN, pastikan tipe pengeluaran di-null kan
-            // (Mencegah label "Shared Expense" muncul di transaksi Pemasukan)
             if ($data['jenis'] === 'masuk') {
                 $data['tipe_pengeluaran'] = null; 
             }

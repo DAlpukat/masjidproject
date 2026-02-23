@@ -63,7 +63,8 @@ class TempatLayanan extends Model
         return $this->hasMany(LaporanKas::class);
     }
 
-    public function users()
+    // RELATIONS
+    public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'tempat_layanan_user', 'tempat_layanan_id', 'user_id');
     }
@@ -78,10 +79,18 @@ class TempatLayanan extends Model
         return $this->belongsToMany(User::class, 'tempat_layanan_user');
     }
 
-    // ACCESSORS (Helpers)
-
-    public function getMembersCountAttribute(): int
+    public function getAnggotaCountAttribute(): int
     {
-        return $this->users()->where('users.id', '!=', $this->user_id)->count();
+        return $this->users()
+            ->where('users.id', '!=', $this->user_id)
+            ->where(function($query) {
+                $query->where('users.is_admin', false)
+                    ->orWhereNull('users.is_admin');
+            })
+            ->where(function($query) {
+                $query->where('users.is_superadmin', false)
+                    ->orWhereNull('users.is_superadmin');
+            })
+            ->count();
     }
 }

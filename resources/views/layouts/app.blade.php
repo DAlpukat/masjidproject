@@ -7,40 +7,51 @@
 
         <title>{{ config('app.name', 'Laravel') }}</title>
 
-        <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-        <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+        <style>
+            /* Override font default */
+            body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        </style>
     </head>
-    <body class="font-sans antialiased text-gray-800 bg-app-theme">
+    
+    <body class="font-sans antialiased text-white/90 min-h-screen relative overflow-x-hidden">
         
-        <!-- NAVIGATION: Pakai style Glass (Fixed Top) -->
+        <div class="bg-monochrome-gif"></div>
+        <div class="bg-overlay"></div>
+
         <div class="fixed top-0 w-full z-50 nav-glass shadow-sm transition-all duration-300">
             @include('layouts.navigation')
         </div>
 
-        <!-- Spacer agar konten tidak tertutup navbar fixed -->
-        <div class="h-16"></div>
+        <div class="h-20"></div>
 
-        <!-- Page Heading (Jika ada) -->
-        @isset($header)
-            <header class="bg-white/50 backdrop-blur-sm border-b border-white/50 mt-6 mb-6">
-                <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                    {{ $header }}
+        <div class="relative z-10 flex flex-col min-h-[calc(100vh-5rem)]">
+            
+            @isset($header)
+                <header class="mb-8">
+                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                        <div class="glass-card px-6 py-4 rounded-2xl flex items-center justify-between">
+                            {{ $header }}
+                        </div>
+                    </div>
+                </header>
+            @endisset
+
+            <main class="flex-grow px-4 sm:px-6 lg:px-8">
+                <div class="max-w-7xl mx-auto">
+                    @yield('content')
+                    {{ $slot ?? '' }}
                 </div>
-            </header>
-        @endisset
+            </main>
 
-        <!-- Page Content -->
-        <main class="min-h-[calc(100vh-4rem)] pb-10">
-            @yield('content')
-        </main>
+            <footer class="py-6 text-center text-xs text-gray-400 mt-10 border-t border-white/10">
+                &copy; {{ date('Y') }} Sistem Management Layanan | AllStarCmp
+            </footer>
+        </div>
 
-        <!-- Footer Kecil (Optional) -->
-        <footer class="py-6 text-center text-xs text-gray-400">
-            &copy; {{ date('Y') }} Sistem Management Layanan
-        </footer>
     </body>
 </html>
