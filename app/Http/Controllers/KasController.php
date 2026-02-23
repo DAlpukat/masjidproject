@@ -11,30 +11,33 @@ use Illuminate\Http\Request;
 
 class KasController extends Controller
 {
+    /**
+     * Menghapus transaksi (hanya untuk Admin pemilik).
+     * Route: DELETE /kas/destroy/{id}
+     */
     public function destroy($id)
     {
         $laporan = LaporanKas::findOrFail($id);
 
-        // 1. Cek Admin / Owner
+        // Otorisasi: Hanya pemilik tempat layanan yang bisa hapus
         if (auth()->id() != $laporan->tempatLayanan->user_id) {
             return response()->json(['error' => 'Akses Ditolak'], 403);
         }
 
-        // 2. Hapus Transaksi (Rollback otomatis user logs)
         \DB::transaction(function () use ($id, $laporan) {
+            // Hapus log kas user jika ada (pengembalian dana atau penghapusan utang)
             UserKasLog::where('laporan_kas_id', $id)->delete();
             $laporan->delete();
         });
 
-        // 3. HITUNG ULANG DATA YANG DIBUTUHKAN UNTUK AJAX UPDATE
         $tempatId = $laporan->tempat_layanan_id;
         
-        // Saldo Total
+        // Kalkulasi ulang saldo total
         $newTotalBalance = LaporanKas::where('tempat_layanan_id', $tempatId)
             ->selectRaw("SUM(IF(jenis='masuk', jumlah, -jumlah)) as saldo")
             ->value('saldo') ?? 0;
 
-        // Saldo Pribadi
+        // Kalkulasi ulang saldo pribadi jika mode individual aktif
         $newPersonalBalance = 0;
         $tempat = TempatLayanan::find($tempatId);
         if ($tempat->use_individual_ledger) {
@@ -46,7 +49,7 @@ class KasController extends Controller
                 ->value('saldo') ?? 0;
         }
 
-        // Data Grafik Baru
+        // Data untuk chart update (opsional, jika pakai AJAX realtime)
         $newChartData = LaporanKas::where('tempat_layanan_id', $tempatId)
             ->selectRaw("DATE_FORMAT(tanggal, '%Y-%m') as bulan, SUM(CASE WHEN jenis='masuk' THEN jumlah ELSE 0 END) as pemasukan, SUM(CASE WHEN jenis='keluar' THEN jumlah ELSE 0 END) as pengeluaran")
             ->groupBy('bulan')
@@ -65,16 +68,23 @@ class KasController extends Controller
         ]);
     }
 
-    public function dashboard($tempatId)
+    /**
+     * Menampilkan Dashboard Kas.
+     * Route: GET /room/{slug}/kas
+     */
+    public function dashboard($slug)
     {
-        $tempat = TempatLayanan::findOrFail($tempatId);
+        // Cari tempat berdasarkan slug
+        $tempat = TempatLayanan::where('slug', $slug)->firstOrFail();
+        
+        $tempatId = $tempat->id;
 
-        // 1. Hitung Saldo Total
+        // Hitung Saldo Total Fisik
         $totalBalance = LaporanKas::where('tempat_layanan_id', $tempatId)
             ->selectRaw("SUM(IF(jenis='masuk', jumlah, -jumlah)) as saldo")
             ->value('saldo') ?? 0;
 
-        // 2. Hitung Saldo Pribadi
+        // Hitung Saldo Pribadi (jika mode individual)
         $personalBalance = 0;
         if ($tempat->use_individual_ledger) {
             $personalBalance = UserKasLog::whereHas('kategori', function($q) use ($tempatId) {
@@ -85,7 +95,7 @@ class KasController extends Controller
                 ->value('saldo') ?? 0;
         }
 
-        // 3. Data untuk Grafik (AMBIL 6 BULAN TERBARU)
+        // Data Grafik (6 bulan terakhir)
         $chartData = LaporanKas::where('tempat_layanan_id', $tempatId)
             ->selectRaw("DATE_FORMAT(tanggal, '%Y-%m') as bulan, SUM(CASE WHEN jenis='masuk' THEN jumlah ELSE 0 END) as pemasukan, SUM(CASE WHEN jenis='keluar' THEN jumlah ELSE 0 END) as pengeluaran")
             ->groupBy('bulan')
@@ -93,7 +103,7 @@ class KasController extends Controller
             ->limit(6)
             ->get();
 
-        // FIX: Tambahkan Eager Loading 'user' dan 'kategori' untuk data tabel
+        // Riwayat Transaksi dengan Pagination
         $laporans = LaporanKas::with(['user', 'kategori'])
             ->where('tempat_layanan_id', $tempatId)
             ->latest('tanggal')
@@ -104,15 +114,19 @@ class KasController extends Controller
         return view('kas.kas-dashboard', compact('tempat', 'laporans', 'kategoriKas', 'totalBalance', 'personalBalance', 'chartData'));
     }
 
-    public function store(Request $request, $tempatId)
+    /**
+     * Menyimpan Transaksi Baru.
+     * Route: POST /room/{slug}/kas
+     */
+    public function store(Request $request, $slug)
     {
-        $tempat = TempatLayanan::findOrFail($tempatId);
+        $tempat = TempatLayanan::where('slug', $slug)->firstOrFail();
 
+        // Otorisasi: Hanya Admin
         if (auth()->id() != $tempat->user_id) {
             abort(403, 'Anda tidak memiliki izin untuk mencatat transaksi.');
         }
 
-        // FIX: Validasi ketat untuk kategori dan user jika personal
         $request->validate([
             'tanggal'           => 'required|date',
             'keterangan'        => 'required|string',
@@ -121,7 +135,6 @@ class KasController extends Controller
             'bukti_foto'        => 'nullable|image|max:2048',
             
             'is_personal'       => 'nullable|boolean', 
-            // Wajib jika is_personal = 1
             'user_id'           => 'required_if:is_personal,1|nullable|exists:users,id',
             'kategori_kas_id'   => 'required_if:is_personal,1|nullable|exists:kategori_kas,id',
             
@@ -135,20 +148,16 @@ class KasController extends Controller
             
             $data['is_personal'] = $request->boolean('is_personal');
             
-            // --- LOGIKA PEMBERSIHAN DATA ---
-            
-            // 1. Jika Uang Bebas (Masuk Umum)
+            // Set default null untuk transaksi umum
             if ($data['jenis'] === 'masuk' && !$data['is_personal']) {
                 $data['user_id'] = null;
                 $data['kategori_kas_id'] = null;
             }
 
-            // 2. Jika PEMASUKAN, pastikan tipe pengeluaran di-null kan
             if ($data['jenis'] === 'masuk') {
                 $data['tipe_pengeluaran'] = null; 
             }
 
-            // Handle File Upload
             if ($request->hasFile('bukti_foto')) {
                 $data['bukti_foto'] = $request->file('bukti_foto')->store('kas', 'public');
             }
@@ -161,9 +170,13 @@ class KasController extends Controller
         }
     }
 
-    public function storeKategori(Request $request, $tempatId)
+    /**
+     * Menyimpan Kategori Kas Baru.
+     * Route: POST /room/{slug}/kategori
+     */
+    public function storeKategori(Request $request, $slug)
     {
-        $tempat = TempatLayanan::findOrFail($tempatId);
+        $tempat = TempatLayanan::where('slug', $slug)->firstOrFail();
 
         if (auth()->id() != $tempat->user_id) {
             abort(403);

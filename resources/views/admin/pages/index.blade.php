@@ -1,7 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-<!-- TAMBAHKAN BACKGROUND DI SINI AGAR TEMA MASUK -->
 <div class="bg-monochrome-gif"></div>
 <div class="bg-overlay"></div>
 
@@ -140,7 +139,7 @@
                                 @endif
 
                                 @if($page->tipe == 'kas')
-                                    <a href="{{ route('kas.dashboard', $page->tempat_layanan_id) }}" 
+                                    <a href="{{ route('kas.dashboard', $page->tempatLayanan->slug) }}" 
                                         class="px-3 py-1.5 bg-emerald-500/10 text-emerald-400 rounded-lg text-xs font-bold hover:bg-emerald-500 hover:text-white transition-all border border-emerald-500/20 hover:border-emerald-500">
                                         Buka Kas
                                     </a>

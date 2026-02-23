@@ -13,6 +13,7 @@
         <!-- Header -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
             <div>
+                {{-- Gunakan ID untuk route admin karena route admin menerima ID --}}
                 <a href="{{ route('admin.pages.index', $tempat->id) }}" class="text-pink-400 hover:text-pink-300 hover:underline font-bold">&larr; Kembali ke Daftar Halaman</a>
                 <h1 class="text-3xl font-black text-white mt-2 drop-shadow-lg">Kas & Keuangan: {{ $tempat->nama }}</h1>
             </div>
@@ -35,7 +36,8 @@
                     <div class="glass-card p-6 sticky top-6">
                         <h2 class="text-lg font-bold mb-4 text-white border-b border-white/10 pb-2">Catat Transaksi</h2>
                         
-                        <form action="{{ route('kas.store', $tempat->id) }}" method="POST" enctype="multipart/form-data">
+                        {{-- PERBAIKAN: Gunakan $tempat->slug --}}
+                        <form action="{{ route('kas.store', $tempat->slug) }}" method="POST" enctype="multipart/form-data">
                             @csrf
 
                             <!-- Toggle Jenis -->
@@ -93,7 +95,6 @@
                                                     
                                                     <div id="personal-inputs" class="hidden mt-3 space-y-2 pl-2 border-l-2 border-pink-500/50">
                                                         <label class="block text-xs font-bold text-gray-400 uppercase">Nama Anggota</label>
-                                                        <!-- Class choices-dark penting untuk selector JS -->
                                                         <select name="user_id" class="glass-input text-sm w-full choices-dark">
                                                             <option value="">-- Pilih Anggota --</option>
                                                             @foreach($tempat->users as $u)
@@ -181,7 +182,8 @@
                                     @endforelse
                                 </div>
 
-                                <form action="{{ route('kas.kategori.store', $tempat->id) }}" method="POST" class="space-y-2">
+                                {{-- PERBAIKAN: Gunakan $tempat->slug --}}
+                                <form action="{{ route('kas.kategori.store', $tempat->slug) }}" method="POST" class="space-y-2">
                                     @csrf
                                     <input type="text" name="nama" placeholder="Nama Kategori baru..." class="glass-input text-sm w-full" required>
                                     <div class="flex gap-2">
@@ -369,7 +371,7 @@
 
 <!-- CSS Dark Mode Override -->
 <style>
-    /* Styling Choices.js agar Dark Mode (Pakai !important agar menang) */
+    /* Styling Choices.js agar Dark Mode */
     .choices__inner {
         background-color: rgba(255, 255, 255, 0.05) !important;
         border: 1px solid rgba(255, 255, 255, 0.15) !important;
@@ -377,27 +379,20 @@
         padding: 0.5rem;
         min-height: 42px;
     }
-    .choices__list--single {
-        padding: 4px 16px 4px 4px;
-    }
-    .choices__list--single .choices__item {
-        color: #fff !important;
-    }
+    .choices__list--single { padding: 4px 16px 4px 4px; }
+    .choices__list--single .choices__item { color: #fff !important; }
     .choices__list--dropdown {
-        background-color: #1f2937 !important; /* Gray 800 */
+        background-color: #1f2937 !important;
         border: 1px solid rgba(255, 255, 255, 0.15) !important;
         color: #fff !important;
     }
-    .choices__list--dropdown .choices__item {
-        color: #d1d5db !important; /* Gray 300 */
-        padding: 10px;
-    }
+    .choices__list--dropdown .choices__item { color: #d1d5db !important; padding: 10px; }
     .choices__list--dropdown .choices__item--selectable.is-highlighted {
         background-color: rgba(255, 255, 255, 0.1) !important;
         color: #fff !important;
     }
     .choices[data-type*="select-one"] .choices__input {
-        background-color: #374151 !important; /* Gray 700 */
+        background-color: #374151 !important;
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
         color: #fff !important;
         padding: 0.5rem;
@@ -405,16 +400,9 @@
         width: calc(100% - 1rem);
         border-radius: 0.25rem;
     }
-    .choices__input::placeholder {
-        color: #9ca3af !important; /* Gray 400 */
-    }
-    /* Fix Arrow Color */
-    .choices::after {
-        border-color: #ffffff transparent transparent !important;
-    }
-    .choices.is-open::after {
-        border-color: transparent transparent #ffffff !important;
-    }
+    .choices__input::placeholder { color: #9ca3af !important; }
+    .choices::after { border-color: #ffffff transparent transparent !important; }
+    .choices.is-open::after { border-color: transparent transparent #ffffff !important; }
     
     /* Pagination Dark Mode */
     .pagination span, .pagination a {
@@ -556,18 +544,16 @@
         document.getElementById('modalImageContent').src = '';
     }
 
-    // --- INIT CHOICES.JS (INI YANG TADI KURANG) ---
+    // --- INIT CHOICES.JS ---
     function initChoices() {
         const choiceElements = document.querySelectorAll('.choices-dark');
         choiceElements.forEach(el => {
-            // Cek apakah sudah di-init sebelumnya agar tidak error
             if (!el.classList.contains('choices__input')) {
                 new Choices(el, {
                     searchEnabled: true,
                     itemSelectText: '',
                     shouldSort: false,
                     allowHTML: true,
-                    // PENTING: Pastikan class names sesuai styling CSS di atas
                     classNames: {
                         containerOuter: 'choices',
                         containerInner: 'choices__inner',
@@ -585,7 +571,7 @@
         toggleForm();
         togglePersonalInput();
         initChart();
-        initChoices(); // Panggil fungsi init Choices di sini
+        initChoices();
     });
 </script>
 @endsection
