@@ -16,24 +16,29 @@ class PageController extends Controller
         return view('admin.pages.index', compact('tempat', 'pages'));
     }
 
+
     public function store(Request $request)
     {
         $request->validate([
             'tempat_layanan_id' => 'required|exists:tempat_layanans,id',
             'judul' => 'required|string|max:255',
-            'tipe' => 'required|in:kas,barang_pinjam,info',
-            'content' => 'nullable|string',
+            'tipe' => 'required|string|in:info,kas', // Hanya menerima nilai ini
+            'konten' => 'nullable|string',
         ]);
 
-        Page::create([
-            'tempat_layanan_id' => $request->tempat_layanan_id,
-            'judul' => $request->judul,
-            'tipe' => $request->tipe,
-            'content' => $request->content,
-            'urutan' => Page::where('tempat_layanan_id', $request->tempat_layanan_id)->count() + 1,
-        ]);
+        // LOGIKA VALIDASI UNIK:
+        // Cek apakah tipe ini sudah ada di tempat layanan ini
+        $sudahAda = Page::where('tempat_layanan_id', $request->tempat_layanan_id)
+                        ->where('tipe', $request->tipe)
+                        ->exists();
 
-        return back()->with('success', 'Halaman berhasil ditambahkan');
+        if ($sudahAda) {
+            return back()->with('error', 'Tipe halaman "' . ucfirst($request->tipe) . '" sudah ada. Tidak boleh duplikat.')->withInput();
+        }
+
+        Page::create($request->all());
+
+        return back()->with('success', 'Halaman berhasil ditambahkan.');
     }
 
     public function edit(Page $page)

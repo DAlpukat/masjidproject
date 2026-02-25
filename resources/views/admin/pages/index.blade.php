@@ -32,6 +32,19 @@
                 <svg class="w-5 h-5 mr-2 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                 Tambah Halaman Baru
             </h3>
+            
+            <!-- Pesan Error/Sukses -->
+            @if(session('error'))
+                <div class="bg-red-500/20 border border-red-500/30 text-red-300 px-4 py-3 rounded-xl text-sm mb-4">
+                    {{ session('error') }}
+                </div>
+            @endif
+            @if(session('success'))
+                <div class="bg-green-500/20 border border-green-500/30 text-green-300 px-4 py-3 rounded-xl text-sm mb-4">
+                    {{ session('success') }}
+                </div>
+            @endif
+
             <form method="POST" action="{{ route('admin.pages.store') }}">
                 @csrf
                 <input type="hidden" name="tempat_layanan_id" value="{{ $tempat->id }}">
@@ -45,10 +58,21 @@
                     
                     <div class="md:w-48">
                         <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Tipe</label>
-                        <select name="tipe" class="glass-input w-full px-4 py-3 rounded-xl text-white focus:ring-2 focus:ring-pink-500/50 transition-all cursor-pointer appearance-none">
-                            <option value="info" class="bg-gray-900">Info (Pengumuman)</option>
-                            <option value="kas" class="bg-gray-900">Kas (Keuangan)</option>
-                            <option value="barang_pinjam" class="bg-gray-900">Barang Pinjam</option>
+                        <select name="tipe" class="glass-input w-full px-4 py-3 rounded-xl text-white focus:ring-2 focus:ring-pink-500/50 transition-all cursor-pointer appearance-none" required>
+                            <option value="" selected disabled>-- Pilih Tipe --</option>
+                            
+                            {{-- LOGIKA: Disable jika tipe sudah ada di array $existingTypes --}}
+                            <option value="info" class="bg-gray-900" {{ in_array('info', $existingTypes ?? []) ? 'disabled' : '' }}>
+                                Info (Pengumuman) {{ in_array('info', $existingTypes ?? []) ? '(Sudah Ada)' : '' }}
+                            </option>
+                            
+                            <option value="kas" class="bg-gray-900" {{ in_array('kas', $existingTypes ?? []) ? 'disabled' : '' }}>
+                                Kas (Keuangan) {{ in_array('kas', $existingTypes ?? []) ? '(Sudah Ada)' : '' }}
+                            </option>
+
+                            <option value="barang_pinjam" class="bg-gray-900" {{ in_array('barang_pinjam', $existingTypes ?? []) ? 'disabled' : '' }}>
+                                Barang Pinjam {{ in_array('barang_pinjam', $existingTypes ?? []) ? '(Sudah Ada)' : '' }}
+                            </option>
                         </select>
                     </div>
 
