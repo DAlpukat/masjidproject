@@ -55,6 +55,28 @@ class TempatLayananController extends Controller
             ->with('success', 'Kelas berhasil diajukan. Menunggu persetujuan Superadmin.');
     }
 
+
+    public function joinPublic($id)
+    {
+        $user = auth()->user();
+        
+        // Cari room, jika tidak ada return error JSON
+        $room = TempatLayanan::find($id);
+        if (!$room) {
+            return response()->json(['message' => 'Room tidak ditemukan'], 404);
+        }
+
+        // Cek apakah sudah join
+        if ($user->tempatLayanans()->where('tempat_layanan_id', $id)->exists()) {
+            return response()->json(['message' => 'Sudah bergabung'], 200);
+        }
+
+        // Logika Join
+        $user->tempatLayanans()->attach($id);
+
+        return response()->json(['message' => 'Berhasil join'], 200);
+    }
+
     public function edit($id)
     {
         $tempat = TempatLayanan::findOrFail($id);
@@ -102,26 +124,54 @@ class TempatLayananController extends Controller
             ->with('success', 'Pengaturan kelas berhasil diperbarui.');
     }
 
-    public function destroy(TempatLayanan $tempat)
+    public function destroy($id)
     {
-        if ($tempat->user_id !== auth()->id()) {
-            abort(403, 'Anda tidak bisa menghapus milik orang lain.');
+        $tempat = TempatLayanan::findOrFail($id);
+
+        // Otorisasi
+        if (auth()->id() != $tempat->user_id && !auth()->user()->is_superadmin) {
+            return response()->json([
+                'success' => false, 
+                'message' => 'Akses Ditolak.'
+            ], 403);
         }
 
-        $tempat->delete();
+        try {
+            // Hapus relasi anggota
+            $tempat->users()->detach();
+            
+            // Hapus ruangan
+            $tempat->delete();
 
-        return redirect()
-            ->route('admin.dashboard')
-            ->with('success', 'Kelas berhasil dihapus.');
+            return response()->json([
+                'success' => true,
+                'message' => 'Ruangan berhasil dihapus.'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menghapus: ' . $e->getMessage()
+            ], 500);
+        }
     }
+    
     public function members($id)
     {
         $tempat = TempatLayanan::findOrFail($id);
-        $members = $tempat->users->filter(function($user) {
-            return !$user->is_admin && !$user->is_superadmin;
-        });
+        
+        $members = $tempat->users()
+            ->where('users.id', '!=', $tempat->user_id) // Exclude admin room
+            ->where(function($query) {
+                $query->where('users.is_admin', false)
+                    ->orWhereNull('users.is_admin');
+            })
+            ->where(function($query) {
+                $query->where('users.is_superadmin', false)
+                    ->orWhereNull('users.is_superadmin');
+            })
+            ->get();
 
-        // Ubah dari 'admin.members' menjadi 'admin.tempat-layanan.members'
         return view('admin.tempat-layanan.members', compact('tempat', 'members'));
     }
     public function kick($id, $userId)

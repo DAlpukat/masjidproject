@@ -1,41 +1,54 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mx-auto py-8 px-4">
+<div class="bg-monochrome-gif"></div>
+<div class="bg-overlay"></div>
+
+<div class="min-h-screen py-12 px-4 sm:px-6 lg:px-8 relative z-10">
     <div class="max-w-4xl mx-auto">
-        <div class="mb-6">
-            <a href="{{ route('posts.index', $page->id) }}" class="text-blue-600 hover:underline">&larr; Kembali</a>
-            <h1 class="text-2xl font-bold mt-2">Tulis Berita Baru</h1>
+        
+        <!-- Header -->
+        <div class="mb-8">
+            <a href="{{ route('admin.posts.index', $page->id) }}" class="text-pink-400 hover:text-pink-300 hover:underline font-bold text-sm inline-flex items-center mb-4">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Kembali ke Daftar Post
+            </a>
+            <h1 class="text-3xl font-black text-white tracking-tight">Tulis Berita Baru</h1>
+            <p class="text-gray-400 mt-1">Buat konten baru untuk halaman ini.</p>
         </div>
 
-        <div class="bg-white shadow rounded-lg p-6 border border-gray-200">
-            <form method="POST" action="{{ route('posts.store') }}" enctype="multipart/form-data">
+        <!-- Form Card -->
+        <div class="glass-card rounded-2xl p-8 border border-white/10">
+            <form method="POST" action="{{ route('admin.posts.store') }}" enctype="multipart/form-data">
                 @csrf
-                
                 <input type="hidden" name="page_id" value="{{ $page->id }}">
 
-                <div class="mb-4">
-                    <label class="block font-bold mb-2">Judul Berita</label>
-                    <input type="text" name="title" class="w-full border p-2 rounded" required>
-                </div>
+                <div class="space-y-6">
+                    <!-- Judul -->
+                    <div>
+                        <label class="block text-xs font-bold text-gray-300 uppercase mb-2">Judul Berita</label>
+                        <input type="text" name="title" class="glass-input w-full" placeholder="Judul yang menarik..." required>
+                    </div>
 
-                <!-- Wajib Upload Gambar -->
-                <div class="mb-4">
-                    <label class="block font-bold mb-2">Gambar Utama (Thumbnail)</label>
-                    <input type="file" name="image" class="w-full border p-2 rounded" required accept="image/*">
-                    <p class="text-xs text-gray-500 mt-1">Wajib diisi. Muncul di kotak daftar berita.</p>
-                </div>
+                    <!-- Gambar -->
+                    <div>
+                        <label class="block text-xs font-bold text-gray-300 uppercase mb-2">Gambar Utama (Thumbnail)</label>
+                        <input type="file" name="image" class="w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-pink-800 file:text-pink-100 hover:file:bg-pink-700 cursor-pointer" required accept="image/*">
+                        <p class="text-xs text-gray-500 mt-2">Wajib diisi. Gambar ini akan muncul di daftar berita.</p>
+                    </div>
 
-                <!-- Konten Editor -->
-                <div class="mb-4">
-                    <label class="block font-bold mb-2">Isi Berita</label>
-                    <textarea id="mytextarea" name="content" class="w-full border p-2 rounded"></textarea>
-                </div>
+                    <!-- Konten Editor -->
+                    <div>
+                        <label class="block text-xs font-bold text-gray-300 uppercase mb-2">Isi Berita</label>
+                        <textarea id="mytextarea" name="content" class="w-full" rows="10"></textarea>
+                    </div>
 
-                <div class="flex justify-end">
-                    <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded font-bold hover:bg-blue-700">
-                        Terbitkan Berita
-                    </button>
+                    <!-- Submit -->
+                    <div class="pt-4 border-t border-white/10">
+                        <button type="submit" class="btn-gradient-pink w-full py-3 rounded-xl font-bold shadow-lg hover:scale-[1.02] transition text-white">
+                            Terbitkan Berita
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>
@@ -43,13 +56,25 @@
 </div>
 
 <!-- TINYMCE SCRIPT -->
-<script src="https://cdn.tiny.cloud/1/{{ env('TINYMCE_API_KEY', 'no-api-key') }}/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<!-- Menggunakan no-api-key untuk menghindari warning domain -->
+ <script src="https://cdn.tiny.cloud/1/{{ env('TINYMCE_API_KEY', 'no-api-key') }}/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
 <script>
     tinymce.init({
         selector: '#mytextarea',
-        plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount checklist mediaembed casechange export formatpainter pageembed permanentpen footnotes advtemplate advtable advcode editimage tableofcontents mergetags powerpaste tinymcespellchecker autocorrect a11ychecker typography inlinecss',
-        toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | align lineheight | tinycomments | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+    
+        plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount code',
+        
+        toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat code',
+        
         height: 500,
+        
+        promotion: false, 
+        branding: false, 
+        
+
+        skin: 'oxide-dark',
+        content_css: 'dark',
+    
         automatic_uploads: true,
     });
 </script>

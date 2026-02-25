@@ -5,10 +5,9 @@
 /* =========================================
    1. TEXT SELECTION FIX
    ========================================= */
-/* Memperbaiki agar saat diblok, warna terang dan teks TIDAK hilang */
 ::selection {
-    background: #ffffff; /* Background Putih Terang */
-    color: #000000; /* Teks Hitam agar kontras & terbaca jelas */
+    background: #ffffff;
+    color: #000000;
     text-shadow: none;
 }
 
@@ -18,16 +17,13 @@
 ::-webkit-scrollbar {
     width: 8px;
 }
-
 ::-webkit-scrollbar-track {
     background: #0f0f0f;
 }
-
 ::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.2);
     border-radius: 4px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.4);
 }
@@ -35,14 +31,11 @@
 /* =========================================
    3. BACKGROUND & LAYOUT (GIF + OVERLAY)
    ========================================= */
-
-/* Wrapper umum untuk konten agar Z-Index bekerja */
 .content-wrapper {
     position: relative;
     z-index: 10;
 }
 
-/* Background GIF (Z-Index -2 agar di paling bawah) */
 .bg-monochrome-gif {
     position: fixed;
     top: 0;
@@ -51,14 +44,12 @@
     height: 100%;
     z-index: -2;
     background-color: #0f0f0f;
-    /* Menggunakan URL GIF yang lebih baru dari input Anda */
-    background-image: url("https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExeWtnM29icHV3aGRsdTVncWZ0dzFkNzhwZXN4aTJ4dnQxcDRkazdkcCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/VrMILFG2YyevPDtGyB/giphy.gif");
+    background-image: url("https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbmNoc3kzOGF1NzV2Nnl5OTBoc3ZpbzNrYXJ4dXltbDVvd2Exd3psdyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/htSM5MPkwlKaSYE7yN/giphy.gif");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
 }
 
-/* Overlay Gelap (Z-Index -1 agar di atas GIF tapi di bawah konten) */
 .bg-overlay {
     position: fixed;
     top: 0;
@@ -66,27 +57,23 @@
     width: 100%;
     height: 100%;
     z-index: -1;
-    pointer-events: none; /* Agar klik tembus ke konten */
-    /* Gradient Radial agar fokus ke tengah */
+    pointer-events: none;
     background: radial-gradient(
         circle at center,
         rgba(0, 0, 0, 0.5) 0%,
         rgba(0, 0, 0, 0.85) 100%
     );
-    /* Fallback solid color */
     background-color: rgba(0, 0, 0, 0.7);
 }
 
 /* =========================================
    4. GLASSMORPHISM COMPONENTS
    ========================================= */
-
-/* Kartu Kaca Utama - Diperbarui agar lebih Terang */
 .glass-card {
-    background: rgba(255, 255, 255, 0.08); /* Dinaikkan agar lebih terlihat */
+    background: rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.15); /* Border lebih terang */
+    border: 1px solid rgba(255, 255, 255, 0.15);
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -98,31 +85,17 @@
     box-shadow: 0 15px 45px rgba(0, 0, 0, 0.5);
 }
 
-
-/* Navbar Glass - Diperbarui untuk menghilangkan glitch hitam */
-/* =========================================
-   4. GLASSMORPHISM COMPONENTS (REVISED)
-   ========================================= */
-
-/* Navbar Glass - Versi Dark Crystal */
 .nav-glass {
-    /* Gunakan warna yang sedikit lebih pekat agar render lebih stabil */
-    background: rgba(10, 10, 10, 0.85) !important; 
-    
-    /* --- SOLUSI AMPUH --- */
-    /* Hapus transisi sama sekali agar tidak ada delay render shadow */
-    transition: none !important; 
-    
-    /* Paksa browser membuat layer baru (Hardware Acceleration) */
+    background: rgba(10, 10, 10, 0.85) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    transition: none !important;
     will-change: transform;
     transform: translateZ(0);
-    
-    /* Hilangkan bayangan box saat loading */
     box-shadow: none !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Input Form Glass */
 .glass-input {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.2);
@@ -144,8 +117,6 @@
 /* =========================================
    5. BUTTONS & INTERACTIVE
    ========================================= */
-
-/* Tombol Monochrome Elegant */
 .btn-monochrome {
     @apply px-6 py-3 rounded-full font-semibold transition-all duration-300 flex items-center justify-center border border-white/20;
     background: linear-gradient(
@@ -162,13 +133,8 @@
     text-shadow: none;
 }
 
-/* Tombol Gradient Pink (Warna lebih terang/vibrant) */
 .btn-gradient-pink {
-    background: linear-gradient(
-        135deg,
-        #ec4899 0%,
-        #a855f7 100%
-    ); /* Pink & Ungu Terang */
+    background: linear-gradient(135deg, #ec4899 0%, #a855f7 100%);
     color: white;
     box-shadow: 0 4px 15px rgba(236, 72, 153, 0.4);
     transition: all 0.3s ease;
@@ -180,24 +146,63 @@
     filter: brightness(1.1);
 }
 
-/* Tombol Secondary Link */
-.btn-secondary {
-    @apply text-gray-300 hover:text-white font-medium transition-colors relative cursor-pointer;
+/* Action Buttons (Mono Glow) */
+.btn-action-mono {
+    @apply p-3 rounded-xl transition-all duration-300 relative overflow-hidden;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.6);
 }
 
-.btn-secondary::after {
+.btn-action-mono:hover {
+    background: #ffffff;
+    color: #000000;
+    transform: translateY(-3px);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+    border-color: #ffffff;
+}
+
+.btn-action-danger {
+    @apply p-3 rounded-xl transition-all duration-300 relative overflow-hidden;
+    background: rgba(239, 68, 68, 0.05);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
+.btn-action-danger:hover {
+    background: #ef4444;
+    color: #ffffff;
+    transform: translateY(-3px);
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+    border-color: #ef4444;
+}
+
+/* Shine Effect for Action Buttons */
+.btn-action-mono::before,
+.btn-action-danger::before {
     content: "";
-    @apply absolute bottom-0 left-0 w-0 h-0.5 bg-white transition-all duration-300;
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.2),
+        transparent
+    );
+    transition: 0.5s;
 }
 
-.btn-secondary:hover::after {
-    @apply w-full;
+.btn-action-mono:hover::before,
+.btn-action-danger:hover::before {
+    left: 100%;
 }
 
 /* =========================================
-   6. TYPOGRAPHY & TEXT UTILS
+   6. TYPOGRAPHY & ANIMATIONS
    ========================================= */
-
 .desc-clamp {
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -206,54 +211,6 @@
     word-break: break-word;
 }
 
-/* Text Gradient Monochrome (Lebih Terang) */
-.text-gradient-mono {
-    background: linear-gradient(
-        to right,
-        #ffffff,
-        #d1d5db
-    ); /* Putih ke Abu-abu Terang */
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-/* Active Link State */
-.nav-link-active {
-    color: #ffffff;
-    background-color: rgba(255, 255, 255, 0.15);
-    border-bottom: 2px solid rgba(255, 255, 255, 0.8);
-}
-
-/* =========================================
-   7. ANIMATIONS
-   ========================================= */
-
-.reveal {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: all 1s cubic-bezier(0.5, 0, 0, 1);
-}
-
-.reveal.active {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* Delays */
-.delay-100 {
-    transition-delay: 100ms;
-}
-.delay-200 {
-    transition-delay: 200ms;
-}
-.delay-300 {
-    transition-delay: 300ms;
-}
-.delay-400 {
-    transition-delay: 400ms;
-}
-
-/* Pulse Animation helper */
 @keyframes soft-pulse {
     0%,
     100% {
@@ -263,6 +220,103 @@
         opacity: 0.7;
     }
 }
+
 .animate-soft-pulse {
     animation: soft-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* =========================================
+   7. THIRD-PARTY PLUGINS: CHOICES.JS
+   ========================================= */
+.choices {
+    margin-bottom: 0;
+    font-size: 1rem;
+}
+
+.choices__inner {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    min-height: 46px;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    transition: all 0.3s ease;
+}
+
+.choices__inner:hover {
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+.choices__list--single {
+    padding: 4px 16px 4px 4px;
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+.choices__list--single .choices__item {
+    color: #ffffff !important;
+}
+
+.choices__list--dropdown {
+    background-color: #1f2937 !important; /* Gray 800 - Dark Solid Background */
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+.choices__list--dropdown .choices__item {
+    color: #e5e5e5 !important; /* Light Gray Text */
+    padding: 10px 12px;
+    font-size: 0.875rem;
+    transition: background 0.2s;
+}
+
+.choices__list--dropdown .choices__item--selectable.is-highlighted {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+}
+
+.choices__list--dropdown .choices__item--selectable.is-highlighted::after {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Input search di dalam dropdown */
+.choices[data-type*="select-one"] .choices__input {
+    background-color: rgba(0, 0, 0, 0.3) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 0.375rem;
+    padding: 0.5rem;
+    margin: 0.5rem;
+    width: calc(100% - 1rem);
+    color: #fff !important;
+}
+
+.choices__input {
+    background-color: transparent;
+    color: #ffffff !important;
+}
+
+.choices__input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* Dropdown state active/focus */
+.is-open .choices__inner {
+    border-color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+}
+
+/* Disabled state */
+.choices.is-disabled .choices__inner {
+    background-color: rgba(255, 255, 255, 0.02);
+    color: rgba(255, 255, 255, 0.3);
+}
+
+/* Fix Arrow Color */
+.choices::after {
+    border-color: #ffffff transparent transparent !important;
+}
+.choices.is-open::after {
+    border-color: transparent transparent #ffffff !important;
 }

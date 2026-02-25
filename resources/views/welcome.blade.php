@@ -41,12 +41,12 @@
                         </div>
                     @endif
                     
-                    <div class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center border border-white/20 hover:bg-white hover:text-black transition-all duration-300 cursor-pointer group">
+                    <div id="dev-trigger" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center border border-white/20 hover:bg-white hover:text-black transition-all duration-300 cursor-pointer group">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                         </svg>
                     </div>
-                </div>
+                    </div>
             </div>
         </div>
     </nav>
@@ -145,6 +145,44 @@
         </div>
     </footer>
 
+    <div id="dev-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-black/80 backdrop-blur-md transition-all duration-300">
+        <div class="glass-card max-w-5xl w-full p-8 md:p-12 rounded-3xl relative max-h-[90vh] overflow-y-auto border border-white/20">
+            <button id="close-modal" class="absolute top-6 right-6 text-gray-400 hover:text-white transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-black text-gradient-mono uppercase tracking-widest">Our Developers</h2>
+                <div class="h-1 w-20 bg-white mx-auto mt-4"></div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                @php
+                    $developers = [
+                        ['name' => 'Diego Prayata F.M', 'gif' => 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExN3duNjd0b2dvMW5pYnVkaGltem9idWo4a3gwbDd4NDI2Mjdva3R3eSZlcD12MV9naWZzX3RyZW5kaW5nJmN0PWc/MDJ9IbxxvDUQM/giphy.gif', 'ig' => 'https://www.instagram.com/diegopryata?igsh=OW43bDVycXJtbHZx', 'role' => 'Project Leader'],
+                        ['name' => 'Achmad Irmansyah', 'gif' => 'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3aGF6dTF6dGg4bnZxNWs1dzRja2N0cm9pN2c4b2s1YmYxd3ZkMGVkZyZlcD12MV9naWZzX3RyZW5kaW5nJmN0PWc/cZe0cYtV3pByHHp5vA/giphy.gif', 'ig' => 'https://www.instagram.com/achmad_irmansyah?igsh=anhpZGNuNnBmdTFp', 'role' => 'Backend Dev'],
+                        ['name' => 'Muhammad Naufal Hakim', 'gif' => 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMWU5cDhydWw1OHJ1cnc0NTR3dmVzYThscGI1YmRiOGZ5dThkajdnZiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/o5srM4M3BTVfD7WQOt/giphy.gif', 'ig' => 'https://www.instagram.com/m.naufal.hakim4?igsh=cjV1aDN0N3hmbGZj', 'role' => 'Frontend Dev'],
+                        ['name' => 'Muhammad Hamizan F.I ', 'gif' => 'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3NGExZmJxanBvc2hkNmk4czhlYzN4OTZ6enZ6MjZqN213a3JmdTE0diZlcD12MV9naWZzX3NlYXJjaCZjdD1n/NHglY9vAmvM2GEsblP/giphy.gif', 'ig' => 'https://www.instagram.com/hzftri_?igsh=bjI2ZzUwcWx4emZ6', 'role' => 'UI/UX Dev'],
+                    ];
+                @endphp
+
+                @foreach($developers as $dev)
+                <div class="group flex flex-col items-center bg-white/5 border border-white/10 p-6 rounded-2xl hover:bg-white/10 transition-all duration-500 hover:-translate-y-2">
+                    <div class="w-full aspect-square mb-6 overflow-hidden rounded-xl border border-white/10 grayscale group-hover:grayscale-0 transition-all duration-700">
+                        <img src="{{ $dev['gif'] }}" alt="{{ $dev['name'] }}" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700">
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-1 tracking-tight">{{ $dev['name'] }}</h3>
+                    <p class="text-gray-400 text-xs uppercase tracking-widest mb-4 font-semibold">{{ $dev['role'] }}</p>
+                    <a href="{{ $dev['ig'] }}" target="_blank" class="w-full text-center py-2 bg-white text-black text-xs font-bold rounded-lg hover:bg-gray-200 transition-colors">
+                        INSTAGRAM
+                    </a>
+                </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Function untuk mendeteksi elemen saat di-scroll
@@ -165,6 +203,33 @@
             // Jalankan saat load & scroll
             window.addEventListener('scroll', revealOnScroll);
             revealOnScroll(); // Trigger sekali di awal jika ada elemen yang sudah terlihat
+
+            // // Update logika modal disini //
+            const devTrigger = document.getElementById('dev-trigger');
+            const devModal = document.getElementById('dev-modal');
+            const closeModal = document.getElementById('close-modal');
+
+            // Buka Modal
+            devTrigger.addEventListener('click', () => {
+                devModal.classList.remove('hidden');
+                devModal.classList.add('flex');
+                document.body.classList.add('overflow-hidden'); // Kunci scroll layar
+            });
+
+            // Tutup Modal via Tombol X
+            const hideModal = () => {
+                devModal.classList.add('hidden');
+                devModal.classList.remove('flex');
+                document.body.classList.remove('overflow-hidden'); // Aktifkan scroll
+            };
+
+            closeModal.addEventListener('click', hideModal);
+
+            // Tutup Modal jika klik di luar card (overlay)
+            devModal.addEventListener('click', (e) => {
+                if (e.target === devModal) hideModal();
+            });
+            // // Berakhir disini //
         });
     </script>
 </body>

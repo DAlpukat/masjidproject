@@ -51,8 +51,8 @@ class User extends Authenticatable
         return $this->hasOne(TempatLayanan::class);
     }
 
-    public function joinedPlaces()
+    public function tempatLayanans()
     {
-        return $this->belongsToMany(TempatLayanan::class);
+        return $this->belongsToMany(TempatLayanan::class, 'tempat_layanan_user', 'user_id', 'tempat_layanan_id');
     }
 }

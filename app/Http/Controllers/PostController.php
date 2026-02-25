@@ -2,76 +2,76 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Post;
 use App\Models\Page;
+use App\Models\Post;
+use App\Models\TempatLayanan;
 use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
-    // List semua berita di dalam halaman info tertentu (Admin)
     public function index($pageId)
     {
-        $page = Page::find($pageId);
-        if ($page->tempatLayanan->user_id !== auth()->id()) { abort(403); }
+        $page = Page::findOrFail($pageId);
+        
+        // AMBIL DATA TEMPAT LAYANAN (INDUK)
+        // Anda bisa menggunakan relasi jika sudah didefinisikan, atau query manual
+        $tempat = TempatLayanan::find($page->tempat_layanan_id);
 
-        $posts = $page->posts;
-        return view('admin.posts.index', compact('page', 'posts'));
+        $posts = $page->posts()->latest()->paginate(10);
+
+        // Kirim $tempat ke view
+        return view('admin.posts.index', compact('page', 'posts', 'tempat'));
     }
 
-    // Form tambah berita
     public function create($pageId)
     {
-        $page = Page::find($pageId);
+        $page = Page::findOrFail($pageId);
         return view('admin.posts.create', compact('page'));
     }
 
-    // Simpan berita + Upload Gambar
     public function store(Request $request)
     {
-        $request->validate([
-            'title' => 'required',
+        $validated = $request->validate([
+            'page_id' => 'required|exists:pages,id',
+            'title' => 'required|string|max:255',
             'content' => 'required',
-            'image' => 'required|image|max:2048',
-            'page_id' => 'required',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        // Handle Upload Gambar
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('uploads/posts', 'public');
+            $path = $request->file('image')->store('posts', 'public');
+            $validated['image'] = $path;
         }
 
-        Post::create([
-            'title' => $request->title,
-            'content' => $request->content,
-            'image' => $imagePath,
-            'page_id' => $request->page_id,
-        ]);
+        $validated['slug'] = \Str::slug($request->title) . '-' . time();
 
-        return redirect()->route('posts.index', $request->page_id)
-            ->with('success', 'Berita berhasil diterbitkan');
+        Post::create($validated);
+
+        return redirect()->route('admin.posts.index', $request->page_id)->with('success', 'Berita berhasil diterbitkan!');
     }
-
-    // Tampilkan detail berita untuk User
+    
     public function show($id)
     {
-        // Cari post sekaligus ambil relasi Page dan TempatLayanan
         $post = Post::with('page.tempatLayanan')->findOrFail($id);
 
-        if (!$post->page) {
-            abort(404, 'Halaman Info tidak ditemukan.');
+        $previousUrl = url()->previous();
+        $currentUrl = url()->current();
+        
+        $backUrl = route('room.view', $post->page->tempatLayanan->slug) . '#info-' . $post->page->id;
+
+        if ($previousUrl && $previousUrl !== $currentUrl) {
+            $backUrl = $previousUrl;
         }
 
-        return view('user.post-show', compact('post'));
+        return view('user.post-show', compact('post', 'backUrl'));
     }
 
-    // Hapus berita
     public function destroy($id)
     {
         $post = Post::findOrFail($id);
-        if ($post->page->tempatLayanan->user_id !== auth()->id()) { abort(403); }
-
-
+        $pageId = $post->page_id;
         $post->delete();
-        return back()->with('success', 'Berita dihapus');
+
+        return back()->with('success', 'Post berhasil dihapus.');
     }
 }
