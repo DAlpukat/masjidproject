@@ -114,13 +114,26 @@ class KasController extends Controller
         return view('kas.kas-dashboard', compact('tempat', 'laporans', 'kategoriKas', 'totalBalance', 'personalBalance', 'chartData'));
     }
 
-    /**
-     * Menyimpan Transaksi Baru.
-     * Route: POST /room/{slug}/kas
-     */
     public function store(Request $request, $slug)
     {
         $tempat = TempatLayanan::where('slug', $slug)->firstOrFail();
+
+        // ============================================================
+        // LOGIKA OVERRIDE IZIN PENGELUARAN
+        // ============================================================
+        
+        // 1. Jika Kas Umum (wajib free)
+        if (!$tempat->use_individual_ledger) {
+            $tempat->free_expense_enabled = true;
+        }
+
+        // 2. Jika Kas Perorangan & User memilih "Free", paksa izinkan.
+        // Ini memastikan bahwa opsi "Ambil Saldo Total" di view tidak ditolak oleh Service.
+        if ($tempat->use_individual_ledger && $request->tipe_pengeluaran == 'free') {
+            $tempat->free_expense_enabled = true;
+        }
+        
+        // ============================================================
 
         // Otorisasi: Hanya Admin
         if (auth()->id() != $tempat->user_id) {

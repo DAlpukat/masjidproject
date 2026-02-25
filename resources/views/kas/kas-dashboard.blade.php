@@ -35,6 +35,32 @@
                     <div class="glass-card p-6 sticky top-6">
                         <h2 class="text-lg font-bold mb-4 text-white border-b border-white/10 pb-2">Catat Transaksi</h2>
                         
+                        <!-- BLOK NOTIFIKASI ERROR / SUKSES (PENTING) -->
+                        <div class="mb-4">
+                            @if ($errors->any())
+                                <div class="bg-red-500/20 border border-red-500/50 text-red-300 px-4 py-3 rounded-xl text-sm mb-3">
+                                    <strong>Ups!</strong> Ada kesalahan input.<br>
+                                    <ul class="list-disc list-inside mt-1">
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
+
+                            @if(session('error'))
+                                <div class="bg-red-500/20 border border-red-500/50 text-red-300 px-4 py-3 rounded-xl text-sm mb-3">
+                                    {{ session('error') }}
+                                </div>
+                            @endif
+
+                            @if(session('success'))
+                                <div class="bg-green-500/20 border border-green-500/50 text-green-300 px-4 py-3 rounded-xl text-sm mb-3">
+                                    {{ session('success') }}
+                                </div>
+                            @endif
+                        </div>
+
                         <form action="{{ route('kas.store', $tempat->slug) }}" method="POST" enctype="multipart/form-data">
                             @csrf
 
@@ -57,17 +83,17 @@
                             <div class="space-y-4">
                                 <div>
                                     <label class="block text-xs font-bold text-gray-300 uppercase mb-1">Tanggal</label>
-                                    <input type="date" name="tanggal" class="glass-input w-full" required value="{{ date('Y-m-d') }}">
+                                    <input type="date" name="tanggal" class="glass-input w-full" required value="{{ old('tanggal', date('Y-m-d')) }}">
                                 </div>
 
                                 <div>
                                     <label class="block text-xs font-bold text-gray-300 uppercase mb-1">Keterangan</label>
-                                    <input type="text" name="keterangan" class="glass-input w-full" placeholder="Contoh: Beli Spidol" required>
+                                    <input type="text" name="keterangan" class="glass-input w-full" placeholder="Contoh: Beli Spidol" value="{{ old('keterangan') }}" required>
                                 </div>
 
                                 <div>
                                     <label class="block text-xs font-bold text-gray-300 uppercase mb-1">Jumlah (Rp)</label>
-                                    <input type="number" name="jumlah" class="glass-input w-full" placeholder="0" required>
+                                    <input type="number" name="jumlah" class="glass-input w-full" placeholder="0" value="{{ old('jumlah') }}" required>
                                 </div>
 
                                 <!-- LOGIKA PEMASUKAN -->
@@ -97,7 +123,7 @@
                                                             <option value="">-- Pilih Anggota --</option>
                                                             @foreach($tempat->users as $u)
                                                                 @if($u->id != $tempat->user_id)
-                                                                    <option value="{{ $u->id }}">{{ $u->name }}</option>
+                                                                    <option value="{{ $u->id }}" {{ old('user_id') == $u->id ? 'selected' : '' }}>{{ $u->name }}</option>
                                                                 @endif
                                                             @endforeach
                                                         </select>
@@ -106,7 +132,7 @@
                                                         <select name="kategori_kas_id" class="glass-input text-sm w-full choices-dark">
                                                             <option value="">-- Pilih Kategori --</option>
                                                             @foreach($kategoriKas as $kat)
-                                                                <option value="{{ $kat->id }}">{{ $kat->nama }} {{ $kat->tipe == 'wajib' ? '(Wajib)' : '(Sedekah)' }}</option>
+                                                                <option value="{{ $kat->id }}" {{ old('kategori_kas_id') == $kat->id ? 'selected' : '' }}>{{ $kat->nama }} {{ $kat->tipe == 'wajib' ? '(Wajib)' : '(Sedekah)' }}</option>
                                                             @endforeach
                                                         </select>
                                                     </div>
@@ -121,7 +147,7 @@
                                     @endif
                                 </div>
 
-                                <!-- LOGIKA PENGELUARAN (FINAL) -->
+                                <!-- LOGIKA PENGELUARAN -->
                                 <div id="section-pengeluaran" class="hidden space-y-4 pt-2 border-t border-white/10">
                                     
                                     @if(!$tempat->use_individual_ledger)
@@ -134,7 +160,8 @@
                                         {{-- KAS PERORANGAN: Muncul pilihan mode pengeluaran --}}
                                         <label class="block text-xs font-bold text-gray-300 uppercase mb-1">Mode Pengeluaran</label>
                                         <div class="space-y-2">
-                                            {{-- Opsi 1: Dibagi Rata (Hanya muncul jika fitur shared aktif) --}}
+                                            
+                                            {{-- Opsi 1: Dibagi Rata (Muncul jika di setting aktif) --}}
                                             @if($tempat->shared_expense_enabled)
                                                 <label class="flex items-start p-3 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5 transition">
                                                     <input type="radio" name="tipe_pengeluaran" value="shared" class="mt-1 mr-3 text-pink-500 bg-gray-700 border-gray-600" checked>
@@ -145,7 +172,8 @@
                                                 </label>
                                             @endif
 
-                                            {{-- Opsi 2: Ambil Saldo Total (Selalu muncul untuk Perorangan) --}}
+                                            {{-- Opsi 2: Ambil Saldo Total --}}
+                                            {{-- LOGIKA BARU: Selalu muncul untuk Kas Perorangan agar bisa pilih hanya kurangi saldo total --}}
                                             <label class="flex items-start p-3 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5 transition">
                                                 <input type="radio" name="tipe_pengeluaran" value="free" class="mt-1 mr-3 text-pink-500 bg-gray-700 border-gray-600" {{ !$tempat->shared_expense_enabled ? 'checked' : '' }}>
                                                 <div>
