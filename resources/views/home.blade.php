@@ -130,25 +130,26 @@
                 <div class="relative z-10 pt-4 border-t border-white/10 flex items-center justify-between">
                     <div class="flex items-center text-xs font-bold text-gray-400">
                         <svg class="w-4 h-4 mr-2 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                        {{ $place->members_count }} Anggota
+                        {{ $place->users_count ?? $place->users->count() }} Anggota
                     </div>
 
                     @if(auth()->check() && $place->users->contains(auth()->id()))
-                        <a href="{{ route('room.view', $place->slug) }}" class="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-lg text-xs font-bold transition-all flex items-center gap-2 group/btn">
-                            <span>Masuk Room</span>
-                            <svg class="w-3 h-3 transform group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        {{-- TOMBOL MASUK ROOM (SERAGAM DENGAN JOIN) --}}
+                        <a href="{{ route('room.view', $place->slug) }}" class="px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-600 text-white rounded-xl font-bold hover:shadow-lg transition-all text-sm">
+                            Masuk Room
                         </a>
 
                     @elseif(auth()->check())
-                        <form action="{{ route('join.public', $place->id) }}" method="POST">
+                        {{-- TOMBOL JOIN ROOM --}}
+                        <form action="{{ route('join.public', $place->id) }}" method="POST" class="inline">
                             @csrf
-                            <button type="submit" class="px-5 py-2 bg-white text-black hover:bg-gray-200 rounded-lg text-xs font-bold shadow-lg shadow-white/10 hover:shadow-white/20 hover:scale-105 active:scale-95 transition-all">
-                                + Gabung
+                            <button type="submit" class="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-bold hover:shadow-lg transition-all text-sm">
+                                Join Room
                             </button>
                         </form>
 
                     @else
-                        <a href="{{ route('login') }}" class="px-4 py-2 border border-white/30 text-white hover:bg-white/10 rounded-lg text-xs font-bold transition-all">
+                        <a href="{{ route('login') }}" class="px-4 py-2 border border-white/30 text-white hover:bg-white/10 rounded-xl text-sm font-bold transition-all">
                             Login Dulu
                         </a>
                     @endif
@@ -175,12 +176,11 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Efek stagger untuk card
         const cards = document.querySelectorAll('.glass-card');
         cards.forEach((card, index) => {
             setTimeout(() => {
                 card.classList.add('active');
-            }, index * 100); // Delay bertingkat
+            }, index * 100);
         });
     });
 </script>
