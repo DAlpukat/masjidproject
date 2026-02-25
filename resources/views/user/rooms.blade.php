@@ -76,7 +76,6 @@
                             </button>
                         @endif
 
-<<<<<<< HEAD
                         <form id="leave-room-form-{{ $room->id }}" action="{{ route('room.leave', $room->id) }}" method="POST" class="inline">
                             @csrf
                             <button type="button" onclick="confirmLeave('{{ $room->id }}', '{{ $room->nama }}')" 
@@ -86,15 +85,6 @@
                                 </svg>
                             </button>
                         </form>
-=======
-                        {{-- TOMBOL LEAVE AJAX --}}
-                        <button type="button" 
-                                data-id="{{ $room->id }}"
-                                data-name="{{ $room->nama }}"
-                                class="btn-leave-ajax p-3 text-gray-300 hover:text-red-400 hover:bg-white/10 rounded-xl transition-all border border-transparent hover:border-white/20 group" title="Keluar Ruangan">
-                            <svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-                        </button>
->>>>>>> 72ea7092e19785df1686958cf833e39903bf6c3d
                     </div>
                 </div>
             @empty
@@ -112,7 +102,6 @@
         </div>
     </div>
 </div>
-<<<<<<< HEAD
 <script>
 function confirmLeave(roomId, roomName) {
     Swal.fire({
@@ -141,70 +130,5 @@ function confirmLeave(roomId, roomName) {
         }
     });
 }
-=======
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const csrfToken = document.querySelector('meta[name="csrf-token"]');
-        
-        if (!csrfToken) {
-            console.error('CSRF Token tidak ditemukan!');
-            return;
-        }
-
-        // --- LOGIKA LEAVE AJAX ---
-        const leaveButtons = document.querySelectorAll('.btn-leave-ajax');
-        
-        leaveButtons.forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                const roomName = this.dataset.name;
-                if(!confirm(`Yakin ingin keluar dari ${roomName}?`)) return;
-
-                const id = this.dataset.id;
-                const url = `/room/${id}/leave`;
-                const card = this.closest('.room-card'); // Target card untuk dihapus
-                
-                // Animasi Loading
-                this.innerHTML = '...';
-                this.disabled = true;
-
-                fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken.getAttribute('content'),
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({})
-                })
-                .then(response => {
-                    if (!response.ok) throw new Error('Gagal keluar');
-                    return response.json();
-                })
-                .then(data => {
-                    // Animasi Hilang (Fade Out)
-                    card.style.transition = 'all 0.4s ease';
-                    card.style.opacity = '0';
-                    card.style.transform = 'scale(0.9)';
-                    
-                    // Hapus elemen setelah animasi
-                    setTimeout(() => {
-                        card.remove();
-                        // Cek jika container kosong, tampilkan pesan empty (opsional, bisa reload)
-                        if(document.querySelectorAll('.room-card').length === 0) {
-                            location.reload(); // Reload untuk menampilkan state empty
-                        }
-                    }, 400);
-                })
-                .catch(error => {
-                    // Kembalikan tombol jika gagal
-                    this.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>';
-                    this.disabled = false;
-                    alert('Terjadi kesalahan, coba lagi.');
-                });
-            });
-        });
-    });
->>>>>>> 72ea7092e19785df1686958cf833e39903bf6c3d
 </script>
 @endsection

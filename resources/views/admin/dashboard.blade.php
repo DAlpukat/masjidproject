@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <div class="bg-monochrome-gif"></div>
 <div class="bg-overlay"></div>
 
@@ -137,7 +138,6 @@
         </div>
     </div>
 </div>
-<<<<<<< HEAD
 <script>
 function copyToClipboard(btn, text) {
     navigator.clipboard.writeText(text);
@@ -156,61 +156,98 @@ function copyToClipboard(btn, text) {
         checkIcon.classList.add('hidden');
     }, 2000);
 }
-=======
-
-<script>
     function hapusRuangan(url, btnElement) {
-        if(!confirm('Yakin ingin menghapus ruangan ini?')) return;
+    // 1. Munculkan SweetAlert2 untuk Konfirmasi
+    Swal.fire({
+        title: '<span class="text-white font-black">Hapus Layanan?</span>',
+        html: '<span class="text-gray-400">Seluruh data halaman dan anggota di dalam layanan ini akan ikut terhapus secara permanen.</span>',
+        icon: 'warning',
+        iconColor: '#ef4444',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: 'rgba(255,255,255,0.1)',
+        confirmButtonText: 'Ya, Hapus Sekarang!',
+        cancelButtonText: 'Batal',
+        background: '#111827',
+        color: '#ffffff',
+        borderRadius: '2rem',
+        backdrop: `rgba(0,0,0,0.6) backdrop-blur-sm`,
+        customClass: {
+            popup: 'border border-white/10 glass-card shadow-2xl',
+            confirmButton: 'rounded-xl px-6 py-2 font-bold uppercase text-xs tracking-widest focus:ring-0',
+            cancelButton: 'rounded-xl px-6 py-2 font-bold uppercase text-xs tracking-widest text-gray-300 focus:ring-0'
+        }
+    }).then((result) => {
+        // 2. Jika user menekan tombol "Ya"
+        if (result.isConfirmed) {
+            
+            // Efek Loading pada tombol
+            const originalContent = btnElement.innerHTML;
+            btnElement.disabled = true;
+            btnElement.innerHTML = `<svg class="animate-spin w-5 h-5 text-red-400" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
 
-        const originalContent = btnElement.innerHTML;
-        btnElement.disabled = true;
-        btnElement.innerHTML = `<svg class="animate-spin w-5 h-5 text-red-400" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
+            // Proses Fetch
+            fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
+            .then(result => {
+                if (result.success) {
+                    // Animasi Card Hilang
+                    const card = btnElement.closest('.card-item');
+                    card.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px) scale(0.95)';
+                    
+                    // Munculkan Notifikasi Berhasil (Toast)
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true,
+                        background: '#111827',
+                        color: '#fff'
+                    });
+                    
+                    Toast.fire({
+                        icon: 'success',
+                        title: 'Layanan berhasil dihapus'
+                    });
 
-        fetch(url, {
-            method: 'DELETE', // LANGSUNG DELETE, jangan POST dengan _method
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(response => {
-            // Cek dulu apakah response OK, jika tidak parse text untuk lihat error
-            if (!response.ok) {
-                return response.text().then(text => { 
-                    try { 
-                        return JSON.parse(text); 
-                    } catch (e) { 
-                        throw new Error('Server Error: ' + text.substring(0, 100)); 
-                    } 
+                    setTimeout(() => {
+                        card.remove();
+                        const container = document.getElementById('room-list-container');
+                        if(container.querySelectorAll('.card-item').length === 0) {
+                            window.location.reload();
+                        }
+                    }, 500);
+                }
+            })
+            .catch(error => {
+                // Notifikasi Gagal
+                Swal.fire({
+                    title: 'Gagal!',
+                    text: 'Terjadi kesalahan saat menghapus data.',
+                    icon: 'error',
+                    background: '#111827',
+                    color: '#fff',
+                    confirmButtonColor: '#ef4444'
                 });
-            }
-            return response.json();
-        })
-        .then(result => {
-            if (result.success) {
-                const card = btnElement.closest('.card-item');
-                card.style.transition = 'all 0.3s ease';
-                card.style.opacity = '0';
-                card.style.transform = 'scale(0.9)';
-                
-                setTimeout(() => {
-                    card.remove();
-                    const container = document.getElementById('room-list-container');
-                    if(container.querySelectorAll('.card-item').length === 0) {
-                        window.location.reload();
-                    }
-                }, 300);
-            } else {
-                throw new Error(result.message || 'Gagal menghapus.');
-            }
-        })
-        .catch(error => {
-            alert('Error: ' + error.message);
-            btnElement.disabled = false;
-            btnElement.innerHTML = originalContent;
-        });
-    }
->>>>>>> 72ea7092e19785df1686958cf833e39903bf6c3d
+                btnElement.disabled = false;
+                btnElement.innerHTML = originalContent;
+            });
+        }
+    });
+}
+
 </script>
 @endsection

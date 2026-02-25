@@ -55,4 +55,14 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(TempatLayanan::class, 'tempat_layanan_user', 'user_id', 'tempat_layanan_id');
     }
+    // Tambahkan ini di dalam class User
+    public function joinedPlaces()
+    {
+        return $this->belongsToMany(
+            TempatLayanan::class, 
+            'tempat_layanan_user', // Nama tabel pivot Anda
+            'user_id', 
+            'tempat_layanan_id'
+        )->withPivot('status', 'role'); // Sesuaikan dengan kolom di tabel pivot Anda
+    }
 }
