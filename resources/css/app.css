@@ -320,3 +320,43 @@
 .choices.is-open::after {
     border-color: transparent transparent #ffffff !important;
 }
+
+/* Validation Styling */
+.input-error {
+    border-color: rgba(239, 68, 68, 0.5) !important;
+    background: rgba(239, 68, 68, 0.05) !important;
+}
+
+.error-message {
+    font-size: 0.75rem;
+    color: #fca5a5;
+    margin-top: 0.25rem;
+    padding-left: 0.25rem;
+    display: none; /* Sembunyi secara default */
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Password Strength Meter */
+.strength-meter {
+    height: 4px;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    margin-top: 8px;
+    overflow: hidden;
+}
+
+.strength-bar {
+    height: 100%;
+    width: 0%;
+    transition: all 0.4s ease;
+}
+
+.strength-weak { width: 33%; background: #ef4444; }
+.strength-medium { width: 66%; background: #f59e0b; }
+.strength-strong { width: 100%; background: #10b981; }

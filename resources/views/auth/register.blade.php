@@ -12,6 +12,11 @@
             background-image: url('https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExN2xnYzFnazVvZ3RyZDA2azFtOTN2NzltMTNrazM2NmduYzV6OHNscSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/hVEBWRInEvNOEVS18i/giphy.gif');
             background-size: cover; background-position: center;
         }
+        .text-gradient-mono {
+            background: linear-gradient(to right, #ffffff, #a3a3a3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
     </style>
 </head>
 <body class="antialiased text-white min-h-screen relative overflow-x-hidden">
@@ -21,7 +26,7 @@
     <div class="min-h-screen flex flex-col items-center justify-center p-6 lg:p-12">
         <div class="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
             
-            <div class="space-y-6 lg:pr-10 reveal active">
+            <div class="space-y-6 lg:pr-10">
                 <span class="px-3 py-1 rounded-full border border-white/20 bg-white/5 text-[10px] lg:text-xs font-bold tracking-widest uppercase text-gray-300">
                     Bergabunglah Bersama Kami
                 </span>
@@ -36,46 +41,78 @@
 
             <div class="w-full">
                 <div class="glass-card p-6 md:p-10 rounded-3xl border-t border-white/20 relative shadow-2xl">
-                    <div class="mb-6 text-center lg:text-left">
+                    <div class="mb-6">
                         <h2 class="text-2xl font-bold">Buat Akun</h2>
-                        <p class="text-sm text-gray-400 mt-1">Lengkapi data diri Anda.</p>
+                        <p class="text-sm text-gray-400 mt-1">Lengkapi data diri Anda di bawah ini.</p>
                     </div>
 
-                    <form method="POST" action="{{ route('register') }}" class="space-y-4">
+                    @if($errors->any())
+                    <div class="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/50 text-red-200 text-xs">
+                        @foreach ($errors->all() as $error)
+                            <p>• {{ $error }}</p>
+                        @endforeach
+                    </div>
+                    @endif
+
+                    <form method="POST" action="{{ route('register') }}" id="registerForm" class="space-y-4" novalidate>
                         @csrf
-                        <div>
+                        
+                        <div class="group">
                             <label class="text-xs font-medium text-gray-400 ml-1">Username</label>
-                            <input type="text" name="name" required class="w-full bg-black/40 border border-white/10 text-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-white/20 outline-none transition-all" placeholder="Username">
+                            <input type="text" name="name" id="username" required 
+                                class="w-full bg-black/40 border border-white/10 text-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-white/20 outline-none transition-all" 
+                                placeholder="Username panggilan/samaran">
+                            <p id="usernameError" class="error-message">Gunakan 3-15 karakter. Hanya huruf, angka, titik, atau underscore tanpa spasi.</p>
                         </div>
+
                         <div>
                             <label class="text-xs font-medium text-gray-400 ml-1">Email</label>
-                            <input type="email" name="email" required class="w-full bg-black/40 border border-white/10 text-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-white/20 outline-none transition-all" placeholder="email@anda.com">
+                            <input type="email" name="email" id="email" required 
+                                class="w-full bg-black/40 border border-white/10 text-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-white/20 outline-none transition-all" 
+                                placeholder="nama@gmail.com">
+                            <p id="emailError" class="error-message">Format email tidak valid. Wajib menggunakan @gmail.com</p>
                         </div>
+
                         <div>
                             <label class="text-xs font-medium text-gray-400 ml-1">Password</label>
                             <div class="relative">
-                                <input id="password" type="password" name="password" required class="w-full bg-black/40 border border-white/10 text-white rounded-xl px-4 py-3 pr-12 focus:ring-2 focus:ring-white/20 outline-none transition-all" placeholder="••••••••">
+                                <input id="password" type="password" name="password" required 
+                                    class="w-full bg-black/40 border border-white/10 text-white rounded-xl px-4 py-3 pr-12 focus:ring-2 focus:ring-white/20 outline-none transition-all" 
+                                    placeholder="••••••••">
                                 <button type="button" onclick="togglePassword('password', this)" class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500">
-                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                                 </button>
                             </div>
+                            <div class="strength-meter">
+                                <div id="strengthBar" class="strength-bar"></div>
+                            </div>
+                            <p id="strengthText" class="text-[10px] mt-1 text-gray-500 text-right italic">Gunakan kombinasi Kapital, Angka, & Karakter Unik</p>
                         </div>
+
                         <div>
                             <label class="text-xs font-medium text-gray-400 ml-1">Konfirmasi Password</label>
                             <div class="relative">
-                                <input id="password_confirmation" type="password" name="password_confirmation" required class="w-full bg-black/40 border border-white/10 text-white rounded-xl px-4 py-3 pr-12 focus:ring-2 focus:ring-white/20 outline-none transition-all" placeholder="••••••••">
+                                <input id="password_confirmation" type="password" name="password_confirmation" required 
+                                    class="w-full bg-black/40 border border-white/10 text-white rounded-xl px-4 py-3 pr-12 focus:ring-2 focus:ring-white/20 outline-none transition-all" 
+                                    placeholder="Ulangi password">
                                 <button type="button" onclick="togglePassword('password_confirmation', this)" class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500">
-                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                                 </button>
                             </div>
+                            <p id="matchError" class="error-message">Password tidak sama. Pastikan input identik dengan password di atas.</p>
                         </div>
+
                         <button type="submit" class="w-full btn-monochrome py-4 mt-4 shadow-lg">Daftar Sekarang</button>
-                        <p class="text-center text-sm text-gray-400 mt-4">Sudah punya akun? <a href="{{ route('login') }}" class="text-white font-semibold hover:underline">Masuk</a></p>
+                        
+                        <p class="text-center text-sm text-gray-400 mt-4">
+                            Sudah punya akun? <a href="{{ route('login') }}" class="text-white font-semibold hover:underline">Masuk</a>
+                        </p>
                     </form>
                 </div>
             </div>
         </div>
     </div>
+
     <script>
         function togglePassword(inputId, btn) {
             const input = document.getElementById(inputId);
@@ -88,13 +125,83 @@
                 icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />';
             }
         }
+
+        const form = document.getElementById('registerForm');
+        const username = document.getElementById('username');
+        const email = document.getElementById('email');
+        const password = document.getElementById('password');
+        const confirm = document.getElementById('password_confirmation');
+
+        // Logic Visualisasi Kesalahan (Tampilkan Pesan & Border Merah)
+        const showError = (input, errorId, isVisible) => {
+            const errorElement = document.getElementById(errorId);
+            if (isVisible) {
+                input.classList.add('input-error');
+                errorElement.style.display = 'block';
+            } else {
+                input.classList.remove('input-error');
+                errorElement.style.display = 'none';
+            }
+        };
+
+        // Indikator Kekuatan Password Real-time
+        password.addEventListener('input', () => {
+            const val = password.value;
+            const bar = document.getElementById('strengthBar');
+            const text = document.getElementById('strengthText');
+            let score = 0;
+
+            if (val.length >= 8) score++;
+            if (/[A-Z]/.test(val)) score++;
+            if (/[0-9]/.test(val)) score++;
+            if (/[^A-Za-z0-9]/.test(val)) score++;
+
+            bar.className = 'strength-bar';
+            if (val.length === 0) {
+                text.innerText = "Gunakan kombinasi Kapital, Angka, & Karakter Unik";
+            } else if (score <= 2) {
+                bar.classList.add('strength-weak');
+                text.innerText = "Kekuatan: Lemah";
+            } else if (score === 3) {
+                bar.classList.add('strength-medium');
+                text.innerText = "Kekuatan: Sedang";
+            } else {
+                bar.classList.add('strength-strong');
+                text.innerText = "Kekuatan: Sangat Kuat";
+            }
+        });
+
+        // Validasi saat Submit
+        form.addEventListener('submit', (e) => {
+            let isValid = true;
+
+            // 1. Validasi Username (3-15 Karakter, Alphanumeric/dot/underscore)
+            const userRegex = /^[a-zA-Z0-9._]{3,15}$/;
+            if (!userRegex.test(username.value)) {
+                showError(username, 'usernameError', true);
+                isValid = false;
+            } else {
+                showError(username, 'usernameError', false);
+            }
+
+            // 2. Validasi Email Gmail
+            if (!email.value.toLowerCase().endsWith('@gmail.com')) {
+                showError(email, 'emailError', true);
+                isValid = false;
+            } else {
+                showError(email, 'emailError', false);
+            }
+
+            // 3. Validasi Kecocokan Password
+            if (confirm.value !== password.value || confirm.value === "") {
+                showError(confirm, 'matchError', true);
+                isValid = false;
+            } else {
+                showError(confirm, 'matchError', false);
+            }
+
+            if (!isValid) e.preventDefault();
+        });
     </script>
-    
-    <a href="/" class="fixed top-6 left-6 z-[100] group flex items-center gap-3 px-4 py-2 rounded-full glass-card border border-white/10 hover:bg-white hover:text-black transition-all duration-300">
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transform group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-    </svg>
-    <span class="text-sm font-medium">Kembali</span>
-</a>
 </body>
 </html>
