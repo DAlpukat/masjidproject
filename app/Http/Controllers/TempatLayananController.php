@@ -102,18 +102,38 @@ class TempatLayananController extends Controller
             ->with('success', 'Pengaturan kelas berhasil diperbarui.');
     }
 
-    public function destroy(TempatLayanan $tempat)
+    public function destroy($id)
     {
-        if ($tempat->user_id !== auth()->id()) {
-            abort(403, 'Anda tidak bisa menghapus milik orang lain.');
+        $tempat = TempatLayanan::findOrFail($id);
+
+        // Otorisasi
+        if (auth()->id() != $tempat->user_id && !auth()->user()->is_superadmin) {
+            return response()->json([
+                'success' => false, 
+                'message' => 'Akses Ditolak.'
+            ], 403);
         }
 
-        $tempat->delete();
+        try {
+            // Hapus relasi anggota
+            $tempat->users()->detach();
+            
+            // Hapus ruangan
+            $tempat->delete();
 
-        return redirect()
-            ->route('admin.dashboard')
-            ->with('success', 'Kelas berhasil dihapus.');
+            return response()->json([
+                'success' => true,
+                'message' => 'Ruangan berhasil dihapus.'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menghapus: ' . $e->getMessage()
+            ], 500);
+        }
     }
+    
     public function members($id)
     {
         $tempat = TempatLayanan::findOrFail($id);

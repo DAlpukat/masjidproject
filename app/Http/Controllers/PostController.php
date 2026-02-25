@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Page;
 use App\Models\Post;
+use App\Models\TempatLayanan;
 use Illuminate\Http\Request;
 
 class PostController extends Controller
@@ -11,9 +12,15 @@ class PostController extends Controller
     public function index($pageId)
     {
         $page = Page::findOrFail($pageId);
+        
+        // AMBIL DATA TEMPAT LAYANAN (INDUK)
+        // Anda bisa menggunakan relasi jika sudah didefinisikan, atau query manual
+        $tempat = TempatLayanan::find($page->tempat_layanan_id);
+
         $posts = $page->posts()->latest()->paginate(10);
 
-        return view('admin.posts.index', compact('page', 'posts'));
+        // Kirim $tempat ke view
+        return view('admin.posts.index', compact('page', 'posts', 'tempat'));
     }
 
     public function create($pageId)

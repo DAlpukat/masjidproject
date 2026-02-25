@@ -17,11 +17,13 @@
                     <h1 class="text-4xl font-black text-white tracking-tight">
                         Daftar Post
                     </h1>
-                    <p class="text-gray-400 font-medium">Halaman: <span class="text-pink-400 font-bold">{{ $page->nama }}</span></p>
+                    {{-- Perbaikan: Gunakan judul, bukan nama --}}
+                    <p class="text-gray-400 font-medium">Halaman: <span class="text-pink-400 font-bold">{{ $page->judul }}</span></p>
                 </div>
                 
                 <div class="flex gap-3">
-                    <a href="{{ route('admin.pages.index', $page->id) }}" class="px-6 py-3 rounded-xl font-bold border border-white/10 text-gray-300 hover:bg-white/5 transition text-sm">
+                    {{-- PERBAIKAN: Arahkan ke tempat->id, bukan page->id --}}
+                    <a href="{{ route('admin.pages.index', $tempat->id) }}" class="px-6 py-3 rounded-xl font-bold border border-white/10 text-gray-300 hover:bg-white/5 transition text-sm">
                         &larr; Kembali
                     </a>
                     <a href="{{ route('admin.posts.create', $page->id) }}" class="group relative inline-flex items-center px-8 py-3.5 overflow-hidden text-white bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl shadow-xl shadow-blue-500/20 transition-all hover:shadow-blue-500/40 hover:scale-105 active:scale-95">
@@ -60,7 +62,6 @@
                             @foreach ($posts as $index => $post)
                                 <tr class="hover:bg-white/5 transition group">
                                     <td class="px-6 py-4 text-sm text-gray-500 font-mono">
-                                        {{-- Perbaikan Penomoran --}}
                                         {{ $posts->firstItem() + $index }}
                                     </td>
                                     <td class="px-6 py-4">

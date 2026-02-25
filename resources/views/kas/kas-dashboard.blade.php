@@ -13,7 +13,8 @@
         <!-- Header -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
             <div>
-                <a href="{{ route('admin.pages.index', $tempat->id) }}" class="text-pink-400 hover:text-pink-300 hover:underline font-bold">&larr; Kembali ke Daftar Halaman</a>
+                {{-- PERBAIKAN: Arahkan ke room.view dengan slug, BUKAN admin.pages.index --}}
+                <a href="{{ route('room.view', $tempat->slug) }}" class="text-pink-400 hover:text-pink-300 hover:underline font-bold">&larr; Kembali ke Ruangan</a>
                 <h1 class="text-3xl font-black text-white mt-2 drop-shadow-lg">Kas & Keuangan: {{ $tempat->nama }}</h1>
             </div>
             
@@ -35,7 +36,7 @@
                     <div class="glass-card p-6 sticky top-6">
                         <h2 class="text-lg font-bold mb-4 text-white border-b border-white/10 pb-2">Catat Transaksi</h2>
                         
-                        <!-- BLOK NOTIFIKASI ERROR / SUKSES (PENTING) -->
+                        <!-- BLOK NOTIFIKASI ERROR / SUKSES -->
                         <div class="mb-4">
                             @if ($errors->any())
                                 <div class="bg-red-500/20 border border-red-500/50 text-red-300 px-4 py-3 rounded-xl text-sm mb-3">
@@ -147,7 +148,7 @@
                                     @endif
                                 </div>
 
-                                <!-- LOGIKA PENGELUARAN -->
+                                <!-- LOGIKA PENGELUARAN (FINAL) -->
                                 <div id="section-pengeluaran" class="hidden space-y-4 pt-2 border-t border-white/10">
                                     
                                     @if(!$tempat->use_individual_ledger)
@@ -161,10 +162,10 @@
                                         <label class="block text-xs font-bold text-gray-300 uppercase mb-1">Mode Pengeluaran</label>
                                         <div class="space-y-2">
                                             
-                                            {{-- Opsi 1: Dibagi Rata (Muncul jika di setting aktif) --}}
+                                            {{-- Opsi 1: Dibagi Rata (Hanya muncul jika fitur shared aktif) --}}
                                             @if($tempat->shared_expense_enabled)
                                                 <label class="flex items-start p-3 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5 transition">
-                                                    <input type="radio" name="tipe_pengeluaran" value="shared" class="mt-1 mr-3 text-pink-500 bg-gray-700 border-gray-600" checked>
+                                                    <input type="radio" name="tipe_pengeluaran" value="shared" class="mt-1 mr-3 text-pink-500 bg-gray-700 border-gray-600" {{ old('tipe_pengeluaran') == 'shared' ? 'checked' : '' }}>
                                                     <div>
                                                         <span class="block font-bold text-white text-sm">Dibagi Rata (Shared)</span>
                                                         <p class="text-xs text-gray-400">Biaya dibagi ke semua anggota.</p>
@@ -172,10 +173,9 @@
                                                 </label>
                                             @endif
 
-                                            {{-- Opsi 2: Ambil Saldo Total --}}
-                                            {{-- LOGIKA BARU: Selalu muncul untuk Kas Perorangan agar bisa pilih hanya kurangi saldo total --}}
+                                            {{-- Opsi 2: Ambil Saldo Total (Selalu muncul untuk Perorangan) --}}
                                             <label class="flex items-start p-3 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5 transition">
-                                                <input type="radio" name="tipe_pengeluaran" value="free" class="mt-1 mr-3 text-pink-500 bg-gray-700 border-gray-600" {{ !$tempat->shared_expense_enabled ? 'checked' : '' }}>
+                                                <input type="radio" name="tipe_pengeluaran" value="free" class="mt-1 mr-3 text-pink-500 bg-gray-700 border-gray-600" {{ old('tipe_pengeluaran') == 'free' || !$tempat->shared_expense_enabled ? 'checked' : '' }}>
                                                 <div>
                                                     <span class="block font-bold text-white text-sm">Ambil Saldo Total (Free)</span>
                                                     <p class="text-xs text-gray-400">Hanya kurangi uang fisik (tidak membebani anggota).</p>
