@@ -9,7 +9,7 @@
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
         .bg-register {
-            background-image: url('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExODh0ZzNqOHp2enZtcXByazhqOGR1bjNrNHJyYnFyMXB3MGZxdWd6MyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/igyfXHSWGHZME0PLvr/giphy.gif');
+            background-image: url('https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExN2xnYzFnazVvZ3RyZDA2azFtOTN2NzltMTNrazM2NmduYzV6OHNscSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/hVEBWRInEvNOEVS18i/giphy.gif');
             background-size: cover; background-position: center;
         }
     </style>

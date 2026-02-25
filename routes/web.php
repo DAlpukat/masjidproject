@@ -32,7 +32,7 @@ Route::middleware('auth')->group(function () {
     // Home & Room Navigation
     Route::get('/home', [HomeController::class, 'index'])->name('home');
     Route::post('/join', [HomeController::class, 'join'])->name('join.store');
-    Route::post('/join-public/{place}', [HomeController::class, 'joinPublic'])->name('join.public');
+    Route::post('/join-public/{id}', [HomeController::class, 'joinPublic'])->name('join.public');
     Route::get('/my-rooms', [HomeController::class, 'myRooms'])->name('user.rooms');
     Route::get('/room/{slug}', [HomeController::class, 'viewRoom'])->name('room.view');
     Route::post('/room/{tempat}/leave', [HomeController::class, 'leave'])->name('room.leave');
@@ -45,9 +45,9 @@ Route::middleware('auth')->group(function () {
 
 // --- 3. Sistem Kas (Authenticated) ---
 Route::middleware('auth')->group(function () {
-    Route::get('/room/{tempatId}/kas', [KasController::class, 'dashboard'])->name('kas.dashboard');
-    Route::post('/room/{tempatId}/kas', [KasController::class, 'store'])->name('kas.store');
-    Route::post('/room/{tempatId}/kategori', [KasController::class, 'storeKategori'])->name('kas.kategori.store');
+    Route::get('/room/{slug}/kas', [KasController::class, 'dashboard'])->name('kas.dashboard');
+    Route::post('/room/{slug}/kas', [KasController::class, 'store'])->name('kas.store');
+    Route::post('/room/{slug}/kategori', [KasController::class, 'storeKategori'])->name('kas.kategori.store');
     Route::delete('/kas/destroy/{id}', [KasController::class, 'destroy'])->name('kas.destroy');
     
     // Public Post View

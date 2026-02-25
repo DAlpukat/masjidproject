@@ -24,6 +24,7 @@
                 </div>
                 
                 @if(auth()->id() == $tempat->user_id)
+                    {{-- Untuk Admin Panel, jika route meminta ID, biarkan id. Jika route diubah ke slug, ganti ke slug --}}
                     <a href="{{ route('admin.pages.index', $tempat->id) }}" class="flex-shrink-0 inline-flex items-center px-6 py-3 bg-white/10 backdrop-blur-md text-white border-2 border-white/20 rounded-2xl hover:bg-white/20 font-bold shadow-xl transition-all active:scale-95">
                         <svg class="w-5 h-5 mr-2 text-pink-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
                         Admin Panel
@@ -37,7 +38,8 @@
                 <div class="flex space-x-8 min-w-max">
                     @foreach($pages as $page)
                         @php 
-                            $link = ($page->tipe == 'kas') ? route('kas.dashboard', $tempat->id) : "#{$page->tipe}-{$page->id}"; 
+                            // PERBAIKAN: Menggunakan $tempat->slug
+                            $link = ($page->tipe == 'kas') ? route('kas.dashboard', $tempat->slug) : "#{$page->tipe}-{$page->id}"; 
                         @endphp
                         
                         <a href="{{ $link }}" class="nav-tab-item py-6 text-gray-300 hover:text-white font-bold flex items-center transition-all border-b-2 border-transparent hover:border-pink-500">
@@ -67,7 +69,8 @@
                         </div>
                         <p class="text-gray-100 text-lg mb-8 relative z-10 font-medium">Laporan keuangan transparan tersedia.</p>
                         
-                        <a href="{{ route('kas.dashboard', $tempat->id) }}" class="btn-gradient-pink px-10 py-4 rounded-2xl font-bold text-lg inline-flex items-center text-white shadow-lg shadow-pink-500/30 transform hover:-translate-y-1 transition-all">
+                        {{-- PERBAIKAN: Menggunakan $tempat->slug --}}
+                        <a href="{{ route('kas.dashboard', $tempat->slug) }}" class="btn-gradient-pink px-10 py-4 rounded-2xl font-bold text-lg inline-flex items-center text-white shadow-lg shadow-pink-500/30 transform hover:-translate-y-1 transition-all">
                             {{ auth()->id() == $tempat->user_id ? 'Buka Dashboard Kas (Admin)' : 'Lihat Laporan Kas' }}
                             <svg class="w-6 h-6 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
                         </a>

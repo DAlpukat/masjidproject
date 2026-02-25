@@ -130,25 +130,25 @@
                 <div class="relative z-10 pt-4 border-t border-white/10 flex items-center justify-between">
                     <div class="flex items-center text-xs font-bold text-gray-400">
                         <svg class="w-4 h-4 mr-2 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                        {{ $place->members_count }} Anggota
+                        {{ $place->users_count ?? $place->users->count() }} Anggota
                     </div>
 
                     @if(auth()->check() && $place->users->contains(auth()->id()))
-                        <a href="{{ route('room.view', $place->slug) }}" class="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-lg text-xs font-bold transition-all flex items-center gap-2 group/btn">
-                            <span>Masuk Room</span>
-                            <svg class="w-3 h-3 transform group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        <a href="{{ route('room.view', $place->slug) }}" class="px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-600 text-white rounded-xl font-bold hover:shadow-lg transition-all text-sm">
+                            Masuk Room
                         </a>
 
                     @elseif(auth()->check())
-                        <form action="{{ route('join.public', $place->id) }}" method="POST">
-                            @csrf
-                            <button type="submit" class="px-5 py-2 bg-white text-black hover:bg-gray-200 rounded-lg text-xs font-bold shadow-lg shadow-white/10 hover:shadow-white/20 hover:scale-105 active:scale-95 transition-all">
-                                + Gabung
-                            </button>
-                        </form>
+                        {{-- TOMBOL JOIN FINAL --}}
+                        <button type="button" 
+                                data-id="{{ $place->id }}" 
+                                data-slug="{{ $place->slug }}"
+                                class="btn-join-ajax px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-bold hover:shadow-lg transition-all text-sm">
+                            Join Room
+                        </button>
 
                     @else
-                        <a href="{{ route('login') }}" class="px-4 py-2 border border-white/30 text-white hover:bg-white/10 rounded-lg text-xs font-bold transition-all">
+                        <a href="{{ route('login') }}" class="px-4 py-2 border border-white/30 text-white hover:bg-white/10 rounded-xl text-sm font-bold transition-all">
                             Login Dulu
                         </a>
                     @endif
@@ -157,7 +157,7 @@
         @empty
             <div class="col-span-1 md:col-span-3 py-16 text-center">
                 <div class="inline-flex p-6 rounded-full bg-white/5 border border-white/10 mb-4 animate-soft-pulse">
-                    <svg class="w-12 h-12 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                    <svg class="w-12 h-12 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
                 </div>
                 <p class="text-white font-bold tracking-tight text-lg">BELUM ADA TEMPAT LAYANAN</p>
                 <p class="text-sm text-gray-500 mt-2">Coba ubah kata kunci pencarian atau filter status.</p>
@@ -173,14 +173,68 @@
     
 </div>
 
+{{-- SCRIPT FINAL --}}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Efek stagger untuk card
         const cards = document.querySelectorAll('.glass-card');
         cards.forEach((card, index) => {
             setTimeout(() => {
                 card.classList.add('active');
-            }, index * 100); // Delay bertingkat
+            }, index * 100);
+        });
+
+        const buttons = document.querySelectorAll('.btn-join-ajax');
+        const csrfToken = document.querySelector('meta[name="csrf-token"]');
+
+        if (!csrfToken) {
+            console.error('CSRF Token tidak ditemukan!');
+            return;
+        }
+
+        buttons.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const id = this.dataset.id;
+                const slug = this.dataset.slug;
+                const url = `/join-public/${id}`;
+                const originalBtn = this;
+
+                originalBtn.innerHTML = 'Processing...';
+                originalBtn.disabled = true;
+                originalBtn.style.opacity = '0.7';
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken.getAttribute('content'),
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({})
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => { throw err; });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    originalBtn.innerHTML = 'Masuk Room';
+                    originalBtn.classList.remove('from-green-500', 'to-emerald-600');
+                    originalBtn.classList.add('from-blue-500', 'to-cyan-600');
+                    this.disabled = false;
+                    originalBtn.onclick = function() {
+                        window.location.href = `/room/${slug}`;
+                    };
+                })
+                .catch(error => {
+                    originalBtn.innerHTML = 'Join Room';
+                    originalBtn.disabled = false;
+                    originalBtn.style.opacity = '1';
+                    alert('Gagal bergabung: ' + (error.message || 'Server Error'));
+                });
+            });
         });
     });
 </script>

@@ -13,7 +13,8 @@
         <!-- Header -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
             <div>
-                <a href="{{ route('admin.pages.index', $tempat->id) }}" class="text-pink-400 hover:text-pink-300 hover:underline font-bold">&larr; Kembali ke Daftar Halaman</a>
+                {{-- PERBAIKAN: Arahkan ke room.view dengan slug, BUKAN admin.pages.index --}}
+                <a href="{{ route('room.view', $tempat->slug) }}" class="text-pink-400 hover:text-pink-300 hover:underline font-bold">&larr; Kembali ke Ruangan</a>
                 <h1 class="text-3xl font-black text-white mt-2 drop-shadow-lg">Kas & Keuangan: {{ $tempat->nama }}</h1>
             </div>
             
@@ -35,7 +36,33 @@
                     <div class="glass-card p-6 sticky top-6">
                         <h2 class="text-lg font-bold mb-4 text-white border-b border-white/10 pb-2">Catat Transaksi</h2>
                         
-                        <form action="{{ route('kas.store', $tempat->id) }}" method="POST" enctype="multipart/form-data">
+                        <!-- BLOK NOTIFIKASI ERROR / SUKSES -->
+                        <div class="mb-4">
+                            @if ($errors->any())
+                                <div class="bg-red-500/20 border border-red-500/50 text-red-300 px-4 py-3 rounded-xl text-sm mb-3">
+                                    <strong>Ups!</strong> Ada kesalahan input.<br>
+                                    <ul class="list-disc list-inside mt-1">
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
+
+                            @if(session('error'))
+                                <div class="bg-red-500/20 border border-red-500/50 text-red-300 px-4 py-3 rounded-xl text-sm mb-3">
+                                    {{ session('error') }}
+                                </div>
+                            @endif
+
+                            @if(session('success'))
+                                <div class="bg-green-500/20 border border-green-500/50 text-green-300 px-4 py-3 rounded-xl text-sm mb-3">
+                                    {{ session('success') }}
+                                </div>
+                            @endif
+                        </div>
+
+                        <form action="{{ route('kas.store', $tempat->slug) }}" method="POST" enctype="multipart/form-data">
                             @csrf
 
                             <!-- Toggle Jenis -->
@@ -57,17 +84,17 @@
                             <div class="space-y-4">
                                 <div>
                                     <label class="block text-xs font-bold text-gray-300 uppercase mb-1">Tanggal</label>
-                                    <input type="date" name="tanggal" class="glass-input w-full" required value="{{ date('Y-m-d') }}">
+                                    <input type="date" name="tanggal" class="glass-input w-full" required value="{{ old('tanggal', date('Y-m-d')) }}">
                                 </div>
 
                                 <div>
                                     <label class="block text-xs font-bold text-gray-300 uppercase mb-1">Keterangan</label>
-                                    <input type="text" name="keterangan" class="glass-input w-full" placeholder="Contoh: Beli Spidol" required>
+                                    <input type="text" name="keterangan" class="glass-input w-full" placeholder="Contoh: Beli Spidol" value="{{ old('keterangan') }}" required>
                                 </div>
 
                                 <div>
                                     <label class="block text-xs font-bold text-gray-300 uppercase mb-1">Jumlah (Rp)</label>
-                                    <input type="number" name="jumlah" class="glass-input w-full" placeholder="0" required>
+                                    <input type="number" name="jumlah" class="glass-input w-full" placeholder="0" value="{{ old('jumlah') }}" required>
                                 </div>
 
                                 <!-- LOGIKA PEMASUKAN -->
@@ -93,12 +120,11 @@
                                                     
                                                     <div id="personal-inputs" class="hidden mt-3 space-y-2 pl-2 border-l-2 border-pink-500/50">
                                                         <label class="block text-xs font-bold text-gray-400 uppercase">Nama Anggota</label>
-                                                        <!-- Class choices-dark penting untuk selector JS -->
                                                         <select name="user_id" class="glass-input text-sm w-full choices-dark">
                                                             <option value="">-- Pilih Anggota --</option>
                                                             @foreach($tempat->users as $u)
                                                                 @if($u->id != $tempat->user_id)
-                                                                    <option value="{{ $u->id }}">{{ $u->name }}</option>
+                                                                    <option value="{{ $u->id }}" {{ old('user_id') == $u->id ? 'selected' : '' }}>{{ $u->name }}</option>
                                                                 @endif
                                                             @endforeach
                                                         </select>
@@ -107,7 +133,7 @@
                                                         <select name="kategori_kas_id" class="glass-input text-sm w-full choices-dark">
                                                             <option value="">-- Pilih Kategori --</option>
                                                             @foreach($kategoriKas as $kat)
-                                                                <option value="{{ $kat->id }}">{{ $kat->nama }} {{ $kat->tipe == 'wajib' ? '(Wajib)' : '(Sedekah)' }}</option>
+                                                                <option value="{{ $kat->id }}" {{ old('kategori_kas_id') == $kat->id ? 'selected' : '' }}>{{ $kat->nama }} {{ $kat->tipe == 'wajib' ? '(Wajib)' : '(Sedekah)' }}</option>
                                                             @endforeach
                                                         </select>
                                                     </div>
@@ -122,30 +148,41 @@
                                     @endif
                                 </div>
 
-                                <!-- LOGIKA PENGELUARAN -->
+                                <!-- LOGIKA PENGELUARAN (FINAL) -->
                                 <div id="section-pengeluaran" class="hidden space-y-4 pt-2 border-t border-white/10">
-                                    <label class="block text-xs font-bold text-gray-300 uppercase mb-1">Mode Pengeluaran</label>
-                                    <div class="space-y-2">
-                                        @if($tempat->shared_expense_enabled)
+                                    
+                                    @if(!$tempat->use_individual_ledger)
+                                        {{-- KAS UMUM: Langsung ambil dari total, tanpa pilihan --}}
+                                        <div class="p-3 bg-red-500/10 text-red-200 text-xs rounded border border-red-500/20">
+                                            Mode <strong>Kas Umum</strong>. Pengeluaran diambil dari saldo fisik total.
+                                        </div>
+                                        <input type="hidden" name="tipe_pengeluaran" value="free">
+                                    @else
+                                        {{-- KAS PERORANGAN: Muncul pilihan mode pengeluaran --}}
+                                        <label class="block text-xs font-bold text-gray-300 uppercase mb-1">Mode Pengeluaran</label>
+                                        <div class="space-y-2">
+                                            
+                                            {{-- Opsi 1: Dibagi Rata (Hanya muncul jika fitur shared aktif) --}}
+                                            @if($tempat->shared_expense_enabled)
+                                                <label class="flex items-start p-3 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5 transition">
+                                                    <input type="radio" name="tipe_pengeluaran" value="shared" class="mt-1 mr-3 text-pink-500 bg-gray-700 border-gray-600" {{ old('tipe_pengeluaran') == 'shared' ? 'checked' : '' }}>
+                                                    <div>
+                                                        <span class="block font-bold text-white text-sm">Dibagi Rata (Shared)</span>
+                                                        <p class="text-xs text-gray-400">Biaya dibagi ke semua anggota.</p>
+                                                    </div>
+                                                </label>
+                                            @endif
+
+                                            {{-- Opsi 2: Ambil Saldo Total (Selalu muncul untuk Perorangan) --}}
                                             <label class="flex items-start p-3 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5 transition">
-                                                <input type="radio" name="tipe_pengeluaran" value="shared" class="mt-1 mr-3 text-pink-500 bg-gray-700 border-gray-600" checked>
-                                                <div>
-                                                    <span class="block font-bold text-white text-sm">Dibagi Rata (Shared)</span>
-                                                    <p class="text-xs text-gray-400">Biaya dibagi ke semua anggota.</p>
-                                                </div>
-                                            </label>
-                                        @endif
-                                        
-                                        @if($tempat->free_expense_enabled)
-                                            <label class="flex items-start p-3 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5 transition">
-                                                <input type="radio" name="tipe_pengeluaran" value="free" class="mt-1 mr-3 text-pink-500 bg-gray-700 border-gray-600" {{ !$tempat->shared_expense_enabled ? 'checked' : '' }}>
+                                                <input type="radio" name="tipe_pengeluaran" value="free" class="mt-1 mr-3 text-pink-500 bg-gray-700 border-gray-600" {{ old('tipe_pengeluaran') == 'free' || !$tempat->shared_expense_enabled ? 'checked' : '' }}>
                                                 <div>
                                                     <span class="block font-bold text-white text-sm">Ambil Saldo Total (Free)</span>
-                                                    <p class="text-xs text-gray-400">Hanya kurangi uang fisik.</p>
+                                                    <p class="text-xs text-gray-400">Hanya kurangi uang fisik (tidak membebani anggota).</p>
                                                 </div>
                                             </label>
-                                        @endif
-                                    </div>
+                                        </div>
+                                    @endif
                                 </div>
 
                                 <div>
@@ -181,7 +218,7 @@
                                     @endforelse
                                 </div>
 
-                                <form action="{{ route('kas.kategori.store', $tempat->id) }}" method="POST" class="space-y-2">
+                                <form action="{{ route('kas.kategori.store', $tempat->slug) }}" method="POST" class="space-y-2">
                                     @csrf
                                     <input type="text" name="nama" placeholder="Nama Kategori baru..." class="glass-input text-sm w-full" required>
                                     <div class="flex gap-2">
@@ -369,7 +406,6 @@
 
 <!-- CSS Dark Mode Override -->
 <style>
-    /* Styling Choices.js agar Dark Mode (Pakai !important agar menang) */
     .choices__inner {
         background-color: rgba(255, 255, 255, 0.05) !important;
         border: 1px solid rgba(255, 255, 255, 0.15) !important;
@@ -377,27 +413,20 @@
         padding: 0.5rem;
         min-height: 42px;
     }
-    .choices__list--single {
-        padding: 4px 16px 4px 4px;
-    }
-    .choices__list--single .choices__item {
-        color: #fff !important;
-    }
+    .choices__list--single { padding: 4px 16px 4px 4px; }
+    .choices__list--single .choices__item { color: #fff !important; }
     .choices__list--dropdown {
-        background-color: #1f2937 !important; /* Gray 800 */
+        background-color: #1f2937 !important;
         border: 1px solid rgba(255, 255, 255, 0.15) !important;
         color: #fff !important;
     }
-    .choices__list--dropdown .choices__item {
-        color: #d1d5db !important; /* Gray 300 */
-        padding: 10px;
-    }
+    .choices__list--dropdown .choices__item { color: #d1d5db !important; padding: 10px; }
     .choices__list--dropdown .choices__item--selectable.is-highlighted {
         background-color: rgba(255, 255, 255, 0.1) !important;
         color: #fff !important;
     }
     .choices[data-type*="select-one"] .choices__input {
-        background-color: #374151 !important; /* Gray 700 */
+        background-color: #374151 !important;
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
         color: #fff !important;
         padding: 0.5rem;
@@ -405,18 +434,10 @@
         width: calc(100% - 1rem);
         border-radius: 0.25rem;
     }
-    .choices__input::placeholder {
-        color: #9ca3af !important; /* Gray 400 */
-    }
-    /* Fix Arrow Color */
-    .choices::after {
-        border-color: #ffffff transparent transparent !important;
-    }
-    .choices.is-open::after {
-        border-color: transparent transparent #ffffff !important;
-    }
+    .choices__input::placeholder { color: #9ca3af !important; }
+    .choices::after { border-color: #ffffff transparent transparent !important; }
+    .choices.is-open::after { border-color: transparent transparent #ffffff !important; }
     
-    /* Pagination Dark Mode */
     .pagination span, .pagination a {
         background-color: rgba(255, 255, 255, 0.05) !important;
         color: #d1d5db !important;
@@ -434,7 +455,6 @@
 </style>
 
 <script>
-    // --- LOGIC HELPERS ---
     function toggleForm() {
         const sectionMasuk = document.getElementById('section-pemasukan');
         const sectionKeluar = document.getElementById('section-pengeluaran');
@@ -462,7 +482,6 @@
         }
     }
 
-    // --- CHART LOGIC ---
     function initChart() {
         const canvas = document.getElementById('kasChart');
         if(!canvas) return;
@@ -521,7 +540,6 @@
         } catch (e) { console.error(e); }
     }
 
-    // --- DELETE LOGIC ---
     async function hapusTransaksi(id, btnElement) {
         if(!confirm('Yakin ingin menghapus transaksi ini?')) return;
         const originalContent = btnElement.innerHTML;
@@ -545,7 +563,6 @@
         }
     }
 
-    // --- MODAL LOGIC ---
     function openPhotoModal(url) {
         document.getElementById('modalImageContent').src = url;
         document.getElementById('photoModal').classList.remove('hidden');
@@ -556,18 +573,15 @@
         document.getElementById('modalImageContent').src = '';
     }
 
-    // --- INIT CHOICES.JS (INI YANG TADI KURANG) ---
     function initChoices() {
         const choiceElements = document.querySelectorAll('.choices-dark');
         choiceElements.forEach(el => {
-            // Cek apakah sudah di-init sebelumnya agar tidak error
             if (!el.classList.contains('choices__input')) {
                 new Choices(el, {
                     searchEnabled: true,
                     itemSelectText: '',
                     shouldSort: false,
                     allowHTML: true,
-                    // PENTING: Pastikan class names sesuai styling CSS di atas
                     classNames: {
                         containerOuter: 'choices',
                         containerInner: 'choices__inner',
@@ -580,12 +594,11 @@
         });
     }
 
-    // --- MAIN INIT ---
     window.addEventListener('DOMContentLoaded', () => {
         toggleForm();
         togglePersonalInput();
         initChart();
-        initChoices(); // Panggil fungsi init Choices di sini
+        initChoices();
     });
 </script>
 @endsection

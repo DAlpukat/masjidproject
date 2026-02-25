@@ -46,6 +46,16 @@ class TempatLayanan extends Model
         'free_expense_enabled' => 'boolean',
     ];
 
+    /**
+     * Method penting untuk Route Model Binding.
+     * Menginstruksikan Laravel untuk menggunakan 'slug' 
+     * daripada 'id' saat mencari data di route.
+     */
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
+
     // RELATIONS
 
     public function pages(): HasMany
@@ -63,7 +73,6 @@ class TempatLayanan extends Model
         return $this->hasMany(LaporanKas::class);
     }
 
-    // RELATIONS
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'tempat_layanan_user', 'tempat_layanan_id', 'user_id');
