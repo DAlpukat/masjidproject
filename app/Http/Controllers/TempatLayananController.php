@@ -55,6 +55,28 @@ class TempatLayananController extends Controller
             ->with('success', 'Kelas berhasil diajukan. Menunggu persetujuan Superadmin.');
     }
 
+
+    public function joinPublic($id)
+    {
+        $user = auth()->user();
+        
+        // Cari room, jika tidak ada return error JSON
+        $room = TempatLayanan::find($id);
+        if (!$room) {
+            return response()->json(['message' => 'Room tidak ditemukan'], 404);
+        }
+
+        // Cek apakah sudah join
+        if ($user->tempatLayanans()->where('tempat_layanan_id', $id)->exists()) {
+            return response()->json(['message' => 'Sudah bergabung'], 200);
+        }
+
+        // Logika Join
+        $user->tempatLayanans()->attach($id);
+
+        return response()->json(['message' => 'Berhasil join'], 200);
+    }
+
     public function edit($id)
     {
         $tempat = TempatLayanan::findOrFail($id);

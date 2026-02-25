@@ -20,9 +20,9 @@
             </div>
         @endif
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8" id="rooms-container">
             @forelse($rooms as $room)
-                <div class="glass-card rounded-[2rem] p-8 flex flex-col justify-between shadow-2xl hover:shadow-pink-500/20 hover:-translate-y-1 transition-all duration-300 border border-white/30 bg-black/20 backdrop-blur-lg">
+                <div class="glass-card rounded-[2rem] p-8 flex flex-col justify-between shadow-2xl hover:shadow-pink-500/20 hover:-translate-y-1 transition-all duration-300 border border-white/30 bg-black/20 backdrop-blur-lg room-card" data-id="{{ $room->id }}">
                     <div>
                         <div class="flex justify-between items-start mb-6">
                             <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-white to-pink-100 flex items-center justify-center text-pink-600 font-black text-2xl shadow-xl">
@@ -76,12 +76,13 @@
                             </button>
                         @endif
 
-                        <form action="{{ route('room.leave', $room->id) }}" method="POST" onsubmit="return confirm('Yakin ingin keluar dari {{ $room->nama }}?');" class="inline">
-                            @csrf
-                            <button type="submit" class="p-3 text-gray-300 hover:text-red-400 hover:bg-white/10 rounded-xl transition-all border border-transparent hover:border-white/20 group" title="Keluar Ruangan">
-                                <svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-                            </button>
-                        </form>
+                        {{-- TOMBOL LEAVE AJAX --}}
+                        <button type="button" 
+                                data-id="{{ $room->id }}"
+                                data-name="{{ $room->nama }}"
+                                class="btn-leave-ajax p-3 text-gray-300 hover:text-red-400 hover:bg-white/10 rounded-xl transition-all border border-transparent hover:border-white/20 group" title="Keluar Ruangan">
+                            <svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                        </button>
                     </div>
                 </div>
             @empty
@@ -99,4 +100,68 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]');
+        
+        if (!csrfToken) {
+            console.error('CSRF Token tidak ditemukan!');
+            return;
+        }
+
+        // --- LOGIKA LEAVE AJAX ---
+        const leaveButtons = document.querySelectorAll('.btn-leave-ajax');
+        
+        leaveButtons.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                const roomName = this.dataset.name;
+                if(!confirm(`Yakin ingin keluar dari ${roomName}?`)) return;
+
+                const id = this.dataset.id;
+                const url = `/room/${id}/leave`;
+                const card = this.closest('.room-card'); // Target card untuk dihapus
+                
+                // Animasi Loading
+                this.innerHTML = '...';
+                this.disabled = true;
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken.getAttribute('content'),
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({})
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error('Gagal keluar');
+                    return response.json();
+                })
+                .then(data => {
+                    // Animasi Hilang (Fade Out)
+                    card.style.transition = 'all 0.4s ease';
+                    card.style.opacity = '0';
+                    card.style.transform = 'scale(0.9)';
+                    
+                    // Hapus elemen setelah animasi
+                    setTimeout(() => {
+                        card.remove();
+                        // Cek jika container kosong, tampilkan pesan empty (opsional, bisa reload)
+                        if(document.querySelectorAll('.room-card').length === 0) {
+                            location.reload(); // Reload untuk menampilkan state empty
+                        }
+                    }, 400);
+                })
+                .catch(error => {
+                    // Kembalikan tombol jika gagal
+                    this.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>';
+                    this.disabled = false;
+                    alert('Terjadi kesalahan, coba lagi.');
+                });
+            });
+        });
+    });
+</script>
 @endsection

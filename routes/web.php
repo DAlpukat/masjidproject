@@ -32,7 +32,7 @@ Route::middleware('auth')->group(function () {
     // Home & Room Navigation
     Route::get('/home', [HomeController::class, 'index'])->name('home');
     Route::post('/join', [HomeController::class, 'join'])->name('join.store');
-    Route::post('/join-public/{place}', [HomeController::class, 'joinPublic'])->name('join.public');
+    Route::post('/join-public/{id}', [HomeController::class, 'joinPublic'])->name('join.public');
     Route::get('/my-rooms', [HomeController::class, 'myRooms'])->name('user.rooms');
     Route::get('/room/{slug}', [HomeController::class, 'viewRoom'])->name('room.view');
     Route::post('/room/{tempat}/leave', [HomeController::class, 'leave'])->name('room.leave');

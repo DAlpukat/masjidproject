@@ -88,7 +88,7 @@ class HomeController extends Controller
      */
     public function myRooms()
     {
-        $rooms = auth()->user()->joinedPlaces()
+        $rooms = auth()->user()->tempatLayanans()
             ->withCount(['users as anggota_count' => function($query) {
                 // Hitung user yang bukan admin pemilik dan bukan superadmin
                 $query->whereColumn('users.id', '!=', 'tempat_layanans.user_id')
@@ -129,32 +129,50 @@ class HomeController extends Controller
     /**
      * Keluar dari Room.
      */
-    public function leave(TempatLayanan $tempat)
+    public function leave($id)
     {
-        // Pemilik tidak bisa leave
-        if ($tempat->user_id === auth()->id()) {
-            return back()->with('error', 'Kamu adalah pengurus utama. Tidak bisa keluar. Hapus room dari Dashboard Admin jika tidak diperlukan.');
+        $user = auth()->user();
+        
+        // Cek relasi
+        if ($user->tempatLayanans()->where('tempat_layanan_id', $id)->exists()) {
+            $user->tempatLayanans()->detach($id);
+            
+            // Kembalikan JSON untuk AJAX
+            return response()->json([
+                'message' => 'Berhasil keluar dari room',
+                'status' => 'success'
+            ]);
         }
 
-        // Proses Leave
-        auth()->user()->joinedPlaces()->detach($tempat->id);
-
-        return redirect()->route('user.rooms')->with('success', 'Berhasil keluar dari ' . $tempat->nama);
+        return response()->json([
+            'message' => 'Anda bukan anggota room ini',
+            'status' => 'error'
+        ], 400);
     }
 
     /**
      * Join Room Publik via Tombol.
      */
-        public function joinPublic(TempatLayanan $place)
+    public function joinPublic($id)
     {
-        // Cek jika sudah join
-        if ($place->users->contains(auth()->id())) {
-            return redirect()->route('room.view', $place->slug)->with('info', 'Kamu sudah bergabung ke room ini.');
+        $user = auth()->user();
+        
+        // Cari room berdasarkan ID
+        $room = TempatLayanan::find($id);
+
+        // Jika room tidak ada, kirim response error (ini penyebab 404 jika binding gagal)
+        if (!$room) {
+            return response()->json(['message' => 'Room tidak ditemukan'], 404);
         }
 
-        // Proses Gabung
-        $place->users()->attach(auth()->id());
+        // Cek jika user sudah join
+        if ($user->tempatLayanans()->where('tempat_layanan_id', $id)->exists()) {
+            return response()->json(['message' => 'Sudah bergabung'], 200);
+        }
 
-        return redirect()->route('room.view', $place->slug)->with('success', 'Berhasil bergabung ke ' . $place->nama);
+        // Proses join
+        $user->tempatLayanans()->attach($id);
+
+        return response()->json(['message' => 'Berhasil join'], 200);
     }
 }
