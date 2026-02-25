@@ -1,5 +1,5 @@
 @extends('layouts.app')
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 @section('content')
 <div class="bg-mesh-elegant min-h-screen py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-5xl mx-auto">
@@ -76,10 +76,13 @@
                             </button>
                         @endif
 
-                        <form action="{{ route('room.leave', $room->id) }}" method="POST" onsubmit="return confirm('Yakin ingin keluar dari {{ $room->nama }}?');" class="inline">
+                        <form id="leave-room-form-{{ $room->id }}" action="{{ route('room.leave', $room->id) }}" method="POST" class="inline">
                             @csrf
-                            <button type="submit" class="p-3 text-gray-300 hover:text-red-400 hover:bg-white/10 rounded-xl transition-all border border-transparent hover:border-white/20 group" title="Keluar Ruangan">
-                                <svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                            <button type="button" onclick="confirmLeave('{{ $room->id }}', '{{ $room->nama }}')" 
+                                class="p-3 text-gray-300 hover:text-red-400 hover:bg-white/10 rounded-xl transition-all border border-transparent hover:border-white/20 group" title="Keluar Ruangan">
+                                <svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                                </svg>
                             </button>
                         </form>
                     </div>
@@ -99,4 +102,33 @@
         </div>
     </div>
 </div>
+<script>
+function confirmLeave(roomId, roomName) {
+    Swal.fire({
+        title: '<span class="text-white">Keluar Ruangan?</span>',
+        html: `<span class="text-gray-400">Yakin ingin keluar dari <b>${roomName}</b>?<br>Anda harus menggunakan kode referral lagi untuk masuk.</span>`,
+        icon: 'warning',
+        iconColor: '#f472b6', // Warna pink-400
+        showCancelButton: true,
+        confirmButtonColor: '#ec4899', // Pink-500
+        cancelButtonColor: 'rgba(255,255,255,0.1)',
+        confirmButtonText: 'Ya, Keluar!',
+        cancelButtonText: 'Batal',
+        background: '#111827', // Dark Gray (Match your theme)
+        color: '#ffffff',
+        borderRadius: '1.5rem',
+        backdrop: `rgba(0,0,0,0.6) backdrop-blur-sm`, // Efek blur di belakang pop-up
+        customClass: {
+            popup: 'border border-white/10 glass-card shadow-2xl',
+            confirmButton: 'rounded-xl px-6 py-2 font-bold uppercase text-xs tracking-widest',
+            cancelButton: 'rounded-xl px-6 py-2 font-bold uppercase text-xs tracking-widest text-gray-300'
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Jalankan submit form jika user klik "Ya"
+            document.getElementById('leave-room-form-' + roomId).submit();
+        }
+    });
+}
+</script>
 @endsection
