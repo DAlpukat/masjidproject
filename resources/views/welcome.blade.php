@@ -185,10 +185,10 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                 @php
                     $developers = [
-                        ['name' => 'Diego Prayata F.M', 'gif' => 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExN3duNjd0b2dvMW5pYnVkaGltem9idWo4a3gwbDd4NDI2Mjdva3R3eSZlcD12MV9naWZzX3RyZW5kaW5nJmN0PWc/MDJ9IbxxvDUQM/giphy.gif', 'ig' => 'https://www.instagram.com/diegopryata?igsh=OW43bDVycXJtbHZx', 'role' => 'Project Leader'],
-                        ['name' => 'Achmad Irmansyah', 'gif' => 'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3aGF6dTF6dGg4bnZxNWs1dzRja2N0cm9pN2c4b2s1YmYxd3ZkMGVkZyZlcD12MV9naWZzX3RyZW5kaW5nJmN0PWc/cZe0cYtV3pByHHp5vA/giphy.gif', 'ig' => 'https://www.instagram.com/achmad_irmansyah?igsh=anhpZGNuNnBmdTFp', 'role' => 'Backend Dev'],
-                        ['name' => 'Muhammad Naufal Hakim', 'gif' => 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMWU5cDhydWw1OHJ1cnc0NTR3dmVzYThscGI1YmRiOGZ5dThkajdnZiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/o5srM4M3BTVfD7WQOt/giphy.gif', 'ig' => 'https://www.instagram.com/m.naufal.hakim4?igsh=cjV1aDN0N3hmbGZj', 'role' => 'Frontend Dev'],
-                        ['name' => 'Muhammad Hamizan F.I ', 'gif' => 'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3NGExZmJxanBvc2hkNmk4czhlYzN4OTZ6enZ6MjZqN213a3JmdTE0diZlcD12MV9naWZzX3NlYXJjaCZjdD1n/NHglY9vAmvM2GEsblP/giphy.gif', 'ig' => 'https://www.instagram.com/hzftri_?igsh=bjI2ZzUwcWx4emZ6', 'role' => 'UI/UX Dev'],
+                        ['name' => 'Diego Prayata F.M', 'gif' => 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZjF5ZWE2aWxmdW1kMXg0ZGZlZnFrdDRyc2Z1OXQ1cWVhbXdqZWI1ZSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/a5viI92PAF89q/giphy.gif', 'ig' => 'https://www.instagram.com/diegopryata?igsh=OW43bDVycXJtbHZx', 'role' => 'Project Leader'],
+                        ['name' => 'Achmad Irmansyah', 'gif' => 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZjF5ZWE2aWxmdW1kMXg0ZGZlZnFrdDRyc2Z1OXQ1cWVhbXdqZWI1ZSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/VUnodGEqaNiCQ63aLm/giphy.gif', 'ig' => 'https://www.instagram.com/achmad_irmansyah?igsh=anhpZGNuNnBmdTFp', 'role' => 'Backend Dev'],
+                        ['name' => 'Muhammad Naufal Hakim', 'gif' => 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZjF5ZWE2aWxmdW1kMXg0ZGZlZnFrdDRyc2Z1OXQ1cWVhbXdqZWI1ZSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/XHroGvuhnDUasQCqOr/giphy.gif', 'ig' => 'https://www.instagram.com/m.naufal.hakim4?igsh=cjV1aDN0N3hmbGZj', 'role' => 'Frontend Dev'],
+                        ['name' => 'Muhammad Hamizan F.I ', 'gif' => 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZjF5ZWE2aWxmdW1kMXg0ZGZlZnFrdDRyc2Z1OXQ1cWVhbXdqZWI1ZSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/UT8MQKVHr9EWN6Mg2X/giphy.gif', 'ig' => 'https://www.instagram.com/hzftri_?igsh=bjI2ZzUwcWx4emZ6', 'role' => 'UI/UX Dev'],
                     ];
                 @endphp
                 @foreach($developers as $dev)

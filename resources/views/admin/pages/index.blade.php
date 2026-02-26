@@ -71,9 +71,6 @@
                                 Kas (Keuangan) {{ in_array('kas', $existingTypes ?? []) ? '(Sudah Ada)' : '' }}
                             </option>
 
-                            <option value="barang_pinjam" class="bg-gray-900" {{ in_array('barang_pinjam', $existingTypes ?? []) ? 'disabled' : '' }}>
-                                Barang Pinjam {{ in_array('barang_pinjam', $existingTypes ?? []) ? '(Sudah Ada)' : '' }}
-                            </option>
                         </select>
                     </div>
 

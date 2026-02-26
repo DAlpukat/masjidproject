@@ -138,10 +138,6 @@
         </div>
     </div>
 </div>
-<<<<<<< HEAD
-
-=======
->>>>>>> 701661d71d61aaa9ba1cde94f945d52624fe3b77
 <script>
 function copyToClipboard(btn, text) {
     navigator.clipboard.writeText(text);
@@ -160,8 +156,8 @@ function copyToClipboard(btn, text) {
         checkIcon.classList.add('hidden');
     }, 2000);
 }
-<<<<<<< HEAD
-=======
+
+
     function hapusRuangan(url, btnElement) {
     // 1. Munculkan SweetAlert2 untuk Konfirmasi
     Swal.fire({
@@ -255,6 +251,6 @@ function copyToClipboard(btn, text) {
     });
 }
 
->>>>>>> 701661d71d61aaa9ba1cde94f945d52624fe3b77
+
 </script>
 @endsection

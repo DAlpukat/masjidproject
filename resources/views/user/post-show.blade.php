@@ -25,14 +25,18 @@
             <header class="p-8 md:p-10 pb-4 border-b border-white/5">
                 <div class="flex items-center text-pink-400 text-xs font-black uppercase tracking-[0.3em] mb-4">
                     <span class="w-12 h-px bg-pink-500/50 mr-4"></span>
-                    {{ $post->created_at->format('d F Y') }}
+                    {{-- Mengubah ke WITA (Asia/Makassar) --}}
+                    {{ $post->created_at->timezone('Asia/Makassar')->format('d F Y') }}
                 </div>
                 <h1 class="text-2xl md:text-4xl font-black text-white leading-tight mb-4 break-words">
                     {{ $post->title }}
                 </h1>
                 <div class="flex items-center text-gray-400 text-xs italic">
-                    <svg class="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    Waktu publikasi: {{ $post->created_at->format('H:i') }} WIB
+                    <svg class="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    {{-- Mengubah jam ke WITA --}}
+                    Waktu publikasi: {{ $post->created_at->timezone('Asia/Makassar')->format('H:i') }} WITA
                 </div>
             </header>
 
