@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <div class="bg-monochrome-gif"></div>
 <div class="bg-overlay"></div>
 
@@ -170,11 +171,14 @@
                                 @endif
                             </div>
 
-                            <form method="POST" action="{{ route('admin.pages.destroy', $page->id) }}" onsubmit="return confirm('Yakin hapus halaman ini?')">
+                            <form id="delete-page-form-{{ $page->id }}" method="POST" action="{{ route('admin.pages.destroy', $page->id) }}" class="inline">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="p-2 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all" title="Hapus Halaman">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                <button type="button" onclick="confirmDeletePage('{{ $page->id }}', '{{ $page->judul }}')" 
+                                    class="p-2 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all" title="Hapus Halaman">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
                                 </button>
                             </form>
                         </div>
@@ -193,4 +197,33 @@
         @endif
     </div>
 </div>
+<script>
+function confirmDeletePage(pageId, pageTitle) {
+    Swal.fire({
+        title: '<span class="text-white">Hapus Halaman?</span>',
+        html: `<span class="text-gray-400">Apakah Anda yakin ingin menghapus halaman <b>${pageTitle}</b>?<br>Data yang sudah dihapus tidak bisa dikembalikan.</span>`,
+        icon: 'error', // Ikon silang merah untuk aksi berbahaya
+        iconColor: '#ef4444', // Red-500
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444', // Red-500
+        cancelButtonColor: 'rgba(255,255,255,0.1)',
+        confirmButtonText: 'Ya, Hapus!',
+        cancelButtonText: 'Batal',
+        background: '#111827', 
+        color: '#ffffff',
+        borderRadius: '1.5rem',
+        backdrop: `rgba(0,0,0,0.6) backdrop-blur-sm`,
+        customClass: {
+            popup: 'border border-white/10 glass-card shadow-2xl',
+            confirmButton: 'rounded-xl px-6 py-2 font-bold uppercase text-xs tracking-widest',
+            cancelButton: 'rounded-xl px-6 py-2 font-bold uppercase text-xs tracking-widest text-gray-300'
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Submit form spesifik berdasarkan ID halaman
+            document.getElementById('delete-page-form-' + pageId).submit();
+        }
+    });
+}
+</script>
 @endsection

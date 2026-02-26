@@ -1,5 +1,5 @@
 @extends('layouts.app')
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 @section('content')
 <div class="bg-mesh-elegant min-h-screen py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-5xl mx-auto">
@@ -76,13 +76,15 @@
                             </button>
                         @endif
 
-                        {{-- TOMBOL LEAVE AJAX --}}
-                        <button type="button" 
-                                data-id="{{ $room->id }}"
-                                data-name="{{ $room->nama }}"
-                                class="btn-leave-ajax p-3 text-gray-300 hover:text-red-400 hover:bg-white/10 rounded-xl transition-all border border-transparent hover:border-white/20 group" title="Keluar Ruangan">
-                            <svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-                        </button>
+                        <form id="leave-room-form-{{ $room->id }}" action="{{ route('room.leave', $room->id) }}" method="POST" class="inline">
+                            @csrf
+                            <button type="button" onclick="confirmLeave('{{ $room->id }}', '{{ $room->nama }}')" 
+                                class="p-3 text-gray-300 hover:text-red-400 hover:bg-white/10 rounded-xl transition-all border border-transparent hover:border-white/20 group" title="Keluar Ruangan">
+                                <svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                                </svg>
+                            </button>
+                        </form>
                     </div>
                 </div>
             @empty
@@ -100,68 +102,33 @@
         </div>
     </div>
 </div>
-
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const csrfToken = document.querySelector('meta[name="csrf-token"]');
-        
-        if (!csrfToken) {
-            console.error('CSRF Token tidak ditemukan!');
-            return;
+function confirmLeave(roomId, roomName) {
+    Swal.fire({
+        title: '<span class="text-white">Keluar Ruangan?</span>',
+        html: `<span class="text-gray-400">Yakin ingin keluar dari <b>${roomName}</b>?<br>Anda harus menggunakan kode referral lagi untuk masuk.</span>`,
+        icon: 'warning',
+        iconColor: '#f472b6', // Warna pink-400
+        showCancelButton: true,
+        confirmButtonColor: '#ec4899', // Pink-500
+        cancelButtonColor: 'rgba(255,255,255,0.1)',
+        confirmButtonText: 'Ya, Keluar!',
+        cancelButtonText: 'Batal',
+        background: '#111827', // Dark Gray (Match your theme)
+        color: '#ffffff',
+        borderRadius: '1.5rem',
+        backdrop: `rgba(0,0,0,0.6) backdrop-blur-sm`, // Efek blur di belakang pop-up
+        customClass: {
+            popup: 'border border-white/10 glass-card shadow-2xl',
+            confirmButton: 'rounded-xl px-6 py-2 font-bold uppercase text-xs tracking-widest',
+            cancelButton: 'rounded-xl px-6 py-2 font-bold uppercase text-xs tracking-widest text-gray-300'
         }
-
-        // --- LOGIKA LEAVE AJAX ---
-        const leaveButtons = document.querySelectorAll('.btn-leave-ajax');
-        
-        leaveButtons.forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                const roomName = this.dataset.name;
-                if(!confirm(`Yakin ingin keluar dari ${roomName}?`)) return;
-
-                const id = this.dataset.id;
-                const url = `/room/${id}/leave`;
-                const card = this.closest('.room-card'); // Target card untuk dihapus
-                
-                // Animasi Loading
-                this.innerHTML = '...';
-                this.disabled = true;
-
-                fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken.getAttribute('content'),
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({})
-                })
-                .then(response => {
-                    if (!response.ok) throw new Error('Gagal keluar');
-                    return response.json();
-                })
-                .then(data => {
-                    // Animasi Hilang (Fade Out)
-                    card.style.transition = 'all 0.4s ease';
-                    card.style.opacity = '0';
-                    card.style.transform = 'scale(0.9)';
-                    
-                    // Hapus elemen setelah animasi
-                    setTimeout(() => {
-                        card.remove();
-                        // Cek jika container kosong, tampilkan pesan empty (opsional, bisa reload)
-                        if(document.querySelectorAll('.room-card').length === 0) {
-                            location.reload(); // Reload untuk menampilkan state empty
-                        }
-                    }, 400);
-                })
-                .catch(error => {
-                    // Kembalikan tombol jika gagal
-                    this.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>';
-                    this.disabled = false;
-                    alert('Terjadi kesalahan, coba lagi.');
-                });
-            });
-        });
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Jalankan submit form jika user klik "Ya"
+            document.getElementById('leave-room-form-' + roomId).submit();
+        }
     });
+}
 </script>
 @endsection
