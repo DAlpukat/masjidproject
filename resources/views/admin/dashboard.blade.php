@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <div class="bg-monochrome-gif"></div>
 <div class="bg-overlay"></div>
 
@@ -36,9 +37,9 @@
             </div>
         @endif
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8" id="room-list-container">
             @forelse($tempatLayanans as $item)
-                <div class="glass-card rounded-[2rem] p-8 flex flex-col justify-between shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-white/10 relative overflow-hidden group">
+                <div id="room-card-{{ $item->id }}" class="glass-card rounded-[2rem] p-8 flex flex-col justify-between shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-white/10 relative overflow-hidden group card-item">
                     
                     <div class="absolute -right-10 -top-10 w-40 h-40 bg-pink-500/5 rounded-full blur-2xl group-hover:bg-pink-500/10 transition-all duration-500"></div>
                     
@@ -71,20 +72,20 @@
                                     <span class="px-2 py-0.5 bg-blue-500/10 border border-blue-500/20 rounded text-xs">Publik</span>
                                 </div>
                             @else
-                            <button onclick="copyToClipboard(this, '{{ $item->kode_referral }}')" 
-                                class="flex items-center group/btn space-x-2 bg-white/5 px-4 py-2 rounded-xl border border-white/10 hover:border-pink-500/30 transition-all active:scale-95">
-                                
-                                <span class="font-mono font-bold text-pink-400">{{ $item->kode_referral }}</span>
-                                
-                                <div class="icon-container">
-                                    <svg class="copy-icon w-4 h-4 text-gray-500 group-hover/btn:text-pink-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path>
-                                    </svg>
-                                    <svg class="check-icon hidden w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                    </svg>
-                                </div>
-                            </button>
+                                <button onclick="copyToClipboard(this, '{{ $item->kode_referral }}')" 
+                                    class="flex items-center group/btn space-x-2 bg-white/5 px-4 py-2 rounded-xl border border-white/10 hover:border-pink-500/30 transition-all active:scale-95">
+                                    
+                                    <span class="font-mono font-bold text-pink-400">{{ $item->kode_referral }}</span>
+                                    
+                                    <div class="icon-container">
+                                        <svg class="copy-icon w-4 h-4 text-gray-500 group-hover/btn:text-pink-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path>
+                                        </svg>
+                                        <svg class="check-icon hidden w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                    </div>
+                                </button>
                             @endif
                         </div>
 
@@ -120,14 +121,11 @@
                             <svg class="w-5 h-5 transition-transform duration-300 group-hover/btn:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                         </a>
                         
-                        <form action="{{ route('admin.temp.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Hapus permanen?');" class="ml-auto">
-                            @csrf @method('DELETE')
-                            <button type="submit" class="btn-action-danger group/btn" title="Hapus Layanan">
-                                <svg class="w-5 h-5 transition-all duration-300 group-hover/btn:rotate-12 group-hover/btn:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                            </button>
-                        </form>
+                        <button onclick="hapusRuangan('{{ route('admin.temp.destroy', $item->id) }}', this)" class="btn-action-danger group/btn ml-auto" title="Hapus Layanan">
+                            <svg class="w-5 h-5 transition-all duration-300 group-hover/btn:rotate-12 group-hover/btn:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </button>
                     </div>
-                    </div>
+                </div>
             @empty
                 <div class="col-span-full glass-card rounded-[2.5rem] p-16 text-center border border-white/10">
                     <div class="w-24 h-24 bg-pink-500/10 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner border border-pink-500/20">
@@ -140,7 +138,10 @@
         </div>
     </div>
 </div>
+<<<<<<< HEAD
 
+=======
+>>>>>>> 701661d71d61aaa9ba1cde94f945d52624fe3b77
 <script>
 function copyToClipboard(btn, text) {
     navigator.clipboard.writeText(text);
@@ -159,5 +160,101 @@ function copyToClipboard(btn, text) {
         checkIcon.classList.add('hidden');
     }, 2000);
 }
+<<<<<<< HEAD
+=======
+    function hapusRuangan(url, btnElement) {
+    // 1. Munculkan SweetAlert2 untuk Konfirmasi
+    Swal.fire({
+        title: '<span class="text-white font-black">Hapus Layanan?</span>',
+        html: '<span class="text-gray-400">Seluruh data halaman dan anggota di dalam layanan ini akan ikut terhapus secara permanen.</span>',
+        icon: 'warning',
+        iconColor: '#ef4444',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: 'rgba(255,255,255,0.1)',
+        confirmButtonText: 'Ya, Hapus Sekarang!',
+        cancelButtonText: 'Batal',
+        background: '#111827',
+        color: '#ffffff',
+        borderRadius: '2rem',
+        backdrop: `rgba(0,0,0,0.6) backdrop-blur-sm`,
+        customClass: {
+            popup: 'border border-white/10 glass-card shadow-2xl',
+            confirmButton: 'rounded-xl px-6 py-2 font-bold uppercase text-xs tracking-widest focus:ring-0',
+            cancelButton: 'rounded-xl px-6 py-2 font-bold uppercase text-xs tracking-widest text-gray-300 focus:ring-0'
+        }
+    }).then((result) => {
+        // 2. Jika user menekan tombol "Ya"
+        if (result.isConfirmed) {
+            
+            // Efek Loading pada tombol
+            const originalContent = btnElement.innerHTML;
+            btnElement.disabled = true;
+            btnElement.innerHTML = `<svg class="animate-spin w-5 h-5 text-red-400" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
+
+            // Proses Fetch
+            fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
+            .then(result => {
+                if (result.success) {
+                    // Animasi Card Hilang
+                    const card = btnElement.closest('.card-item');
+                    card.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px) scale(0.95)';
+                    
+                    // Munculkan Notifikasi Berhasil (Toast)
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true,
+                        background: '#111827',
+                        color: '#fff'
+                    });
+                    
+                    Toast.fire({
+                        icon: 'success',
+                        title: 'Layanan berhasil dihapus'
+                    });
+
+                    setTimeout(() => {
+                        card.remove();
+                        const container = document.getElementById('room-list-container');
+                        if(container.querySelectorAll('.card-item').length === 0) {
+                            window.location.reload();
+                        }
+                    }, 500);
+                }
+            })
+            .catch(error => {
+                // Notifikasi Gagal
+                Swal.fire({
+                    title: 'Gagal!',
+                    text: 'Terjadi kesalahan saat menghapus data.',
+                    icon: 'error',
+                    background: '#111827',
+                    color: '#fff',
+                    confirmButtonColor: '#ef4444'
+                });
+                btnElement.disabled = false;
+                btnElement.innerHTML = originalContent;
+            });
+        }
+    });
+}
+
+>>>>>>> 701661d71d61aaa9ba1cde94f945d52624fe3b77
 </script>
 @endsection

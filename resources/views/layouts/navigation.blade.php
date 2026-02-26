@@ -42,12 +42,14 @@ if (auth()->check()) {
                     </a>
                 @endif
 
+                @if(auth()->check() && !auth()->user()->is_superadmin)
                 <a href="{{ route('user.rooms') }}" 
                     class="{{ request()->routeIs('user.rooms') ? 'text-white bg-white/20' : 'text-gray-300 hover:text-white hover:bg-white/10' }} px-4 py-2 rounded-lg text-sm font-bold">
                     Ruangan Saya
                 </a>
+                @endif
 
-                @if(auth()->check() && !auth()->user()->is_admin)
+                @if(auth()->check() && !auth()->user()->is_admin && !auth()->user()->is_superadmin)
                 <a href="{{ route('home') }}" 
                 class="{{ request()->routeIs('home') ? 'text-white bg-white/20' : 'text-gray-300 hover:text-white hover:bg-white/10' }} px-4 py-2 rounded-lg text-sm font-bold">
                     Cari Room

@@ -11,6 +11,56 @@
 
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        /* =========================================
+           ANIMASI REVEAL (SCROLL EFFECT)
+           ========================================= */
+        .reveal {
+            position: relative;
+            transform: translateY(50px);
+            opacity: 0;
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .reveal.active {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .delay-100 { transition-delay: 0.1s; }
+        .delay-200 { transition-delay: 0.2s; }
+        .delay-300 { transition-delay: 0.3s; }
+
+        .text-gradient-mono {
+            background: linear-gradient(to right, #ffffff, #a3a3a3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* =========================================
+           EFEK HOVER TOMBOL MASUK (SECONDARY)
+           ========================================= */
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem 1.25rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.03);
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+        }
     </style>
 </head>
 <body class="antialiased text-white min-h-screen flex flex-col relative overflow-x-hidden">
@@ -33,7 +83,7 @@
                             @auth
                                 <a href="{{ url('/dashboard') }}" class="btn-monochrome text-sm">Dashboard</a>
                             @else
-                                <a href="{{ route('login') }}" class="btn-secondary text-sm">Masuk</a>
+                                <a href="{{ route('login') }}" class="btn-secondary">Masuk</a>
                                 @if (Route::has('register'))
                                     <a href="{{ route('register') }}" class="btn-monochrome text-sm">Daftar</a>
                                 @endif
@@ -46,13 +96,12 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                         </svg>
                     </div>
-                    </div>
+                </div>
             </div>
         </div>
     </nav>
 
     <main class="flex-grow flex flex-col pt-20">
-        
         <div class="min-h-[90vh] flex flex-col items-center justify-center px-4 text-center relative z-10">
             <div class="glass-card p-10 md:p-16 rounded-3xl max-w-4xl w-full reveal active">
                 <span class="inline-block py-1 px-3 rounded-full bg-white/10 border border-white/20 text-xs font-bold tracking-widest uppercase mb-6 text-gray-300">
@@ -66,7 +115,6 @@
                     Kami berkomitmen untuk menyediakan platform transparansi dana yang akuntabel. 
                     Pantau arus kas, verifikasi laporan, dan bangun kepercayaan publik dengan data yang real-time.
                 </p>
-                
                 <div class="flex flex-col sm:flex-row justify-center gap-4">
                     <a href="#about" class="btn-monochrome w-full sm:w-auto">
                         Pelajari Lebih Lanjut
@@ -81,33 +129,19 @@
         <div id="about" class="py-24 px-4 relative z-10 max-w-7xl mx-auto w-full">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div class="glass-card p-8 rounded-2xl reveal delay-100 flex flex-col items-center text-center">
-                    <div class="w-14 h-14 bg-white/10 rounded-full flex items-center justify-center mb-6 text-white text-2xl">
-                        📊
-                    </div>
+                    <div class="w-14 h-14 bg-white/10 rounded-full flex items-center justify-center mb-6 text-white text-2xl">📊</div>
                     <h3 class="text-xl font-bold mb-3 text-white">Real-time Data</h3>
-                    <p class="text-gray-400 text-sm leading-relaxed">
-                        Akses laporan keuangan secara langsung saat transaksi terjadi tanpa penundaan.
-                    </p>
+                    <p class="text-gray-400 text-sm leading-relaxed">Akses laporan keuangan secara langsung saat transaksi terjadi tanpa penundaan.</p>
                 </div>
-
                 <div class="glass-card p-8 rounded-2xl reveal delay-200 flex flex-col items-center text-center">
-                    <div class="w-14 h-14 bg-white/10 rounded-full flex items-center justify-center mb-6 text-white text-2xl">
-                        🛡️
-                    </div>
+                    <div class="w-14 h-14 bg-white/10 rounded-full flex items-center justify-center mb-6 text-white text-2xl">🛡️</div>
                     <h3 class="text-xl font-bold mb-3 text-white">Keamanan Terjamin</h3>
-                    <p class="text-gray-400 text-sm leading-relaxed">
-                        Enkripsi tingkat tinggi memastikan data integritas dana tetap terjaga dari manipulasi.
-                    </p>
+                    <p class="text-gray-400 text-sm leading-relaxed">Enkripsi tingkat tinggi memastikan data integritas dana tetap terjaga dari manipulasi.</p>
                 </div>
-
                 <div class="glass-card p-8 rounded-2xl reveal delay-300 flex flex-col items-center text-center">
-                    <div class="w-14 h-14 bg-white/10 rounded-full flex items-center justify-center mb-6 text-white text-2xl">
-                        🔍
-                    </div>
+                    <div class="w-14 h-14 bg-white/10 rounded-full flex items-center justify-center mb-6 text-white text-2xl">🔍</div>
                     <h3 class="text-xl font-bold mb-3 text-white">Transparansi Total</h3>
-                    <p class="text-gray-400 text-sm leading-relaxed">
-                        Publik dapat mengakses rincian penggunaan anggaran hingga ke sen terakhir.
-                    </p>
+                    <p class="text-gray-400 text-sm leading-relaxed">Publik dapat mengakses rincian penggunaan anggaran hingga ke sen terakhir.</p>
                 </div>
             </div>
 
@@ -115,9 +149,7 @@
                 <div class="glass-card p-10 rounded-3xl border-l-4 border-white text-center md:text-left md:flex items-center gap-8">
                     <div class="flex-1">
                         <h2 class="text-2xl font-bold mb-4">Membangun Kepercayaan</h2>
-                        <p class="text-gray-300">
-                            "Transparansi bukan hanya tentang angka, tetapi tentang tanggung jawab moral kepada publik."
-                        </p>
+                        <p class="text-gray-300">"Transparansi bukan hanya tentang angka, tetapi tentang tanggung jawab moral kepada publik."</p>
                     </div>
                     <div class="mt-6 md:mt-0 flex-shrink-0">
                          @if (Route::has('register'))
@@ -127,20 +159,14 @@
                 </div>
             </div>
         </div>
-
     </main>
 
     <footer class="relative z-10 border-t border-white/10 bg-black/80 backdrop-blur-lg mt-auto">
         <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="text-gray-400 text-sm">
-                &copy; {{ date('Y') }} AllStarCmp. All rights reserved.
-            </div>
-            
+            <div class="text-gray-400 text-sm">&copy; {{ date('Y') }} AllStarCmp. All rights reserved.</div>
             <div class="flex items-center gap-2 text-sm text-gray-500">
                 <span>Developed by</span>
-                <span class="text-white font-semibold px-2 py-1 bg-white/10 rounded-md border border-white/10 hover:bg-white hover:text-black transition-colors cursor-default">
-                    AllStarCmp
-                </span>
+                <span class="text-white font-semibold px-2 py-1 bg-white/10 rounded-md border border-white/10 hover:bg-white hover:text-black transition-colors cursor-default">AllStarCmp</span>
             </div>
         </div>
     </footer>
@@ -152,12 +178,10 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
-
             <div class="text-center mb-12">
                 <h2 class="text-3xl font-black text-gradient-mono uppercase tracking-widest">Our Developers</h2>
                 <div class="h-1 w-20 bg-white mx-auto mt-4"></div>
             </div>
-
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                 @php
                     $developers = [
@@ -167,7 +191,6 @@
                         ['name' => 'Muhammad Hamizan F.I ', 'gif' => 'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3NGExZmJxanBvc2hkNmk4czhlYzN4OTZ6enZ6MjZqN213a3JmdTE0diZlcD12MV9naWZzX3NlYXJjaCZjdD1n/NHglY9vAmvM2GEsblP/giphy.gif', 'ig' => 'https://www.instagram.com/hzftri_?igsh=bjI2ZzUwcWx4emZ6', 'role' => 'UI/UX Dev'],
                     ];
                 @endphp
-
                 @foreach($developers as $dev)
                 <div class="group flex flex-col items-center bg-white/5 border border-white/10 p-6 rounded-2xl hover:bg-white/10 transition-all duration-500 hover:-translate-y-2">
                     <div class="w-full aspect-square mb-6 overflow-hidden rounded-xl border border-white/10 grayscale group-hover:grayscale-0 transition-all duration-700">
@@ -175,23 +198,19 @@
                     </div>
                     <h3 class="text-xl font-bold text-white mb-1 tracking-tight">{{ $dev['name'] }}</h3>
                     <p class="text-gray-400 text-xs uppercase tracking-widest mb-4 font-semibold">{{ $dev['role'] }}</p>
-                    <a href="{{ $dev['ig'] }}" target="_blank" class="w-full text-center py-2 bg-white text-black text-xs font-bold rounded-lg hover:bg-gray-200 transition-colors">
-                        INSTAGRAM
-                    </a>
+                    <a href="{{ $dev['ig'] }}" target="_blank" class="w-full text-center py-2 bg-white text-black text-xs font-bold rounded-lg hover:bg-gray-200 transition-colors">INSTAGRAM</a>
                 </div>
                 @endforeach
             </div>
         </div>
     </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Function untuk mendeteksi elemen saat di-scroll
             const revealElements = document.querySelectorAll('.reveal');
-
             const revealOnScroll = () => {
                 const windowHeight = window.innerHeight;
-                const elementVisible = 150; // Jarak trigger dari bawah
-
+                const elementVisible = 100;
                 revealElements.forEach((reveal) => {
                     const elementTop = reveal.getBoundingClientRect().top;
                     if (elementTop < windowHeight - elementVisible) {
@@ -199,37 +218,29 @@
                     }
                 });
             };
-
-            // Jalankan saat load & scroll
             window.addEventListener('scroll', revealOnScroll);
-            revealOnScroll(); // Trigger sekali di awal jika ada elemen yang sudah terlihat
+            revealOnScroll();
 
-            // // Update logika modal disini //
             const devTrigger = document.getElementById('dev-trigger');
             const devModal = document.getElementById('dev-modal');
             const closeModal = document.getElementById('close-modal');
 
-            // Buka Modal
             devTrigger.addEventListener('click', () => {
                 devModal.classList.remove('hidden');
                 devModal.classList.add('flex');
-                document.body.classList.add('overflow-hidden'); // Kunci scroll layar
+                document.body.classList.add('overflow-hidden');
             });
 
-            // Tutup Modal via Tombol X
             const hideModal = () => {
                 devModal.classList.add('hidden');
                 devModal.classList.remove('flex');
-                document.body.classList.remove('overflow-hidden'); // Aktifkan scroll
+                document.body.classList.remove('overflow-hidden');
             };
 
             closeModal.addEventListener('click', hideModal);
-
-            // Tutup Modal jika klik di luar card (overlay)
             devModal.addEventListener('click', (e) => {
                 if (e.target === devModal) hideModal();
             });
-            // // Berakhir disini //
         });
     </script>
 </body>
