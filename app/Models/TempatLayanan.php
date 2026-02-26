@@ -12,7 +12,56 @@ class TempatLayanan extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['nama', 'slug', 'deskripsi', 'status', 'is_public', 'kode_referral', 'user_id'];
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'nama',
+        'slug',
+        'deskripsi',
+        'status', // 'pending', 'approved', 'rejected'
+        'is_public', // true (publik), false (privat)
+        'kode_referral', // Kode akses jika privat
+        'user_id',
+        
+        // Konfigurasi Logika Kas
+        'use_individual_ledger',
+        'use_mandatory_cash',
+        'shared_expense_enabled',
+        'free_expense_enabled',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'is_public' => 'boolean',
+        'use_individual_ledger' => 'boolean',
+        'use_mandatory_cash' => 'boolean',
+        'shared_expense_enabled' => 'boolean',
+        'free_expense_enabled' => 'boolean',
+    ];
+
+    /**
+     * Method penting untuk Route Model Binding.
+     * Menginstruksikan Laravel untuk menggunakan 'slug' 
+     * daripada 'id' saat mencari data di route.
+     */
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
+
+    // RELATIONS
+
+    public function pages(): HasMany
+    {
+        return $this->hasMany(Page::class);
+    }
 
     public function user(): BelongsTo
     {
@@ -26,6 +75,31 @@ class TempatLayanan extends Model
 
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(User::class);
+        return $this->belongsToMany(User::class, 'tempat_layanan_user', 'tempat_layanan_id', 'user_id');
+    }
+
+    public function kategoriKas(): HasMany
+    {
+        return $this->hasMany(KategoriKas::class);
+    }
+
+    public function anggota(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'tempat_layanan_user');
+    }
+
+    public function getAnggotaCountAttribute(): int
+    {
+        return $this->users()
+            ->where('users.id', '!=', $this->user_id)
+            ->where(function($query) {
+                $query->where('users.is_admin', false)
+                    ->orWhereNull('users.is_admin');
+            })
+            ->where(function($query) {
+                $query->where('users.is_superadmin', false)
+                    ->orWhereNull('users.is_superadmin');
+            })
+            ->count();
     }
 }

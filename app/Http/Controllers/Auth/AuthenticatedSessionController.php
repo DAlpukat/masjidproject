@@ -25,16 +25,32 @@ class AuthenticatedSessionController extends Controller
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
+
         $request->session()->regenerate();
 
-        // Cek Role
+        // --- LOGIKA REDIRECT BERDASARKAN ROLE ---
+
+        // 1. PRIORITY PERTAMA: Superadmin
+        if (auth()->user()->is_superadmin) {
+            return redirect()->route('superadmin.dashboard');
+        }
+
+        // 2. PRIORITY KEDUA: Admin Biasa (Pembuat Kelas)
         if (auth()->user()->is_admin) {
-            // Kalau Admin, lempar ke dashboard admin
             return redirect()->route('admin.dashboard');
         }
 
-        // Kalau User Biasa, lempar ke halaman Home (Form Join Code)
-        return redirect()->route('home');
+        // 3. PRIORITY KETIGA: User Biasa
+        // Cek apakah user sudah gabung kelas apa saja
+        $joinedCount = auth()->user()->joinedPlaces()->count();
+
+        if ($joinedCount > 0) {
+            // Kalau sudah ada room -> Ke Halaman "Ruangan Saya"
+            return redirect()->route('user.rooms');
+        } else {
+            // Kalau belum ada room -> Ke Halaman Home (Cari Kelas)
+            return redirect()->route('home');
+        }
     }
 
     /**
